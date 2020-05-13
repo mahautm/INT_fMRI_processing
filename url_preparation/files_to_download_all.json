@@ -1,5 +1,10 @@
 {
-  "subject": {
+  "rsfMRI": {
+    "pipeline": "cpac",
+    "strategy": "filt_global",
+    "derivative": "alff"
+  },
+  "freesurfer": {
     "label": [
       "BA.ctab",
       "aparc.annot.a2009s.ctab",

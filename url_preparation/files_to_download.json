@@ -1,0 +1,14 @@
+{
+  "rsfMRI": {
+    "pipeline": "cpac",
+    "strategy": "filt_global",
+    "derivative": "alff"
+  },
+  "freesurfer": {
+    "label": [],
+    "mri": ["T1.mgz"],
+    "scripts": [],
+    "stats": [],
+    "surf": ["lh.area", "lh.white", "rh.area", "rh.white"]
+  }
+}
