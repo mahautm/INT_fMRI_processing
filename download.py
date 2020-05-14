@@ -1,5 +1,7 @@
 import os
 import json
+import shutil
+import glob
 
 
 def download_abide_urls(
@@ -29,9 +31,7 @@ def download_abide_urls(
     This function requires the subs_list.json, listing which subjects to consider amongst those found in the .yml here :
     https://github.com/preprocessed-connectomes-project/abide/blob/master/preprocessing/yamls/subs_list.yml
 
-    TODO :  only download files which have not been downloaded in the past
-            add user feedback
-            mkdir only works on LINUX for now
+    TODO : add user feedback
     """
     # opening .json
     subs_list_file = open(subject_list)
@@ -43,8 +43,8 @@ def download_abide_urls(
 
         # Adding rsFMRI file
         cmd = (
-            "wget -q -P {}/{} https://s3.amazonaws.com/fcp-indi/data/Projects/"
-            + "ABIDE_Initiative/Outputs/{}/{}/{}/{}_{}.nii.gz "
+            "wget -c -q -P {}/{} https://s3.amazonaws.com/fcp-indi/data/Projects/"
+            + "ABIDE_Initiative/Outputs/{}/{}/{}/{}_{}.nii.gz"
         ).format(
             destination_folder,
             subs_list[i],
@@ -58,12 +58,48 @@ def download_abide_urls(
 
         # Adding freesurfer directory
         for key in data_list["freesurfer"]:
-            os.system(
-                "mkdir -p {}/{}/{}".format(destination_folder, subs_list[i], key)
-            )  # only works on LINUX
+            os.makedirs("{}/{}/{}".format(destination_folder, subs_list[i], key))
             for file in data_list["freesurfer"][key]:
                 cmd = (
-                    "wget -q -P {}/{}/{} https://s3.amazonaws.com/fcp-indi/data/Projects/ABIDE_Initiative/Outputs/freesurfer/5.1/"
+                    "wget -c -q -P {}/{}/{} https://s3.amazonaws.com/fcp-indi/data/Projects/ABIDE_Initiative/Outputs/freesurfer/5.1/"
                     + "{}/{}/{} "
                 ).format(destination_folder, subs_list[i], key, subs_list[i], key, file)
                 os.system(cmd)
+    subs_list_file.close()
+    data_list_file.close()
+
+
+def split_all(
+    subject_list="./url_preparation/subs_list.json",
+    data_list_files="./url_preparation/files_to_download.json",
+    subject_folder="./rsfMRI_ABIDE",
+):
+    """
+    will only split files for subjects which do not allready have a 'splited' directory
+    in their subject folder.
+
+    TODO : ADD user feedback
+    """
+    subs_list_file = open(subject_list)
+    subs_list = json.load(subs_list_file)
+    data_list_file = open(data_list_files)
+    data_list = json.load(data_list_file)
+
+    for subject in subs_list:
+        destination = "{}/{}/splitted/".format(subject_folder, subject)
+        if not os.path.exists(destination):
+            cmd = "fslsplit {}/{}/{}_{}.nii.gz {}_{}_Res".format(
+                subject_folder,
+                subject,
+                subject,
+                data_list["rsfMRI"]["derivative"],
+                subject,
+                data_list["rsfMRI"]["derivative"],
+            )
+            os.system(cmd)
+
+            os.makedirs(destination)
+            for file in glob.glob(
+                "{}_{}_Res*".format(subject, data_list["rsfMRI"]["derivative"])
+            ):
+                shutil.move(file, destination)
