@@ -58,7 +58,9 @@ def download_abide_urls(
 
         # Adding freesurfer directory
         for key in data_list["freesurfer"]:
-            os.makedirs("{}/{}/{}".format(destination_folder, subs_list[i], key))
+            path = "{}/{}/{}".format(destination_folder, subs_list[i], key)
+            if not os.path.exists(path):
+                os.makedirs(path)
             for file in data_list["freesurfer"][key]:
                 cmd = (
                     "wget -c -q -P {}/{}/{} https://s3.amazonaws.com/fcp-indi/data/Projects/ABIDE_Initiative/Outputs/freesurfer/5.1/"
@@ -103,3 +105,28 @@ def split_all(
                 "{}_{}_Res*".format(subject, data_list["rsfMRI"]["derivative"])
             ):
                 shutil.move(file, destination)
+
+
+def register_all(
+    change_sub_dir=False,
+    subject_list="./url_preparation/subs_list.json",
+    data_list_files="./url_preparation/files_to_download.json",
+    subject_folder="./rsfMRI_ABIDE",
+    contrast="bold",
+):
+    """
+    contrast can be either bold, dti, t2 or t1
+    """
+    subs_list_file = open(subject_list)
+    subs_list = json.load(subs_list_file)
+    data_list_file = open(data_list_files)
+    data_list = json.load(data_list_file)
+
+    if change_sub_dir:
+        os.system("export SUBJECT_DIR=" + subject_folder)
+
+    for subject in subs_list:
+        cmd = "bbregister --s {0} --mov {1}/{0}/{0}_{2}.nii.gz --reg {1}/{0}/{0}_register --{3}".format(
+            subject, subject_folder, data_list["rsfMRI"]["derivative"], contrast
+        )
+        os.system(cmd)

@@ -5,10 +5,17 @@
     "derivative": "func_preproc"
   },
   "freesurfer": {
-    "label": [],
-    "mri": ["T1.mgz"],
+    "label": ["lh.cortex.label", "rh.cortex.label"],
+    "mri": ["T1.mgz", "brainmask.mgz", "orig.mgz"],
     "scripts": [],
     "stats": [],
-    "surf": ["lh.area", "lh.white", "rh.area", "rh.white"]
+    "surf": [
+      "lh.area",
+      "lh.white",
+      "rh.area",
+      "rh.white",
+      "lh.thickness",
+      "rh.thickness"
+    ]
   }
 }
