@@ -112,7 +112,7 @@ def register_all(
     subject_list="./url_preparation/subs_list.json",
     data_list_files="./url_preparation/files_to_download.json",
     subject_folder="./rsfMRI_ABIDE",
-    contrast="bold",
+    contrast="t1",
 ):
     """
     contrast can be either bold, dti, t2 or t1
@@ -122,11 +122,15 @@ def register_all(
     data_list_file = open(data_list_files)
     data_list = json.load(data_list_file)
 
+    cmd_base = ""
     if change_sub_dir:
-        os.system("export SUBJECT_DIR=" + subject_folder)
+        cmd_base = "export SUBJECTS_DIR=" + subject_folder + "&& "
 
     for subject in subs_list:
-        cmd = "bbregister --s {0} --mov {1}/{0}/{0}_{2}.nii.gz --reg {1}/{0}/{0}_register --{3}".format(
-            subject, subject_folder, data_list["rsfMRI"]["derivative"], contrast
+        cmd = (
+            cmd_base
+            + "bbregister --s {0} --mov {1}/{0}/{0}_{2}.nii.gz --reg {1}/{0}/{0}_register --{3}".format(
+                subject, subject_folder, data_list["rsfMRI"]["derivative"], contrast
+            )
         )
         os.system(cmd)
