@@ -54,6 +54,8 @@ def project_all(
                     subject, split_dir
                 )
             )
+    subs_list_file.close()
+    data_list_file.close()
 
 
 def project_epi(
@@ -97,7 +99,6 @@ def correlate_all(
     template="fsaverage5",
     fs_subdir="./rsfMRI_ABIDE",
     subject_list="./url_preparation/subs_list.json",
-    data_list_files="./url_preparation/files_to_download.json",
 ):
     """
 
@@ -116,6 +117,7 @@ def correlate_all(
             correlation(fs_subdir, subject, template, split_dir)
         else:
             print("correlation matrix already exits for {}".format(subject))
+    subs_list_file.close()
 
 
 def correlation(subdir, sub, template, split_dir):
