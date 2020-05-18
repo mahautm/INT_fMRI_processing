@@ -107,7 +107,15 @@ def correlate_all(
 
     for subject in subs_list:
         split_dir = "{}/{}/splitted/".format(fs_subdir, subject)
-        correlation(fs_subdir, subject, template, split_dir)
+        if not os.path.exists(
+            fs_subdir
+            + "/"
+            + subject
+            + "/glm/noisefiltering/correlation_matrix_{}.npy".format(template)
+        ):
+            correlation(fs_subdir, subject, template, split_dir)
+        else:
+            print("correlation matrix already exits for {}".format(subject))
 
 
 def correlation(subdir, sub, template, split_dir):
