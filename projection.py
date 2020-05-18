@@ -25,20 +25,34 @@ def project_all(
 
     for subject in subs_list:
         split_dir = "{}/{}/splitted/".format(fs_subdir, subject)
-        print(split_dir)
-        for file in glob.glob(split_dir + "{}_{}_Res*".format(subject, derivative)):
-            print("in")
-            filename = file[len(split_dir) :]
+        # here we check that no gii have already been built for this subject, that the projection has not allready been attempted
+        if (
+            len(glob.glob(split_dir + "{}_{}_Res*.gii".format(subject, derivative)))
+            == 0
+        ):
 
-            project_epi(
-                fs_subdir,
-                subject,
-                file,
-                filename,
-                split_dir,
-                tgt_subject=template,
-                hem_list=["lh", "rh"],
-                sfwhm=0,
+            for file in glob.glob(
+                split_dir + "{}_{}_Res*.nii.gz".format(subject, derivative)
+            ):
+                print("in")
+                filename = file[len(split_dir) :]
+
+                project_epi(
+                    fs_subdir,
+                    subject,
+                    file,
+                    filename,
+                    split_dir,
+                    tgt_subject=template,
+                    hem_list=["lh", "rh"],
+                    sfwhm=0,
+                )
+                print("projection of {} done".format(subject))
+        else:
+            print(
+                "!! Subject {} already has .gii files generated, if you wish to regenerate .gii files, remove all .gii files from {}\n".format(
+                    subject, split_dir
+                )
             )
 
 
@@ -90,9 +104,6 @@ def correlate_all(
     """
     subs_list_file = open(subject_list)
     subs_list = json.load(subs_list_file)
-    data_list_file = open(data_list_files)
-    data_list = json.load(data_list_file)
-    derivative = data_list["rsfMRI"]["derivative"]
 
     for subject in subs_list:
         split_dir = "{}/{}/splitted/".format(fs_subdir, subject)

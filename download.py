@@ -30,8 +30,6 @@ def download_abide_urls(
 
     This function requires the subs_list.json, listing which subjects to consider amongst those found in the .yml here :
     https://github.com/preprocessed-connectomes-project/abide/blob/master/preprocessing/yamls/subs_list.yml
-
-    TODO : add user feedback
     """
     # opening .json
     subs_list_file = open(subject_list)
@@ -67,6 +65,7 @@ def download_abide_urls(
                     + "{}/{}/{} "
                 ).format(destination_folder, subs_list[i], key, subs_list[i], key, file)
                 os.system(cmd)
+        print("Downloaded all of {}'s required files".format(subs_list[i]))
     subs_list_file.close()
     data_list_file.close()
 
@@ -105,6 +104,9 @@ def split_all(
                 "{}_{}_Res*".format(subject, data_list["rsfMRI"]["derivative"])
             ):
                 shutil.move(file, destination)
+            print("{} split done".format(subject))
+    subs_list_file.close()
+    data_list_file.close()
 
 
 def register_all(
@@ -116,6 +118,8 @@ def register_all(
 ):
     """
     contrast can be either bold, dti, t2 or t1
+    this function will only be called on subjects which have not allready been registered, 
+    by checking they do not have a "_register" file.
     """
     subs_list_file = open(subject_list)
     subs_list = json.load(subs_list_file)
@@ -127,10 +131,15 @@ def register_all(
         cmd_base = "export SUBJECTS_DIR=" + subject_folder + "&& "
 
     for subject in subs_list:
-        cmd = (
-            cmd_base
-            + "bbregister --s {0} --mov {1}/{0}/{0}_{2}.nii.gz --reg {1}/{0}/{0}_register --{3}".format(
-                subject, subject_folder, data_list["rsfMRI"]["derivative"], contrast
+        if not os.path.exists("{1}/{0}/{0}_register".format(subject, subject_folder)):
+            cmd = (
+                cmd_base
+                + "bbregister --s {0} --mov {1}/{0}/{0}_{2}.nii.gz --reg {1}/{0}/{0}_register --{3} --init-spm".format(
+                    subject, subject_folder, data_list["rsfMRI"]["derivative"], contrast
+                )
             )
-        )
-        os.system(cmd)
+
+            os.system(cmd)
+
+    subs_list_file.close()
+    data_list_file.close()
