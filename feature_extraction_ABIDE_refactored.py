@@ -29,6 +29,7 @@ def extract_all_ABIDE(
     subs_list = json.load(subs_list_file)
     data_list_file = open(data_list_files)
     data_list = json.load(data_list_file)
+
     for subject in subs_list:
         download_abide_urls(subject, data_list, destination_folder)
         split(subject, data_list["rsfMRI"]["derivative"], destination_folder)
