@@ -20,9 +20,17 @@ def extract_all_ABIDE(
     template="fsaverage5",
 ):
     """
-    calls all functions, in order, on all subjects.
-    will get all required subject data from json files, 
-    and build the correlation matrices with all required feature extraction steps.
+    calls all feature-extraction functions, in order, on all subjects.
+    requires freesurfer to be setup (tested on v6.0.0-a)
+
+    subject_list is a path to a JSON file listing all subjects to call function on 
+    data_list_files is a path to a JSON file, where required freesurfer data, and fMRI modalities are found
+    destination_folder is the path to the folder where all aquired data will be saved
+    force_destination_folder is a bool that if activated will force SUBJECTS_DIR to be destination folder during registration
+    template must be found in freesurfer's SUBJECTS_DIR
+
+    complet ABIDE subject list may be found here :
+    https://github.com/preprocessed-connectomes-project/abide/blob/master/preprocessing/yamls/subs_list.yml
     """
     # opening .json
     subs_list_file = open(subject_list)
@@ -57,6 +65,7 @@ def download_abide_urls(
     http://preprocessed-connectomes-project.org/abide/download.html
 
     we expect to find in the data_list_files the PATH to a .JSON, which determines
+
         1 : the folowing parameters, once, for the resting state fMRI file of all subjects :
 
             [pipeline] = ccs | cpac | dparsf | niak 
@@ -70,9 +79,6 @@ def download_abide_urls(
         2: which files to download in the freesurfer file tree
     
     each file is then aquired and put in the right folder using wget
-
-    This function requires the subs_list.json, listing which subjects to consider amongst those found in the .yml here :
-    https://github.com/preprocessed-connectomes-project/abide/blob/master/preprocessing/yamls/subs_list.yml
     """
 
     # Adding rsFMRI file
@@ -108,9 +114,12 @@ def split(
     subject, derivative, subject_folder="./rsfMRI_ABIDE",
 ):
     """
-    will only split files for subjects which do not allready have a 'splited' directory
-    in their subject folder.
+    Takes the .nii file found at the root of a given subject's folder in subject_folder
+    will split it temporally into as many .nii files as they are time frames.
+    These new files will be located in the same folder, in a new directory : '/splitted'
 
+    will only split files for subjects which do not allready have a 'splited' directory
+    in their subject folder, to avoid calling the same function on a subject multiple times.
     """
 
     destination = "{}/{}/splitted/".format(subject_folder, subject)
@@ -140,7 +149,15 @@ def register(
     contrast="t1",
 ):
     """
+    this function call bbregister on the .nii file found at the root of each subject's folder
+    it registers the .nii image to match its freesurfer files
+
     contrast can be either bold, dti, t2 or t1
+    derivative may be any found in the ABIDE project :
+        http://preprocessed-connectomes-project.org/abide/download.html
+    change_sub_dir is a bool which will determine wether freesurfer's SUBJECTS_DIR must be forced
+    to the subject_folder value.
+
     this function will only be called on subjects which have not allready been registered, 
     by checking they do not have a "_register" file.
     """
@@ -167,7 +184,7 @@ def project(
     data_list_files="./url_preparation/files_to_download.json",
 ):
     """
-
+    Makes a splitted .nii files into splitted .gii files after checking it has not already been done for a given subject
     """
     split_dir = "{}/{}/splitted/".format(fs_subdir, subject)
     # here we check that no gii have already been built for this subject, that the projection has not allready been attempted
@@ -239,7 +256,7 @@ def check_and_correlate(
     subject, template="fsaverage5", fs_subdir="./rsfMRI_ABIDE",
 ):
     """
-
+    Makes the correlation matrix between ROIs and Voxels only when this step has not already been done for a given subject
     """
     split_dir = "{}/{}/splitted/".format(fs_subdir, subject)
     if not os.path.exists(
@@ -255,7 +272,6 @@ def check_and_correlate(
 
 def correlation(subdir, sub, template, split_dir):
     """"
-    //!! WIP still adapting to ABIDE
     This code allows to compute the correlation bewteen voxels and ROIs.
     It needs a set of labels (annotation files) and gii files.
     The code is decomposed into three phases (procedures)
@@ -439,6 +455,9 @@ def correlation(subdir, sub, template, split_dir):
 
 
 def prepare_matlab(subject, subject_folder="./rsfMRI_ABIDE"):
+    """
+    makes .mat files out of .white files to be used to get the eigenvectors
+    """
     hem_list = ["lh", "rh"]
     for hem in hem_list:
         geom_in = nib.freesurfer.io.read_geometry(
