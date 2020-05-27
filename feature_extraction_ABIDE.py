@@ -15,17 +15,18 @@ from scipy.stats import pearsonr
 def extract_all_ABIDE(
     subject_list="./url_preparation/subs_list.json",
     data_list_files="./url_preparation/files_to_download.json",
-    destination_folder="./rsfMRI_ABIDE",
+    raw_data_path="./rsfMRI_ABIDE",
     force_destination_folder=False,
     template="fsaverage5",
+    processed_data_path="./processed",
 ):
     """
     calls all feature-extraction functions, in order, on all subjects.
     requires freesurfer to be setup (tested on v6.0.0-a)
 
     subject_list is a path to a JSON file listing all subjects to call function on 
-    data_list_files is a path to a JSON file, where required freesurfer data, and fMRI modalities are found
-    destination_folder is the path to the folder where all aquired data will be saved
+    raw_data_path is a path to a JSON file, where required freesurfer data, and fMRI modalities are found
+    raw_data_path is the path to the folder where all aquired data will be saved
     force_destination_folder is a bool that if activated will force SUBJECTS_DIR to be destination folder during registration
     template must be found in freesurfer's SUBJECTS_DIR
 
@@ -39,19 +40,31 @@ def extract_all_ABIDE(
     data_list = json.load(data_list_file)
 
     for subject in subs_list:
-        download_abide_urls(subject, data_list, destination_folder)
-        split(subject, data_list["rsfMRI"]["derivative"], destination_folder)
+        download_abide_urls(subject, data_list, raw_data_path)
+        split(
+            subject,
+            data_list["rsfMRI"]["derivative"],
+            raw_data_path,
+            processed_data_path,
+        )
         register(
             subject,
             data_list["rsfMRI"]["derivative"],
             force_destination_folder,
-            destination_folder,
+            raw_data_path,
+            contrast="t1",
+            out_data=processed_data_path,
         )
         project(
-            subject, data_list["rsfMRI"]["derivative"], template, destination_folder
+            subject,
+            data_list["rsfMRI"]["derivative"],
+            template,
+            raw_data_path,
+            out_dir=processed_data_path,
         )
-        check_and_correlate(template, destination_folder, subject)
-        prepare_matlab(subject, destination_folder)
+        check_and_correlate(template, raw_data_path, subject, processed_data_path)
+        prepare_matlab(subject, raw_data_path, processed_data_path)
+        matlab_find_eig(subject, raw_data_path, ".", ".")
 
     subs_list_file.close()
     data_list_file.close()
@@ -110,9 +123,7 @@ def download_abide_urls(
     print("Downloaded all of {}'s required files".format(subject))
 
 
-def split(
-    subject, derivative, subject_folder="./rsfMRI_ABIDE",
-):
+def split(subject, derivative, subject_folder="./rsfMRI_ABIDE", out_data="./processed"):
     """
     Takes the .nii file found at the root of a given subject's folder in subject_folder
     will split it temporally into as many .nii files as they are time frames.
@@ -122,7 +133,7 @@ def split(
     in their subject folder, to avoid calling the same function on a subject multiple times.
     """
 
-    destination = "{}/{}/splitted/".format(subject_folder, subject)
+    destination = "{}/{}/splitted/".format(out_data, subject)
     if not os.path.exists(destination):
         cmd = "fslsplit {}/{}/{}_{}.nii.gz {}_{}_Res".format(
             subject_folder, subject, subject, derivative, subject, derivative,
@@ -135,7 +146,7 @@ def split(
         print("{} split done\n".format(subject))
     else:
         print(
-            "splitted folder already exists, skipping {} remove floder if you wish to run again \n".format(
+            "splitted folder already exists, skipping {} remove folder if you wish to run again \n".format(
                 subject
             )
         )
@@ -147,9 +158,11 @@ def register(
     change_sub_dir=False,
     subject_folder="./rsfMRI_ABIDE",
     contrast="t1",
+    out_data="./processed",
 ):
     """
-    this function call bbregister on the .nii file found at the root of each subject's folder
+    this function copies the original .nii file to the oudir,
+    then calls bbregister on the .nii file found at the root of each subject's folder
     it registers the .nii image to match its freesurfer files
 
     contrast can be either bold, dti, t2 or t1
@@ -162,14 +175,19 @@ def register(
     by checking they do not have a "_register" file.
     """
     cmd_base = ""
-    if change_sub_dir:
-        cmd_base = "export SUBJECTS_DIR=" + subject_folder + "&& "
+    if not os.path.exists("{1}/{0}/{0}_register".format(subject, out_data)):
+        shutil.copy2(
+            "{1}/{0}/{0}_{2}.nii.gz".format(subject, subject_folder, derivative),
+            "{1}/{0}/{0}_{2}.nii.gz".format(subject, out_data, derivative),
+        )
 
-    if not os.path.exists("{1}/{0}/{0}_register".format(subject, subject_folder)):
+        if change_sub_dir:
+            cmd_base = "export SUBJECTS_DIR=" + subject_folder + "&& "
+
         cmd = (
             cmd_base
             + "bbregister --s {0} --mov {1}/{0}/{0}_{2}.nii.gz --reg {1}/{0}/{0}_register --{3} --init-spm".format(
-                subject, subject_folder, derivative, contrast
+                subject, out_data, derivative, contrast
             )
         )
 
@@ -182,11 +200,12 @@ def project(
     template="fsaverage5",
     fs_subdir="./rsfMRI_ABIDE",
     data_list_files="./url_preparation/files_to_download.json",
+    out_dir="./processed",
 ):
     """
     Makes a splitted .nii files into splitted .gii files after checking it has not already been done for a given subject
     """
-    split_dir = "{}/{}/splitted/".format(fs_subdir, subject)
+    split_dir = "{}/{}/splitted/".format(out_dir, subject)
     # here we check that no gii have already been built for this subject, that the projection has not allready been attempted
     if len(glob.glob(split_dir + "{}_{}_Res*.gii".format(subject, derivative))) == 0:
 
@@ -253,38 +272,38 @@ def project_epi(
 
 
 def check_and_correlate(
-    subject, template="fsaverage5", fs_subdir="./rsfMRI_ABIDE",
+    subject, template="fsaverage5", fs_subdir="./rsfMRI_ABIDE", out_dir="./processed",
 ):
     """
     Makes the correlation matrix between ROIs and Voxels only when this step has not already been done for a given subject
     """
-    split_dir = "{}/{}/splitted/".format(fs_subdir, subject)
+    split_dir = "{}/{}/splitted/".format(out_dir, subject)
     if not os.path.exists(
-        fs_subdir
+        out_dir
         + "/"
         + subject
         + "/glm/noisefiltering/correlation_matrix_{}.npy".format(template)
     ):
-        correlation(fs_subdir, subject, template, split_dir)
+        correlation(fs_subdir, subject, template, split_dir, out_dir)
     else:
         print("correlation matrix already exits for {}".format(subject))
 
 
-def correlation(subdir, sub, template, split_dir):
+def correlation(subdir, sub, template, split_dir, out_dir):
     """"
     This code allows to compute the correlation bewteen voxels and ROIs.
     It needs a set of labels (annotation files) and gii files.
+    the template file must be in subdir with the subjects raw data
     The code is decomposed into three phases (procedures)
         :proc  1: matrix construction of gii file (each line is a voxel, and the column is the j time serie)
         :proc  2: : for each ROI, we save the set of selected voxels based on the annotation file (labels)
         :proc  3: Coorelation matrix, for each voxel we compute their correlation with the average value of each ROI
 
+
     """
     # trgt_fsaverage = "/hpc/soft/freesurfer/freesurfer_6.0.0/subjects/fsaverage/label/"
     # trgt_fsaverage5 = "/hpc/soft/freesurfer/freesurfer_6.0.0/subjects/fsaverage5/label/"
-    trgt = "/usr/local/freesurfer/6.0.0-1/subjects/{}/label/".format(
-        template
-    )  # this all needs to be in a .json so we can deal with it with more ease
+    trgt = "{}/{}/label/".format(subdir, template)
 
     subname = sub
     start = time.time()
@@ -311,14 +330,14 @@ def correlation(subdir, sub, template, split_dir):
         print("Size of Matrix " + hem + ":", gii_matrix.shape)
 
         save_file = (
-            subdir
+            out_dir
             + "/"
             + subname
             + "/glm/noisefiltering/gii_matrix_{}_{}.npy".format(template, hem)
         )
 
-        if not os.path.exists(subdir + "/" + subname + "/glm/noisefiltering/"):
-            os.makedirs(subdir + "/" + subname + "/glm/noisefiltering/")
+        if not os.path.exists(out_dir + "/" + subname + "/glm/noisefiltering/"):
+            os.makedirs(out_dir + "/" + subname + "/glm/noisefiltering/")
 
         np.save(save_file, gii_matrix)
         end = time.time()
@@ -365,7 +384,7 @@ def correlation(subdir, sub, template, split_dir):
         # Save the average matrix of all ROIs
         if hem == "lh":
             file = (
-                subdir
+                out_dir
                 + "/"
                 + subname
                 + "/glm/noisefiltering/roi_avg_lh_{}.npy".format(template)
@@ -373,7 +392,7 @@ def correlation(subdir, sub, template, split_dir):
             np.save(file, roi_avg)
         else:
             file = (
-                subdir
+                out_dir
                 + "/"
                 + subname
                 + "/glm/noisefiltering/roi_avg_rh_{}.npy".format(template)
@@ -395,13 +414,13 @@ def correlation(subdir, sub, template, split_dir):
     """ ""
     print("STEP 3: COMPUTING OF THE CORRELATION MATRIX ")
     roi_avg_lh = np.load(
-        subdir
+        out_dir
         + "/"
         + subname
         + "/glm/noisefiltering/roi_avg_lh_{}.npy".format(template)
     )
     roi_avg_rh = np.load(
-        subdir
+        out_dir
         + "/"
         + subname
         + "/glm/noisefiltering/roi_avg_rh_{}.npy".format(template)
@@ -409,13 +428,13 @@ def correlation(subdir, sub, template, split_dir):
     roi_avg = np.concatenate((roi_avg_lh, roi_avg_rh))
     print("roi avg shape", roi_avg.shape)
     gii_matrix_lh = np.load(
-        subdir
+        out_dir
         + "/"
         + subname
         + "/glm/noisefiltering/gii_matrix_{}_lh.npy".format(template)
     )
     gii_matrix_rh = np.load(
-        subdir
+        out_dir
         + "/"
         + subname
         + "/glm/noisefiltering/gii_matrix_{}_rh.npy".format(template)
@@ -429,7 +448,7 @@ def correlation(subdir, sub, template, split_dir):
             correlation_matrix[n, m] = pearsonr(gii_matrix[n, :], roi_avg[m, :])[0]
     correlation_matrix[np.where(np.isnan(correlation_matrix[:]))] = 0
     file = (
-        subdir
+        out_dir
         + "/"
         + subname
         + "/glm/noisefiltering/correlation_matrix_{}.npy".format(template)
@@ -454,7 +473,7 @@ def correlation(subdir, sub, template, split_dir):
     )
 
 
-def prepare_matlab(subject, subject_folder="./rsfMRI_ABIDE"):
+def prepare_matlab(subject, subject_folder="./rsfMRI_ABIDE", out_dir="./processed"):
     """
     makes .mat files out of .white files to be used to get the eigenvectors
     """
@@ -465,6 +484,17 @@ def prepare_matlab(subject, subject_folder="./rsfMRI_ABIDE"):
         )
         geom_out = np.array((geom_in[0] + 1, geom_in[1] + 1))
         scio.savemat(
-            "{}/{}/surf/{}_{}_white.mat".format(subject_folder, subject, subject, hem),
+            "{}/{}/{}_{}_white.mat".format(out_dir, subject, subject, hem),
             {hem: geom_out},
         )
+
+
+def matlab_find_eig(subject, subject_folder, matlab_runtime_path, script_path="."):
+    """
+    ICI il est peut être plus logique, dans une philosophie modulable,
+    de donner le chemin vers les fichiers .mat plutôt que les noms de sujet ?
+    """
+    cmd = "{}/run_find_eig {} {} {}".format(
+        script_path, matlab_runtime_path, subject, subject_folder
+    )
+    os.system(cmd)
