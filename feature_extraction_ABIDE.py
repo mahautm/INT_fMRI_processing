@@ -15,10 +15,10 @@ from scipy.stats import pearsonr
 def extract_all_ABIDE(
     subject_list="./url_preparation/subs_list.json",
     data_list_files="./url_preparation/files_to_download.json",
-    raw_data_path="./rsfMRI_ABIDE",
+    raw_data_path="./raw_data_ABIDE",
     force_destination_folder=False,
     template="fsaverage5",
-    processed_data_path="./processed",
+    processed_data_path="./processed_ABIDE",
 ):
     """
     calls all feature-extraction functions, in order, on all subjects.
@@ -71,7 +71,7 @@ def extract_all_ABIDE(
 
 
 def download_abide_urls(
-    subject, data_list, destination_folder="./rsfMRI_ABIDE",
+    subject, data_list, destination_folder="./raw_data_ABIDE",
 ):
     """
     Here we build the urls as described by ABIDE documentation here : 
@@ -91,7 +91,8 @@ def download_abide_urls(
 
         2: which files to download in the freesurfer file tree
     
-    each file is then aquired and put in the right folder using wget
+    each file is then aquired and put in the right folder using wget 
+    with '-c', avoiding thatto be downloaded more than once
     """
 
     # Adding rsFMRI file
@@ -123,7 +124,9 @@ def download_abide_urls(
     print("Downloaded all of {}'s required files".format(subject))
 
 
-def split(subject, derivative, subject_folder="./rsfMRI_ABIDE", out_data="./processed"):
+def split(
+    subject, derivative, subject_folder="./raw_data_ABIDE", out_data="./processed_ABIDE"
+):
     """
     Takes the .nii file found at the root of a given subject's folder in subject_folder
     will split it temporally into as many .nii files as they are time frames.
@@ -156,9 +159,9 @@ def register(
     subject,
     derivative,
     change_sub_dir=False,
-    subject_folder="./rsfMRI_ABIDE",
+    subject_folder="./raw_data_ABIDE",
     contrast="t1",
-    out_data="./processed",
+    out_data="./processed_ABIDE",
 ):
     """
     this function copies the original .nii file to the oudir,
@@ -198,9 +201,9 @@ def project(
     subject,
     derivative,
     template="fsaverage5",
-    fs_subdir="./rsfMRI_ABIDE",
+    fs_subdir="./raw_data_ABIDE",
     data_list_files="./url_preparation/files_to_download.json",
-    out_dir="./processed",
+    out_dir="./processed_ABIDE",
 ):
     """
     Makes a splitted .nii files into splitted .gii files after checking it has not already been done for a given subject
@@ -272,7 +275,10 @@ def project_epi(
 
 
 def check_and_correlate(
-    subject, template="fsaverage5", fs_subdir="./rsfMRI_ABIDE", out_dir="./processed",
+    subject,
+    template="fsaverage5",
+    fs_subdir="./raw_data_ABIDE",
+    out_dir="./processed_ABIDE",
 ):
     """
     Makes the correlation matrix between ROIs and Voxels only when this step has not already been done for a given subject
@@ -473,7 +479,9 @@ def correlation(subdir, sub, template, split_dir, out_dir):
     )
 
 
-def prepare_matlab(subject, subject_folder="./rsfMRI_ABIDE", out_dir="./processed"):
+def prepare_matlab(
+    subject, subject_folder="./raw_data_ABIDE", out_dir="./processed_ABIDE"
+):
     """
     makes .mat files out of .white files to be used to get the eigenvectors
     """
@@ -491,8 +499,8 @@ def prepare_matlab(subject, subject_folder="./rsfMRI_ABIDE", out_dir="./processe
 
 def matlab_find_eig(subject, subject_folder, matlab_runtime_path, script_path="."):
     """
-    ICI il est peut être plus logique, dans une philosophie modulable,
-    de donner le chemin vers les fichiers .mat plutôt que les noms de sujet ?
+    ICI il est peut etre plus logique, dans une philosophie modulable,
+    de donner le chemin vers les fichiers .mat plutot que les noms de sujet ?
     """
     cmd = "{}/run_find_eig {} {} {}".format(
         script_path, matlab_runtime_path, subject, subject_folder
