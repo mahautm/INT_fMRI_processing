@@ -60,12 +60,12 @@ def extract_all_abide(
 def extract_one_abide(
     subject,
     data_list,
-    raw_data_path="./raw_data_ABIDE",
+    raw_data_path="/scratch/mmahaut/raw_data_ABIDE",
     force_destination_folder=False,
     template="fsaverage5",
-    processed_data_path="./processed_ABIDE",
-    matlab_runtime_path="/usr/local/MATLAB/MATLAB_Runtime/v95",
-    matlab_script_path="./for_redistribution_files_only",
+    processed_data_path="/scratch/mmahaut/processed_ABIDE",
+    matlab_runtime_path="/scratch/mmahaut/tools/MATLAB/MATLAB_Runtime/v95",
+    matlab_script_path="/scratch/mmahaut/scripts/INT_fMRI_processing/for_redistribution_files_only",
 ):
     download_abide_urls(subject, data_list, raw_data_path)
     register(

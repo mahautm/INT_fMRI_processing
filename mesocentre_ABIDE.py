@@ -5,10 +5,13 @@ import feature_extraction_ABIDE as fea
 import json
 
 email = "mmahaut@ensc.fr"
-logs_dir = ""
+logs_dir = "/scratch/mmahaut/scripts/logs"
 python_path = ""
-code_dir = ""
-subs_list_file_path = "./url_preparation/subs_list.json"
+code_dir = "/scratch/mmahaut/scripts/INT_fMRI_processing"
+subs_list_file_path = (
+    "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list.json"
+)
+script_name = "feature_extraction_ABIDE.py"
 
 subs_list_file = open(subs_list_file_path)
 subject_list = json.load(subs_list_file)
@@ -37,9 +40,6 @@ for subject in subject_list:
         fh.writelines("#SBATCH --mail-type=BEGIN,END\n")
         fh.writelines("#SBATCH --mail-user={}\n".format(email))
         # making sure group is ok for data sharing within group
-        fh.writelines("newgrp b125\n")
-        # command to be executed
-        script_name = "localizer_parallel_gsvc.py"
         batch_cmd = "{} {}/{} {}".format(python_path, code_dir, script_name, subject)
         fh.writelines(batch_cmd)
 
