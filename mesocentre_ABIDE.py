@@ -20,13 +20,6 @@ for subject in subject_list:
     create_slurmjob_cmd = "touch {}".format(slurmjob_path)
     os.system(create_slurmjob_cmd)
 
-    # processing_graph_dir = op.join(
-    #     root_dir,
-    #     "graph-based_analysis",
-    #     "{}.{}.{}p_cf{:.01f}".format(hemisphere, roi, n_parcels, cf_w),
-    # )
-    # inputs_path = op.join(processing_graph_dir, "inputs.jl")
-
     # write arguments into the slurmjob file
     with open(slurmjob_path, "w") as fh:
         fh.writelines("#!/bin/sh\n")
