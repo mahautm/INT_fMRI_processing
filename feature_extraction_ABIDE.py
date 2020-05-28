@@ -19,6 +19,8 @@ def extract_all_ABIDE(
     force_destination_folder=False,
     template="fsaverage5",
     processed_data_path="./processed_ABIDE",
+    matlab_runtime_path="/usr/local/MATLAB/MATLAB_Runtime/v95",
+    matlab_script_path="./for_redistribution_files_only",
 ):
     """
     calls all feature-extraction functions, in order, on all subjects.
@@ -41,12 +43,6 @@ def extract_all_ABIDE(
 
     for subject in subs_list:
         download_abide_urls(subject, data_list, raw_data_path)
-        split(
-            subject,
-            data_list["rsfMRI"]["derivative"],
-            raw_data_path,
-            processed_data_path,
-        )
         register(
             subject,
             data_list["rsfMRI"]["derivative"],
@@ -55,6 +51,13 @@ def extract_all_ABIDE(
             contrast="t1",
             out_data=processed_data_path,
         )
+
+        split(
+            subject,
+            data_list["rsfMRI"]["derivative"],
+            raw_data_path,
+            processed_data_path,
+        )
         project(
             subject,
             data_list["rsfMRI"]["derivative"],
@@ -62,9 +65,14 @@ def extract_all_ABIDE(
             raw_data_path,
             out_dir=processed_data_path,
         )
-        check_and_correlate(template, raw_data_path, subject, processed_data_path)
+        check_and_correlate(subject, template, raw_data_path, processed_data_path)
         prepare_matlab(subject, raw_data_path, processed_data_path)
-        matlab_find_eig(subject, raw_data_path, ".", ".")
+        matlab_find_eig(
+            subject,
+            raw_data_path + "/" + subject,
+            matlab_runtime_path,
+            matlab_script_path,
+        )
 
     subs_list_file.close()
     data_list_file.close()
@@ -124,37 +132,6 @@ def download_abide_urls(
     print("Downloaded all of {}'s required files".format(subject))
 
 
-def split(
-    subject, derivative, subject_folder="./raw_data_ABIDE", out_data="./processed_ABIDE"
-):
-    """
-    Takes the .nii file found at the root of a given subject's folder in subject_folder
-    will split it temporally into as many .nii files as they are time frames.
-    These new files will be located in the same folder, in a new directory : '/splitted'
-
-    will only split files for subjects which do not allready have a 'splited' directory
-    in their subject folder, to avoid calling the same function on a subject multiple times.
-    """
-
-    destination = "{}/{}/splitted/".format(out_data, subject)
-    if not os.path.exists(destination):
-        cmd = "fslsplit {}/{}/{}_{}.nii.gz {}_{}_Res".format(
-            subject_folder, subject, subject, derivative, subject, derivative,
-        )
-        os.system(cmd)
-
-        os.makedirs(destination)
-        for file in glob.glob("{}_{}_Res*".format(subject, derivative)):
-            shutil.move(file, destination)
-        print("{} split done\n".format(subject))
-    else:
-        print(
-            "splitted folder already exists, skipping {} remove folder if you wish to run again \n".format(
-                subject
-            )
-        )
-
-
 def register(
     subject,
     derivative,
@@ -195,6 +172,37 @@ def register(
         )
 
         os.system(cmd)
+
+
+def split(
+    subject, derivative, subject_folder="./raw_data_ABIDE", out_data="./processed_ABIDE"
+):
+    """
+    Takes the .nii file found at the root of a given subject's folder in subject_folder
+    will split it temporally into as many .nii files as they are time frames.
+    These new files will be located in the same folder, in a new directory : '/splitted'
+
+    will only split files for subjects which do not allready have a 'splited' directory
+    in their subject folder, to avoid calling the same function on a subject multiple times.
+    """
+
+    destination = "{}/{}/splitted/".format(out_data, subject)
+    if not os.path.exists(destination):
+        cmd = "fslsplit {}/{}/{}_{}.nii.gz {}_{}_Res".format(
+            subject_folder, subject, subject, derivative, subject, derivative,
+        )
+        os.system(cmd)
+
+        os.makedirs(destination)
+        for file in glob.glob("{}_{}_Res*".format(subject, derivative)):
+            shutil.move(file, destination)
+        print("{} split done\n".format(subject))
+    else:
+        print(
+            "splitted folder already exists, skipping {} remove folder if you wish to run again \n".format(
+                subject
+            )
+        )
 
 
 def project(
@@ -497,12 +505,12 @@ def prepare_matlab(
         )
 
 
-def matlab_find_eig(subject, subject_folder, matlab_runtime_path, script_path="."):
+def matlab_find_eig(subject, subject_folder, matlab_runtime_path, script_path):
     """
-    ICI il est peut etre plus logique, dans une philosophie modulable,
-    de donner le chemin vers les fichiers .mat plutot que les noms de sujet ?
+    Calls on spangy to build a map of girifications
     """
-    cmd = "{}/run_find_eig {} {} {}".format(
+
+    cmd = "{}/run_find_eig.sh {} {} {}".format(
         script_path, matlab_runtime_path, subject, subject_folder
     )
     os.system(cmd)
