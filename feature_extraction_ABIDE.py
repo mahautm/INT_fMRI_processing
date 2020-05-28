@@ -1,6 +1,6 @@
 # TODO : Better Comments
-
 import os
+import sys
 import json
 import shutil
 import glob
@@ -12,7 +12,7 @@ import time
 from scipy.stats import pearsonr
 
 
-def extract_all_ABIDE(
+def extract_all_abide(
     subject_list="./url_preparation/subs_list.json",
     data_list_files="./url_preparation/files_to_download.json",
     raw_data_path="./raw_data_ABIDE",
@@ -42,40 +42,56 @@ def extract_all_ABIDE(
     data_list = json.load(data_list_file)
 
     for subject in subs_list:
-        download_abide_urls(subject, data_list, raw_data_path)
-        register(
+        extract_one_abide(
             subject,
-            data_list["rsfMRI"]["derivative"],
+            data_list,
+            raw_data_path,
             force_destination_folder,
-            raw_data_path,
-            contrast="t1",
-            out_data=processed_data_path,
-        )
-
-        split(
-            subject,
-            data_list["rsfMRI"]["derivative"],
-            raw_data_path,
-            processed_data_path,
-        )
-        project(
-            subject,
-            data_list["rsfMRI"]["derivative"],
             template,
-            raw_data_path,
-            out_dir=processed_data_path,
-        )
-        check_and_correlate(subject, template, raw_data_path, processed_data_path)
-        prepare_matlab(subject, raw_data_path, processed_data_path)
-        matlab_find_eig(
-            subject,
-            raw_data_path + "/" + subject,
+            processed_data_path,
             matlab_runtime_path,
             matlab_script_path,
         )
 
     subs_list_file.close()
     data_list_file.close()
+
+
+def extract_one_abide(
+    subject,
+    data_list,
+    raw_data_path="./raw_data_ABIDE",
+    force_destination_folder=False,
+    template="fsaverage5",
+    processed_data_path="./processed_ABIDE",
+    matlab_runtime_path="/usr/local/MATLAB/MATLAB_Runtime/v95",
+    matlab_script_path="./for_redistribution_files_only",
+):
+    download_abide_urls(subject, data_list, raw_data_path)
+    register(
+        subject,
+        data_list["rsfMRI"]["derivative"],
+        force_destination_folder,
+        raw_data_path,
+        contrast="t1",
+        out_data=processed_data_path,
+    )
+
+    split(
+        subject, data_list["rsfMRI"]["derivative"], raw_data_path, processed_data_path,
+    )
+    project(
+        subject,
+        data_list["rsfMRI"]["derivative"],
+        template,
+        raw_data_path,
+        out_dir=processed_data_path,
+    )
+    check_and_correlate(subject, template, raw_data_path, processed_data_path)
+    prepare_matlab(subject, raw_data_path, processed_data_path)
+    matlab_find_eig(
+        subject, raw_data_path + "/" + subject, matlab_runtime_path, matlab_script_path,
+    )
 
 
 def download_abide_urls(
@@ -514,3 +530,12 @@ def matlab_find_eig(subject, subject_folder, matlab_runtime_path, script_path):
         script_path, matlab_runtime_path, subject, subject_folder
     )
     os.system(cmd)
+
+
+if __name__ == "__main__":
+    # execute only if run as a script
+    data_list_files = ("./url_preparation/files_to_download.json",)
+    data_list_file = open(data_list_files)
+    data_list = json.load(data_list_file)
+
+    extract_one_abide(sys.argv[1], data_list)
