@@ -7,6 +7,7 @@ import json
 email = "mmahaut@ensc.fr"
 logs_dir = "/scratch/mmahaut/scripts/logs"
 python_path = "python3.7"
+slurm_dir = "/scratch/mmahaut/scripts/slurm"
 code_dir = "/scratch/mmahaut/scripts/INT_fMRI_processing"
 subs_list_file_path = (
     "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list.json"
@@ -19,7 +20,7 @@ subject_list = json.load(subs_list_file)
 
 for subject in subject_list:
     job_name = "{}_extraction".format(subject)
-    slurmjob_path = op.join(logs_dir, "{}.sh".format(job_name))
+    slurmjob_path = op.join(slurm_dir, "{}.sh".format(job_name))
     create_slurmjob_cmd = "touch {}".format(slurmjob_path)
     os.system(create_slurmjob_cmd)
 
