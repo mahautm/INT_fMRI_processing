@@ -40,7 +40,11 @@ for subject in subject_list:
         fh.writelines("#SBATCH --mail-type=BEGIN,END\n")
         fh.writelines("#SBATCH --mail-user={}\n".format(email))
         # making sure group is ok for data sharing within group
-        batch_cmd = "{} {}/{} {}".format(python_path, code_dir, script_name, subject)
+        "/scratch/mmahaut/tools/Anaconda3/bin/conda activate ABIDE"
+        batch_cmd = (
+            "/scratch/mmahaut/tools/Anaconda3/bin/conda activate ABIDE\n"
+            + "{} {}/{} {}".format(python_path, code_dir, script_name, subject)
+        )
         fh.writelines(batch_cmd)
 
     os.system("sbatch %s" % slurmjob_path)
