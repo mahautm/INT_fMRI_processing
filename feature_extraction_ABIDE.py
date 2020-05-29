@@ -533,7 +533,7 @@ def matlab_find_eig(subject, subject_folder, matlab_runtime_path, script_path):
 
 if __name__ == "__main__":
     # execute only if run as a script
-    data_list_files = ("/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/files_to_download.json",)
+    data_list_files = "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/files_to_download.json"
     data_list_file = open(data_list_files)
     data_list = json.load(data_list_file)
 
