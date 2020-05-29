@@ -19,11 +19,8 @@ subject_list = json.load(subs_list_file)
 
 
 for subject in subject_list:
-    job_name = "{}_{}".format(subject,datetime.time())
+    job_name = "{}_{}".format(subject, datetime.time())
     slurmjob_path = op.join(slurm_dir, "{}.sh".format(job_name))
-    if op.exists(slurmjob_path):
-        op.
-
     create_slurmjob_cmd = "touch {}".format(slurmjob_path)
     os.system(create_slurmjob_cmd)
 
@@ -45,7 +42,8 @@ for subject in subject_list:
         fh.writelines("#SBATCH --mail-user={}\n".format(email))
         # making sure group is ok for data sharing within group
         batch_cmd = (
-            'eval "$(/scratch/mmahaut/tools/Anaconda3/bin/conda shell.bash hook)"'
+            ""
+            'eval "$(/scratch/mmahaut/tools/Anaconda3/bin/conda shell.bash hook)"\n'
             + "conda activate ABIDE\n"
             + "{} {}/{} {}".format(python_path, code_dir, script_name, subject)
         )
