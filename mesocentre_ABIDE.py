@@ -6,7 +6,7 @@ import json
 
 email = "mmahaut@ensc.fr"
 logs_dir = "/scratch/mmahaut/scripts/logs"
-python_path = ""
+python_path = "/scratch/mmahaut/tools/Anaconda3/bin/python3.7"
 code_dir = "/scratch/mmahaut/scripts/INT_fMRI_processing"
 subs_list_file_path = (
     "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list.json"
