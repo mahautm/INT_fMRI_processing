@@ -170,6 +170,10 @@ def register(
     by checking they do not have a "_register" file.
     """
     cmd_base = ""
+    if not os.path.exists(out_data) or not os.path.exists(
+        os.path.join(out_data, subject)
+    ):
+        os.makedirs(os.path.join(out_data, subject))
     if not os.path.exists("{1}/{0}/{0}_register".format(subject, out_data)):
         shutil.copy2(
             "{1}/{0}/{0}_{2}.nii.gz".format(subject, subject_folder, derivative),
