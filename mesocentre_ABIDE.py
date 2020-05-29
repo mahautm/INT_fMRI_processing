@@ -19,8 +19,11 @@ subject_list = json.load(subs_list_file)
 
 
 for subject in subject_list:
-    job_name = "{}_extraction".format(subject)
+    job_name = "{}_{}".format(subject,datetime.time())
     slurmjob_path = op.join(slurm_dir, "{}.sh".format(job_name))
+    if op.exists(slurmjob_path):
+        op.
+
     create_slurmjob_cmd = "touch {}".format(slurmjob_path)
     os.system(create_slurmjob_cmd)
 
