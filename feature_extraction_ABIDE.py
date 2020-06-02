@@ -77,7 +77,7 @@ def extract_one_abide(
     )
 
     split(
-        subject, data_list["rsfMRI"]["derivative"], raw_data_path, processed_data_path,
+        subject, data_list["rsfMRI"]["derivative"], processed_data_path,
     )
     project(
         subject,
@@ -193,9 +193,7 @@ def register(
         os.system(cmd)
 
 
-def split(
-    subject, derivative, subject_folder="./raw_data_ABIDE", out_data="./processed_ABIDE"
-):
+def split(subject, derivative, out_data="./processed_ABIDE"):
     """
     Takes the .nii file found at the root of a given subject's folder in subject_folder
     will split it temporally into as many .nii files as they are time frames.
@@ -208,7 +206,7 @@ def split(
     destination = "{}/{}/splitted/".format(out_data, subject)
     if not os.path.exists(destination):
         cmd = "fslsplit {}/{}/{}_{}.nii.gz {}_{}_Res".format(
-            subject_folder, subject, subject, derivative, subject, derivative,
+            out_data, subject, subject, derivative, subject, derivative,
         )
         os.system(cmd)
 
