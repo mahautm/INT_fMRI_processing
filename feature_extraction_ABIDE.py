@@ -89,7 +89,10 @@ def extract_one_abide(
     check_and_correlate(subject, template, raw_data_path, processed_data_path)
     prepare_matlab(subject, raw_data_path, processed_data_path)
     matlab_find_eig(
-        subject, raw_data_path + "/" + subject, matlab_runtime_path, matlab_script_path,
+        subject,
+        processed_data_path + "/" + subject,
+        matlab_runtime_path,
+        matlab_script_path,
     )
 
 
