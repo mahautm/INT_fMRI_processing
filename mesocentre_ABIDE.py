@@ -19,7 +19,7 @@ subject_list = json.load(subs_list_file)
 
 
 for subject in subject_list:
-    job_name = "{}_{}".format(subject, datetime.time())
+    job_name = "{}_{}".format(subject, datetime.datetime.now())
     slurmjob_path = op.join(slurm_dir, "{}.sh".format(job_name))
     create_slurmjob_cmd = "touch {}".format(slurmjob_path)
     os.system(create_slurmjob_cmd)
@@ -42,7 +42,7 @@ for subject in subject_list:
         fh.writelines("#SBATCH --mail-user={}\n".format(email))
         # making sure group is ok for data sharing within group
         batch_cmd = (
-            ""
+            "chmod +x /scratch/mmahaut/scripts/INT_fMRI_processing/for_redistribution_files_only/run_find_eig.sh\n"
             'eval "$(/scratch/mmahaut/tools/Anaconda3/bin/conda shell.bash hook)"\n'
             + "conda activate ABIDE\n"
             + "{} {}/{} {}".format(python_path, code_dir, script_name, subject)

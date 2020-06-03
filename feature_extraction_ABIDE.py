@@ -351,7 +351,7 @@ def correlation(subdir, sub, template, split_dir, out_dir):
         print("load of " + hem + ".gifti files")
         for load_file in glob.glob(split_dir + "*{}_{}.gii".format(hem, template)):
             filename = load_file
-            gii = ng.read(filename)
+            gii = nib.load(filename)
             data = np.array([gii.darrays[0].data])
             if gii_matrix.shape == ():
                 gii_matrix = data
