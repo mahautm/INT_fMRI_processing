@@ -169,18 +169,21 @@ def compute_rfMRI_features(
     force_destination_folder=False,
     template="fsaverage5",
     processed_data_path="/scratch/mmahaut/data/abide/features_rsfMRI",
+    intermediary_data_path="/scratch/mmahaut/data/abide/intermediary",
 ):
     split(
-        subject, data_list["rsfMRI"]["derivative"], processed_data_path,
+        subject, data_list["rsfMRI"]["derivative"], intermediary_data_path,
     )
     project(
         subject,
         data_list["rsfMRI"]["derivative"],
         template,
         raw_data_path,
-        out_dir=processed_data_path,
+        out_dir=intermediary_data_path,
     )
-    check_and_correlate(subject, template, raw_data_path, processed_data_path)
+    check_and_correlate(
+        subject, template, raw_data_path, intermediary_data_path, processed_data_path
+    )
 
 
 def compute_gyrification_features(
@@ -189,11 +192,12 @@ def compute_gyrification_features(
     processed_data_path="/scratch/mmahaut/data/abide/features_gyrification",
     matlab_runtime_path="/usr/local/MATLAB/MATLAB_Runtime/v95",
     matlab_script_path="./for_redistribution_files_only",
+    intermediary_data_path="/scratch/mmahaut/data/abide/intermediary",
 ):
-    prepare_matlab(subject, raw_data_path, processed_data_path)
+    prepare_matlab(subject, raw_data_path, intermediary_data_path)
     matlab_find_eig(
         subject,
-        processed_data_path + "/" + subject,
+        intermediary_data_path + "/" + subject,
         matlab_runtime_path,
         matlab_script_path,
     )
@@ -440,24 +444,22 @@ def check_and_correlate(
     subject,
     template="fsaverage5",
     fs_subdir="./raw_data_ABIDE",
+    intermediary_dir="./intermediary_data",
     out_dir="./processed_ABIDE",
 ):
     """
     Makes the correlation matrix between ROIs and Voxels only when this step has not already been done for a given subject
     """
-    split_dir = "{}/{}/splitted/".format(out_dir, subject)
+    split_dir = "{}/{}/splitted/".format(intermediary_dir, subject)
     if not os.path.exists(
-        out_dir
-        + "/"
-        + subject
-        + "/glm/noisefiltering/correlation_matrix_{}.npy".format(template)
+        out_dir + "/correlation_matrix_{}_{}.npy".format(template, subject)
     ):
-        correlation(fs_subdir, subject, template, split_dir, out_dir)
+        correlation(fs_subdir, subject, template, split_dir, intermediary_dir, out_dir)
     else:
         print("correlation matrix already exits for {}".format(subject))
 
 
-def correlation(subdir, sub, template, split_dir, out_dir):
+def correlation(subdir, sub, template, split_dir, intermediary_dir, out_dir):
     """"
     This code allows to compute the correlation bewteen voxels and ROIs.
     It needs a set of labels (annotation files) and gii files.
@@ -498,14 +500,16 @@ def correlation(subdir, sub, template, split_dir, out_dir):
         print("Size of Matrix " + hem + ":", gii_matrix.shape)
 
         save_file = (
-            out_dir
+            intermediary_dir
             + "/"
             + subname
             + "/glm/noisefiltering/gii_matrix_{}_{}.npy".format(template, hem)
         )
 
-        if not os.path.exists(out_dir + "/" + subname + "/glm/noisefiltering/"):
-            os.makedirs(out_dir + "/" + subname + "/glm/noisefiltering/")
+        if not os.path.exists(
+            intermediary_dir + "/" + subname + "/glm/noisefiltering/"
+        ):
+            os.makedirs(intermediary_dir + "/" + subname + "/glm/noisefiltering/")
 
         np.save(save_file, gii_matrix)
         end = time.time()
@@ -552,7 +556,7 @@ def correlation(subdir, sub, template, split_dir, out_dir):
         # Save the average matrix of all ROIs
         if hem == "lh":
             file = (
-                out_dir
+                intermediary_dir
                 + "/"
                 + subname
                 + "/glm/noisefiltering/roi_avg_lh_{}.npy".format(template)
@@ -560,7 +564,7 @@ def correlation(subdir, sub, template, split_dir, out_dir):
             np.save(file, roi_avg)
         else:
             file = (
-                out_dir
+                intermediary_dir
                 + "/"
                 + subname
                 + "/glm/noisefiltering/roi_avg_rh_{}.npy".format(template)
@@ -582,13 +586,13 @@ def correlation(subdir, sub, template, split_dir, out_dir):
     """ ""
     print("STEP 3: COMPUTING OF THE CORRELATION MATRIX ")
     roi_avg_lh = np.load(
-        out_dir
+        intermediary_dir
         + "/"
         + subname
         + "/glm/noisefiltering/roi_avg_lh_{}.npy".format(template)
     )
     roi_avg_rh = np.load(
-        out_dir
+        intermediary_dir
         + "/"
         + subname
         + "/glm/noisefiltering/roi_avg_rh_{}.npy".format(template)
@@ -596,13 +600,13 @@ def correlation(subdir, sub, template, split_dir, out_dir):
     roi_avg = np.concatenate((roi_avg_lh, roi_avg_rh))
     print("roi avg shape", roi_avg.shape)
     gii_matrix_lh = np.load(
-        out_dir
+        intermediary_dir
         + "/"
         + subname
         + "/glm/noisefiltering/gii_matrix_{}_lh.npy".format(template)
     )
     gii_matrix_rh = np.load(
-        out_dir
+        intermediary_dir
         + "/"
         + subname
         + "/glm/noisefiltering/gii_matrix_{}_rh.npy".format(template)
@@ -615,12 +619,7 @@ def correlation(subdir, sub, template, split_dir, out_dir):
         for m in range(roi_avg.shape[0]):
             correlation_matrix[n, m] = pearsonr(gii_matrix[n, :], roi_avg[m, :])[0]
     correlation_matrix[np.where(np.isnan(correlation_matrix[:]))] = 0
-    file = (
-        out_dir
-        + "/"
-        + subname
-        + "/glm/noisefiltering/correlation_matrix_{}.npy".format(template)
-    )
+    file = out_dir + "/correlation_matrix_{}_{}.npy".format(template, subname)
     np.save(file, correlation_matrix)
     print("********** Results: **********")
     print("Dimensions of the correlation Matrix:", correlation_matrix.shape)
