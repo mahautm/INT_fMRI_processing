@@ -1,3 +1,12 @@
+"""
+Filename : feature_extraction_ABIDE.pt
+Created Date : 20/05/2020
+Last Edited : 03/06/2020
+Author : Mateo MAHAUT (mmahaut@ensc.fr) 
+Git : https://github.com/mahautm/INT_fMRI_processing.git
+
+"""
+
 import os
 import sys
 import json
@@ -23,14 +32,34 @@ def extract_all_abide(
 ):
     """
     calls all feature-extraction functions, in order, on all subjects.
-    requires freesurfer to be setup (tested on v6.0.0-a)
+    requires freesurfer to be setup (tested on v6.0.0-a), as well as FSL and matlab runtime
 
-    subject_list is a path to a JSON file listing all subjects to call function on 
-    raw_data_path is a path to a JSON file, where required freesurfer data, and fMRI modalities are found
-    raw_data_path is the path to the folder where all aquired data will be saved
-    force_destination_folder is a bool that if activated will force SUBJECTS_DIR to be destination folder during registration
-    template must be found in freesurfer's SUBJECTS_DIR
+    Parameters
+    ----------
 
+    subject_list : string path to file ("./url_preparation/subs_list.json" by default)
+    is a path to a JSON file listing all subjects to call function on 
+
+    data_list_files : string path to file ("./url_preparation/files_to_download.json" by default)
+    is a path to a JSON file, where required freesurfer data, and fMRI modalities are found
+    
+    raw_data_path : string path to file ("./raw_data_ABIDE" by default)
+    is the path to the folder where all aquired data will be saved
+    
+    force_destination_folder :  boolean, optional, default False
+    is a bool that if activated will force SUBJECTS_DIR to be destination folder during registration
+    
+    template : ("fsaverage5" by default)
+    must be found in freesurfer's SUBJECTS_DIR
+    
+    processed_data_path : string path to file ("./processed_ABIDE" by default)
+    
+    matlab_runtime_path : string path to file ("/usr/local/MATLAB/MATLAB_Runtime/v95" by default)
+    
+    matlab_script_path : string path to file ("./for_redistribution_files_only" by default)
+
+    Notes : 
+    -----
     complet ABIDE subject list may be found here :
     https://github.com/preprocessed-connectomes-project/abide/blob/master/preprocessing/yamls/subs_list.yml
     """
@@ -59,23 +88,88 @@ def extract_all_abide(
 def extract_one_abide(
     subject,
     data_list,
-    raw_data_path="/scratch/mmahaut/raw_data_ABIDE",
+    raw_data_path="/scratch/mmahaut/data/abide/downloaded_preprocessed",
     force_destination_folder=False,
     template="fsaverage5",
-    processed_data_path="/scratch/mmahaut/processed_ABIDE",
+    rfmri_features_data_path="/scratch/mmahaut/data/abide/features_rsfMRI",
+    gyrification_features_data_path="/scratch/mmahaut/data/abide/features_gyrification",
     matlab_runtime_path="/scratch/mmahaut/tools/MATLAB_Runtime/v95",
     matlab_script_path="/scratch/mmahaut/scripts/INT_fMRI_processing/for_redistribution_files_only",
 ):
+    """
+    calls all feature-extraction functions, in order, on all subjects.
+    requires freesurfer to be setup (tested on v6.0.0-a), as well as FSL and matlab runtime
+
+    Parameters
+    ----------
+
+    subject : string, subject name
+    subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
+
+    data_list : a dictionary folowint this architecture
+        ['rsfMRI']
+
+            ['pipeline'] = ccs | cpac | dparsf | niak 
+            ['strategy'] = filt_global | filt_noglobal | nofilt_global | nofilt_noglobal
+            ['file identifier'] = the FILE_ID value from the summary spreadsheet
+            ['derivative'] = alff | degree_binarize | degree_weighted | dual_regression | ... 
+                eigenvector_binarize | eigenvector_weighted | falff | func_mask | ... 
+                func_mean | func_preproc | lfcd | reho | rois_aal | rois_cc200 | ... 
+                rois_cc400 | rois_dosenbach160 | rois_ez | rois_ho | rois_tt | vmhc
+
+        ['freesurfer']
+            ['labels'] = table of files to download
+            ['mri'] = table of files to download
+            ['scripts'] = table of files to download
+            ['surf'] = table of files to download
+            ['stats'] = table of files to download
+    
+    raw_data_path : string path to file ("./raw_data_ABIDE" by default)
+    is the path to the folder where all aquired data will be saved
+    
+    force_destination_folder :  boolean, optional, default False
+    is a bool that if activated will force SUBJECTS_DIR to be destination folder during registration
+    
+    template : ("fsaverage5" by default)
+    must be found in freesurfer's SUBJECTS_DIR
+    
+    processed_data_path : string path to file ("./processed_ABIDE" by default)
+    
+    matlab_runtime_path : string path to file ("/usr/local/MATLAB/MATLAB_Runtime/v95" by default)
+    
+    matlab_script_path : string path to file ("./for_redistribution_files_only" by default)
+
+    Notes : 
+    -----
+    complet ABIDE subject list may be found here :
+    https://github.com/preprocessed-connectomes-project/abide/blob/master/preprocessing/yamls/subs_list.yml
+    """
     download_abide_urls(subject, data_list, raw_data_path)
-    register(
+    compute_rfMRI_features(
         subject,
-        data_list["rsfMRI"]["derivative"],
-        force_destination_folder,
+        data_list,
         raw_data_path,
-        contrast="t1",
-        out_data=processed_data_path,
+        force_destination_folder,
+        template,
+        rfmri_features_data_path,
+    )
+    compute_gyrification_features(
+        subject,
+        raw_data_path,
+        gyrification_features_data_path,
+        matlab_runtime_path,
+        matlab_script_path,
     )
 
+
+def compute_rfMRI_features(
+    subject,
+    data_list,
+    raw_data_path="/scratch/mmahaut/data/abide/downloaded_preprocessed",
+    force_destination_folder=False,
+    template="fsaverage5",
+    processed_data_path="/scratch/mmahaut/data/abide/features_rsfMRI",
+):
     split(
         subject, data_list["rsfMRI"]["derivative"], processed_data_path,
     )
@@ -87,6 +181,15 @@ def extract_one_abide(
         out_dir=processed_data_path,
     )
     check_and_correlate(subject, template, raw_data_path, processed_data_path)
+
+
+def compute_gyrification_features(
+    subject,
+    raw_data_path="/scratch/mmahaut/raw_data_ABIDE",
+    processed_data_path="/scratch/mmahaut/data/abide/features_gyrification",
+    matlab_runtime_path="/usr/local/MATLAB/MATLAB_Runtime/v95",
+    matlab_script_path="./for_redistribution_files_only",
+):
     prepare_matlab(subject, raw_data_path, processed_data_path)
     matlab_find_eig(
         subject,
@@ -100,25 +203,37 @@ def download_abide_urls(
     subject, data_list, destination_folder="./raw_data_ABIDE",
 ):
     """
-    Here we build the urls as described by ABIDE documentation here : 
-    http://preprocessed-connectomes-project.org/abide/download.html
+    Here we build the urls, each file is then aquired and put in the right folder using wget 
 
-    we expect to find in the data_list_files the PATH to a .JSON, which determines
+    Parameters : 
+    ----------
+    subject : string, subject name
+    subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
 
-        1 : the folowing parameters, once, for the resting state fMRI file of all subjects :
+    data_list : a dictionary folowint this architecture
+        ['rsfMRI']
 
-            [pipeline] = ccs | cpac | dparsf | niak 
-            [strategy] = filt_global | filt_noglobal | nofilt_global | nofilt_noglobal
-            [file identifier] = the FILE_ID value from the summary spreadsheet
-            [derivative] = alff | degree_binarize | degree_weighted | dual_regression | ... 
+            ['pipeline'] = ccs | cpac | dparsf | niak 
+            ['strategy'] = filt_global | filt_noglobal | nofilt_global | nofilt_noglobal
+            ['file identifier'] = the FILE_ID value from the summary spreadsheet
+            ['derivative'] = alff | degree_binarize | degree_weighted | dual_regression | ... 
                 eigenvector_binarize | eigenvector_weighted | falff | func_mask | ... 
                 func_mean | func_preproc | lfcd | reho | rois_aal | rois_cc200 | ... 
                 rois_cc400 | rois_dosenbach160 | rois_ez | rois_ho | rois_tt | vmhc
 
-        2: which files to download in the freesurfer file tree
-    
-    each file is then aquired and put in the right folder using wget 
-    with '-c', avoiding thatto be downloaded more than once
+        ['freesurfer']
+            ['labels']
+            ['mri']
+            ['scripts']
+            ['surf']
+            ['stats']
+
+    Notes :
+    -----
+    urls are built as described by ABIDE documentation here : 
+    http://preprocessed-connectomes-project.org/abide/download.html
+    wget is called with '-c', so that no file is downloaded more than once, 
+    this may allow to continue partial downloads too
     """
 
     # Adding rsFMRI file
@@ -159,11 +274,30 @@ def register(
     out_data="./processed_ABIDE",
 ):
     """
-    this function copies the original .nii file to the oudir,
+    this function copies the original .nii file to the out_dir,
     then calls bbregister on the .nii file found at the root of each subject's folder
     it registers the .nii image to match its freesurfer files
 
+    Parameters : 
+    ----------
+
+    subject : string, subject name
+    subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
+    
+    derivative : string
+    must be one of the following : alff | degree_binarize | degree_weighted | dual_regression | ... 
+                eigenvector_binarize | eigenvector_weighted | falff | func_mask | ... 
+                func_mean | func_preproc | lfcd | reho | rois_aal | rois_cc200 | ... 
+                rois_cc400 | rois_dosenbach160 | rois_ez | rois_ho | rois_tt | vmhc
+
+    change_sub_dir :  boolean, optional, default False
+    if activated will force SUBJECTS_DIR to be destination folder for each call to os.system
+
+    subject_folder="./raw_data_ABIDE",
+    contrast="t1",
+    out_data="./processed_ABIDE",
     contrast can be either bold, dti, t2 or t1
+
     derivative may be any found in the ABIDE project :
         http://preprocessed-connectomes-project.org/abide/download.html
     change_sub_dir is a bool which will determine wether freesurfer's SUBJECTS_DIR must be forced
@@ -525,13 +659,13 @@ def prepare_matlab(
         )
 
 
-def matlab_find_eig(subject, subject_folder, matlab_runtime_path, script_path):
+def matlab_find_eig(subject, white_matlab_matrix, matlab_runtime_path, script_path):
     """
     Calls on spangy to build a map of girifications
     """
 
     cmd = "{}/run_find_eig.sh {} {} {}".format(
-        script_path, matlab_runtime_path, subject, subject_folder
+        script_path, matlab_runtime_path, subject, white_matlab_matrix
     )
     os.system(cmd)
 
