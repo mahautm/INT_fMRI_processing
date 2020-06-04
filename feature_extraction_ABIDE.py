@@ -696,6 +696,7 @@ def matlab_find_eig(
             script_path, matlab_runtime_path, subject, white_matlab_matrix, out_dir
         )
         os.system(cmd)
+        print("Gyrification matrix written for " + subject)
     else:
         print(
             "A file already exists named {} in {} \n If you wish it to be generated again, you must remove it"
