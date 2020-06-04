@@ -1,7 +1,7 @@
 """
 Filename : feature_extraction_ABIDE.pt
 Created Date : 20/05/2020
-Last Edited : 03/06/2020
+Last Edited : 04/06/2020
 Author : Mateo MAHAUT (mmahaut@ensc.fr) 
 Git : https://github.com/mahautm/INT_fMRI_processing.git
 
@@ -111,13 +111,13 @@ def extract_one_abide(
     data_list : a dictionary folowint this architecture
         ['rsfMRI']
 
-            ['pipeline'] = ccs | cpac | dparsf | niak 
-            ['strategy'] = filt_global | filt_noglobal | nofilt_global | nofilt_noglobal
+            ['pipeline'] = ccs "," cpac "," dparsf "," niak 
+            ['strategy'] = filt_global "," filt_noglobal "," nofilt_global "," nofilt_noglobal
             ['file identifier'] = the FILE_ID value from the summary spreadsheet
-            ['derivative'] = alff | degree_binarize | degree_weighted | dual_regression | ... 
-                eigenvector_binarize | eigenvector_weighted | falff | func_mask | ... 
-                func_mean | func_preproc | lfcd | reho | rois_aal | rois_cc200 | ... 
-                rois_cc400 | rois_dosenbach160 | rois_ez | rois_ho | rois_tt | vmhc
+            ['derivative'] = {alff "," degree_binarize "," degree_weighted "," dual_regression ",
+               "eigenvector_binarize "," eigenvector_weighted "," falff "," func_mask ",
+               "func_mean "," func_preproc "," lfcd "," reho "," rois_aal "," rois_cc200 ",
+               "rois_cc400 "," rois_dosenbach160 "," rois_ez "," rois_ho "," rois_tt "," vmhc}
 
         ['freesurfer']
             ['labels'] = table of files to download
@@ -234,13 +234,13 @@ def download_abide_urls(
     data_list : a dictionary folowint this architecture
         ['rsfMRI']
 
-            ['pipeline'] = ccs | cpac | dparsf | niak 
-            ['strategy'] = filt_global | filt_noglobal | nofilt_global | nofilt_noglobal
+            ['pipeline'] = {"ccs","cpac","dparsf","niak"} 
+            ['strategy'] = {"filt_global","filt_noglobal","nofilt_global","nofilt_noglobal"}
             ['file identifier'] = the FILE_ID value from the summary spreadsheet
-            ['derivative'] = alff | degree_binarize | degree_weighted | dual_regression | ... 
-                eigenvector_binarize | eigenvector_weighted | falff | func_mask | ... 
-                func_mean | func_preproc | lfcd | reho | rois_aal | rois_cc200 | ... 
-                rois_cc400 | rois_dosenbach160 | rois_ez | rois_ho | rois_tt | vmhc
+            ['derivative'] = {"alff","degree_binarize","degree_weighted","dual_regression",
+               "eigenvector_binarize","eigenvector_weighted","falff","func_mask",
+               "func_mean","func_preproc","lfcd","reho","rois_aal","rois_cc200",
+               "rois_cc400","rois_dosenbach160","rois_ez","rois_ho","rois_tt","vmhc"}
 
         ['freesurfer']
             ['labels']
@@ -287,45 +287,40 @@ def download_abide_urls(
 
 
 def register(
-    subject,
-    derivative,
-    change_sub_dir=False,
-    subject_folder="/scratch/mmahaut/data/abide/downloaded_preprocessed",
-    contrast="t1",
-    out_data="./processed_ABIDE",
+    subject, derivative, subject_folder, out_data, change_sub_dir=False, contrast="t1",
 ):
     """
-    this function copies the original .nii file to the out_dir,
+    This function copies the original .nii file to the out_dir,
     then calls bbregister on the .nii file found at the root of each subject's folder
     it registers the .nii image to match its freesurfer files
 
-    Parameters : 
+    Parameters
     ----------
 
     subject : string, subject name
-    subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
+        subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
     
-    derivative : string
-    must be one of the following : alff | degree_binarize | degree_weighted | dual_regression | ... 
-                eigenvector_binarize | eigenvector_weighted | falff | func_mask | ... 
-                func_mean | func_preproc | lfcd | reho | rois_aal | rois_cc200 | ... 
-                rois_cc400 | rois_dosenbach160 | rois_ez | rois_ho | rois_tt | vmhc
+    derivative : {"alff","degree_binarize","degree_weighted","dual_regression",
+               "eigenvector_binarize","eigenvector_weighted","falff","func_mask",
+               "func_mean","func_preproc","lfcd","reho","rois_aal","rois_cc200",
+               "rois_cc400","rois_dosenbach160","rois_ez","rois_ho","rois_tt","vmhc"}
+
+    subject_folder : string
+        path to the folder where is kept the data for each subject to be registered
+
+    out_data : string
+        path to folder where new registered data should be kept
 
     change_sub_dir :  boolean, optional, default False
-    if activated will force SUBJECTS_DIR to be destination folder for each call to os.system
+        if activated will force SUBJECTS_DIR to be destination folder for each call to os.system
 
-    subject_folder="/scratch/mmahaut/data/abide/downloaded_preprocessed",
-    contrast="t1",
-    out_data="./processed_ABIDE",
-    contrast can be either bold, dti, t2 or t1
+    contrast : {"t1", "dti", "t2", "bold"}
 
-    derivative may be any found in the ABIDE project :
-        http://preprocessed-connectomes-project.org/abide/download.html
-    change_sub_dir is a bool which will determine wether freesurfer's SUBJECTS_DIR must be forced
-    to the subject_folder value.
 
-    this function will only be called on subjects which have not allready been registered, 
-    by checking they do not have a "_register" file.
+    Notes
+    -----
+    This function will only be called on subjects which have not allready been registered, 
+    by checking they do not have a "_register" file in out_data.
     """
     cmd_base = ""
     if not os.path.exists(out_data) or not os.path.exists(
@@ -471,6 +466,9 @@ def check_and_correlate(
     if not os.path.exists(
         out_dir + "/correlation_matrix_{}_{}.npy".format(template, subject)
     ):
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
+
         correlation(fs_subdir, subject, template, split_dir, intermediary_dir, out_dir)
     else:
         print("correlation matrix already exits for {}".format(subject))
@@ -637,6 +635,7 @@ def correlation(subdir, sub, template, split_dir, intermediary_dir, out_dir):
             correlation_matrix[n, m] = pearsonr(gii_matrix[n, :], roi_avg[m, :])[0]
     correlation_matrix[np.where(np.isnan(correlation_matrix[:]))] = 0
     file = out_dir + "/correlation_matrix_{}_{}.npy".format(template, subname)
+
     np.save(file, correlation_matrix)
     print("********** Results: **********")
     print("Dimensions of the correlation Matrix:", correlation_matrix.shape)
@@ -683,11 +682,18 @@ def matlab_find_eig(
     """
     Calls on spangy to build a map of girifications
     """
+    if not os.path.exists(out_dir + "/{}_lheig_vec.npy".format(subject)):
+        if not os.path.exists(out_dir):
+            os.makedirs(out_dir)
 
-    cmd = "{}/run_find_eig.sh {} {} {} {}".format(
-        script_path, matlab_runtime_path, subject, white_matlab_matrix, out_dir
-    )
-    os.system(cmd)
+        cmd = "{}/run_find_eig.sh {} {} {} {}".format(
+            script_path, matlab_runtime_path, subject, white_matlab_matrix, out_dir
+        )
+        os.system(cmd)
+    else:
+        print(
+            "A file already exists named {} in {} \n If you wish it to be generated again, you must remove it"
+        )
 
 
 if __name__ == "__main__":
