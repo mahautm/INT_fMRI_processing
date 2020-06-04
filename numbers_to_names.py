@@ -180,7 +180,11 @@ subs_list_file = open(
 
 res = []
 for number in asd:
-    res.append(list(filter(lambda name: number in name, all_subs_list)))
+    res.append(next(name for name in all_subs_list if number in name))
+
+for number in ctrl:
+    res.append(next(name for name in all_subs_list if number in name))
+
 json.dump(res, subs_list_file)
 
 subs_list_file.close()

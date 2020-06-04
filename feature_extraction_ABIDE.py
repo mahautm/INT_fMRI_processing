@@ -91,10 +91,12 @@ def extract_one_abide(
     raw_data_path="/scratch/mmahaut/data/abide/downloaded_preprocessed",
     force_destination_folder=False,
     template="fsaverage5",
+    contrast="t1",
     rfmri_features_data_path="/scratch/mmahaut/data/abide/features_rsfMRI",
     gyrification_features_data_path="/scratch/mmahaut/data/abide/features_gyrification",
     matlab_runtime_path="/scratch/mmahaut/tools/MATLAB_Runtime/v95",
     matlab_script_path="/scratch/mmahaut/scripts/INT_fMRI_processing/for_redistribution_files_only",
+    intermediary_data_path="/scratch/mmahaut/data/abide/intermediary",
 ):
     """
     calls all feature-extraction functions, in order, on all subjects.
@@ -148,10 +150,12 @@ def extract_one_abide(
     compute_rfMRI_features(
         subject,
         data_list,
+        contrast,
         raw_data_path,
         force_destination_folder,
         template,
         rfmri_features_data_path,
+        intermediary_data_path,
     )
     compute_gyrification_features(
         subject,
@@ -159,18 +163,28 @@ def extract_one_abide(
         gyrification_features_data_path,
         matlab_runtime_path,
         matlab_script_path,
+        intermediary_data_path,
     )
 
 
 def compute_rfMRI_features(
     subject,
     data_list,
+    contrast="t1",
     raw_data_path="/scratch/mmahaut/data/abide/downloaded_preprocessed",
     force_destination_folder=False,
     template="fsaverage5",
     processed_data_path="/scratch/mmahaut/data/abide/features_rsfMRI",
     intermediary_data_path="/scratch/mmahaut/data/abide/intermediary",
 ):
+    register(
+        subject,
+        data_list["rsfMRI"]["derivative"],
+        force_destination_folder,
+        raw_data_path,
+        contrast,
+        intermediary_data_path,
+    )
     split(
         subject, data_list["rsfMRI"]["derivative"], intermediary_data_path,
     )
