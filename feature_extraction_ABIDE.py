@@ -32,31 +32,35 @@ def extract_all_abide(
 ):
     """
     calls all feature-extraction functions, in order, on all subjects.
-    requires freesurfer to be setup (tested on v6.0.0-a), as well as FSL and matlab runtime
+    requires freesurfer to be setup (tested on v6.0.0-a), as well as FSL and Matlab runtime (v95)
 
     Parameters
     ----------
 
-    subject_list : string path to file ("./url_preparation/subs_list.json" by default)
-    is a path to a JSON file listing all subjects to call function on 
+    subject_list : string, optional ("./url_preparation/subs_list.json" by default)
+        is a path to a JSON file listing all subjects to call function on 
 
-    data_list_files : string path to file ("./url_preparation/files_to_download.json" by default)
-    is a path to a JSON file, where required freesurfer data, and fMRI modalities are found
+    data_list_files : string, optional ("./url_preparation/files_to_download.json" by default)
+        is a path to a JSON file, where required freesurfer data, and fMRI modalities are found
     
-    raw_data_path : string path to file ("./raw_data_ABIDE" by default)
-    is the path to the folder where all aquired data will be saved
+    raw_data_path : string, optional ("./raw_data_ABIDE" by default)
+        is the path to the folder where all aquired data will be saved
     
     force_destination_folder :  boolean, optional, default False
-    is a bool that if activated will force SUBJECTS_DIR to be destination folder during registration
+        is a bool that if activated will force SUBJECTS_DIR to be destination folder during registration
     
     template : ("fsaverage5" by default)
-    must be found in freesurfer's SUBJECTS_DIR
+        must be found in freesurfer's SUBJECTS_DIR, used during freesurfer operations
     
-    processed_data_path : string path to file ("./processed_ABIDE" by default)
+    processed_data_path : string, optional ("./processed_ABIDE" by default)
+        where final processed data should be placed
+
+    matlab_runtime_path : string, optional ("/usr/local/MATLAB/MATLAB_Runtime/v95" by default)
+        path to the folder where Runtime's bin folder is found, used for the gyrification computing
     
-    matlab_runtime_path : string path to file ("/usr/local/MATLAB/MATLAB_Runtime/v95" by default)
-    
-    matlab_script_path : string path to file ("./for_redistribution_files_only" by default)
+    matlab_script_path : string, optional ("./for_redistribution_files_only" by default)
+        path to the folder where the .sh run_find_eig.sh and find_eig are found, used for gyrification computing
+
 
     Notes : 
     -----
@@ -106,18 +110,18 @@ def extract_one_abide(
     ----------
 
     subject : string, subject name
-    subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
+        subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
 
-    data_list : a dictionary folowint this architecture
+    data_list : a dictionary folowing this architecture
         ['rsfMRI']
 
-            ['pipeline'] = ccs "," cpac "," dparsf "," niak 
-            ['strategy'] = filt_global "," filt_noglobal "," nofilt_global "," nofilt_noglobal
+            ['pipeline'] = {"ccs","cpac","dparsf","niak"} 
+            ['strategy'] = {"filt_global","filt_noglobal","nofilt_global","nofilt_noglobal"}
             ['file identifier'] = the FILE_ID value from the summary spreadsheet
-            ['derivative'] = {alff "," degree_binarize "," degree_weighted "," dual_regression ",
-               "eigenvector_binarize "," eigenvector_weighted "," falff "," func_mask ",
-               "func_mean "," func_preproc "," lfcd "," reho "," rois_aal "," rois_cc200 ",
-               "rois_cc400 "," rois_dosenbach160 "," rois_ez "," rois_ho "," rois_tt "," vmhc}
+            ['derivative'] = {"alff","degree_binarize","degree_weighted","dual_regression",
+               "eigenvector_binarize","eigenvector_weighted","falff","func_mask",
+               "func_mean","func_preproc","lfcd","reho","rois_aal","rois_cc200",
+               "rois_cc400","rois_dosenbach160","rois_ez","rois_ho","rois_tt","vmhc"}
 
         ['freesurfer']
             ['labels'] = table of files to download
@@ -127,13 +131,15 @@ def extract_one_abide(
             ['stats'] = table of files to download
     
     raw_data_path : string path to file ("/scratch/mmahaut/data/abide/downloaded_preprocessed" by default)
-    is the path to the folder where all aquired data will be saved
+        is the path to the folder where all aquired data will be saved
     
     force_destination_folder :  boolean, optional, default False
-    is a bool that if activated will force SUBJECTS_DIR to be destination folder during registration
+        is a bool that if activated will force SUBJECTS_DIR to be destination folder during registration
     
-    template : ("fsaverage5" by default)
-    must be found in freesurfer's SUBJECTS_DIR
+    template : string, optional ("fsaverage5" by default)
+        must be found in freesurfer's SUBJECTS_DIR
+
+    contrast : {"t1", "dti", "t2", "bold"}
     
     processed_data_path : string path to file ("./processed_ABIDE" by default)
     
@@ -180,10 +186,10 @@ def compute_rfMRI_features(
     register(
         subject,
         data_list["rsfMRI"]["derivative"],
-        force_destination_folder,
         raw_data_path,
-        contrast,
         intermediary_data_path,
+        force_destination_folder,
+        contrast,
     )
     split(
         subject, data_list["rsfMRI"]["derivative"], intermediary_data_path,
@@ -243,11 +249,11 @@ def download_abide_urls(
                "rois_cc400","rois_dosenbach160","rois_ez","rois_ho","rois_tt","vmhc"}
 
         ['freesurfer']
-            ['labels']
-            ['mri']
-            ['scripts']
-            ['surf']
-            ['stats']
+            ['labels'] = table of files to download
+            ['mri'] = table of files to download
+            ['scripts'] = table of files to download
+            ['surf'] = table of files to download
+            ['stats'] = table of files to download
 
     Notes :
     -----
