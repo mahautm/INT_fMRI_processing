@@ -126,7 +126,7 @@ def extract_one_abide(
             ['surf'] = table of files to download
             ['stats'] = table of files to download
     
-    raw_data_path : string path to file ("./raw_data_ABIDE" by default)
+    raw_data_path : string path to file ("/scratch/mmahaut/data/abide/downloaded_preprocessed" by default)
     is the path to the folder where all aquired data will be saved
     
     force_destination_folder :  boolean, optional, default False
@@ -202,7 +202,7 @@ def compute_rfMRI_features(
 
 def compute_gyrification_features(
     subject,
-    raw_data_path="/scratch/mmahaut/raw_data_ABIDE",
+    raw_data_path="/scratch/mmahaut/data/abide/downloaded_preprocessed",
     processed_data_path="/scratch/mmahaut/data/abide/features_gyrification",
     matlab_runtime_path="/usr/local/MATLAB/MATLAB_Runtime/v95",
     matlab_script_path="./for_redistribution_files_only",
@@ -219,7 +219,9 @@ def compute_gyrification_features(
 
 
 def download_abide_urls(
-    subject, data_list, destination_folder="./raw_data_ABIDE",
+    subject,
+    data_list,
+    destination_folder="/scratch/mmahaut/data/abide/downloaded_preprocessed",
 ):
     """
     Here we build the urls, each file is then aquired and put in the right folder using wget 
@@ -288,7 +290,7 @@ def register(
     subject,
     derivative,
     change_sub_dir=False,
-    subject_folder="./raw_data_ABIDE",
+    subject_folder="/scratch/mmahaut/data/abide/downloaded_preprocessed",
     contrast="t1",
     out_data="./processed_ABIDE",
 ):
@@ -312,7 +314,7 @@ def register(
     change_sub_dir :  boolean, optional, default False
     if activated will force SUBJECTS_DIR to be destination folder for each call to os.system
 
-    subject_folder="./raw_data_ABIDE",
+    subject_folder="/scratch/mmahaut/data/abide/downloaded_preprocessed",
     contrast="t1",
     out_data="./processed_ABIDE",
     contrast can be either bold, dti, t2 or t1
@@ -382,7 +384,7 @@ def project(
     subject,
     derivative,
     template="fsaverage5",
-    fs_subdir="./raw_data_ABIDE",
+    fs_subdir="/scratch/mmahaut/data/abide/downloaded_preprocessed",
     data_list_files="./url_preparation/files_to_download.json",
     out_dir="./processed_ABIDE",
 ):
@@ -458,7 +460,7 @@ def project_epi(
 def check_and_correlate(
     subject,
     template="fsaverage5",
-    fs_subdir="./raw_data_ABIDE",
+    fs_subdir="/scratch/mmahaut/data/abide/downloaded_preprocessed",
     intermediary_dir="./intermediary_data",
     out_dir="./processed_ABIDE",
 ):
@@ -656,7 +658,9 @@ def correlation(subdir, sub, template, split_dir, intermediary_dir, out_dir):
 
 
 def prepare_matlab(
-    subject, subject_folder="./raw_data_ABIDE", out_dir="./processed_ABIDE"
+    subject,
+    subject_folder="/scratch/mmahaut/data/abide/downloaded_preprocessed",
+    out_dir="./processed_ABIDE",
 ):
     """
     makes .mat files out of .white files to be used to get the eigenvectors
