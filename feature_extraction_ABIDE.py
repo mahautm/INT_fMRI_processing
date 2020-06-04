@@ -214,6 +214,7 @@ def compute_gyrification_features(
         intermediary_data_path + "/" + subject,
         matlab_runtime_path,
         matlab_script_path,
+        processed_data_path,
     )
 
 
@@ -672,13 +673,15 @@ def prepare_matlab(
         )
 
 
-def matlab_find_eig(subject, white_matlab_matrix, matlab_runtime_path, script_path):
+def matlab_find_eig(
+    subject, white_matlab_matrix, matlab_runtime_path, script_path, out_dir
+):
     """
     Calls on spangy to build a map of girifications
     """
 
-    cmd = "{}/run_find_eig.sh {} {} {}".format(
-        script_path, matlab_runtime_path, subject, white_matlab_matrix
+    cmd = "{}/run_find_eig.sh {} {} {} {}".format(
+        script_path, matlab_runtime_path, subject, white_matlab_matrix, out_dir
     )
     os.system(cmd)
 
