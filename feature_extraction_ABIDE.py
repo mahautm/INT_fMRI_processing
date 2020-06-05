@@ -69,7 +69,7 @@ def extract_all_abide(
     """
     # opening .json
     subs_list_file = open(subject_list)
-    subs_list = json.load(subs_list_file)
+    subs_list = json.load(subs_list_file))
     data_list_file = open(data_list_files)
     data_list = json.load(data_list_file)
 
@@ -103,8 +103,9 @@ def extract_one_abide(
     intermediary_data_path="/scratch/mmahaut/data/abide/intermediary",
 ):
     """
-    calls all feature-extraction functions, in order, on all subjects.
-    requires freesurfer to be setup (tested on v6.0.0-a), as well as FSL and matlab runtime
+    Grouping of all functions required to produce the rsfMRI features as a correlation matrix between voxels and ROIs
+    and the gyrification features as a eigen vector matrix. All missing required subject data will be downloaded.
+    will save the correlation matrix directly to designated folder, and all intermediary steps
 
     Parameters
     ----------
@@ -131,24 +132,37 @@ def extract_one_abide(
             ['stats'] = table of files to download
     
     raw_data_path : string path to file ("/scratch/mmahaut/data/abide/downloaded_preprocessed" by default)
-        is the path to the folder where all aquired data will be saved
+        is the path to the folder where all original preprocessed data will be downloaded
     
     force_destination_folder :  boolean, optional, default False
         is a bool that if activated will force SUBJECTS_DIR to be destination folder during registration
     
     template : string, optional ("fsaverage5" by default)
-        must be found in freesurfer's SUBJECTS_DIR
+        name of the template used bu freesurfer functions, must be found in freesurfer's SUBJECTS_DIR
 
     contrast : {"t1", "dti", "t2", "bold"}
+        used by freesurfer's bbregister
     
-    processed_data_path : string path to file ("./processed_ABIDE" by default)
-    
+    rfmri_features_data_path : string, optional ("/scratch/mmahaut/data/abide/features_rsfMRI" is default)
+        path to the file where the correlation matrix will be saved. If the path does not exist, folders will be added.
+
+    gyrification_features_data_path : string, optional ("/scratch/mmahaut/data/abide/features_gyrification" is default)
+        path to the file where the gyrification eigen-vector matrix will be saved. If the path does not exist, folders will be added.
+
     matlab_runtime_path : string path to file ("/usr/local/MATLAB/MATLAB_Runtime/v95" by default)
-    
+         path to the folder where Runtime's bin folder is found, used for the gyrification computing
+   
     matlab_script_path : string path to file ("./for_redistribution_files_only" by default)
+        path to the folder where the .sh run_find_eig.sh and find_eig are found, used for gyrification computing
+
+    intermediary_data_path : string, optional ("/scratch/mmahaut/data/abide/intermediary" is default)
+        path to the file where all intermediary data will be saved, included registered rsfMRI and temporally splitted surface data
+
 
     Notes : 
     -----
+    requires freesurfer to be setup (tested on v6.0.0-a), as well as FSL and matlab runtime (v95)
+
     complet ABIDE subject list may be found here :
     https://github.com/preprocessed-connectomes-project/abide/blob/master/preprocessing/yamls/subs_list.yml
     """
@@ -183,6 +197,54 @@ def compute_rfMRI_features(
     processed_data_path="/scratch/mmahaut/data/abide/features_rsfMRI",
     intermediary_data_path="/scratch/mmahaut/data/abide/intermediary",
 ):
+    """
+    Grouping of all functions required to produce the rsfMRI features as a correlation matrix between voxels and ROIs
+    will save the correlation matrix directly to designated folder, and all intermediary steps
+
+    Parameters
+    ----------
+
+    subject : string, subject name
+        subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
+
+    data_list : a dictionary folowing this architecture
+        ['rsfMRI']
+
+            ['pipeline'] = {"ccs","cpac","dparsf","niak"} 
+            ['strategy'] = {"filt_global","filt_noglobal","nofilt_global","nofilt_noglobal"}
+            ['file identifier'] = the FILE_ID value from the summary spreadsheet
+            ['derivative'] = {"alff","degree_binarize","degree_weighted","dual_regression",
+               "eigenvector_binarize","eigenvector_weighted","falff","func_mask",
+               "func_mean","func_preproc","lfcd","reho","rois_aal","rois_cc200",
+               "rois_cc400","rois_dosenbach160","rois_ez","rois_ho","rois_tt","vmhc"}
+
+        ['freesurfer']
+            ['labels'] = table of files to download
+            ['mri'] = table of files to download
+            ['scripts'] = table of files to download
+            ['surf'] = table of files to download
+            ['stats'] = table of files to download
+    
+    contrast : {"t1", "dti", "t2", "bold"}
+        used by freesurfer's bbregister
+
+    raw_data_path : string path to file ("/scratch/mmahaut/data/abide/downloaded_preprocessed" by default)
+        is the path to the folder where subject data will be found
+
+    force_destination_folder :  boolean, optional, default False
+        is a bool that if activated will force SUBJECTS_DIR to be destination folder during registration
+    
+    template : string, optional ("fsaverage5" by default)
+        name of the template used bu freesurfer functions, must be found in freesurfer's SUBJECTS_DIR
+
+    processed_data_path : string, optional ("/scratch/mmahaut/data/abide/features_rsfMRI" is default)
+        path to the file where the correlation matrix will be saved. If the path does not exist, folders will be added.
+
+    intermediary_data_path : string, optional ("/scratch/mmahaut/data/abide/intermediary" is default)
+        path to the file where all intermediary data will be saved, included registered rsfMRI and temporally splitted surface data
+    
+
+    """
     register(
         subject,
         data_list["rsfMRI"]["derivative"],
@@ -191,15 +253,16 @@ def compute_rfMRI_features(
         force_destination_folder,
         contrast,
     )
-    split(
+    split_dim_time(
         subject, data_list["rsfMRI"]["derivative"], intermediary_data_path,
     )
-    project(
+    check_and_project_vol2surf(
         subject,
         data_list["rsfMRI"]["derivative"],
-        template,
         raw_data_path,
         out_dir=intermediary_data_path,
+        template,
+
     )
     check_and_correlate(
         subject, template, raw_data_path, intermediary_data_path, processed_data_path
@@ -214,6 +277,32 @@ def compute_gyrification_features(
     matlab_script_path="./for_redistribution_files_only",
     intermediary_data_path="/scratch/mmahaut/data/abide/intermediary",
 ):
+    """
+    Grouping all functions required to produce the gyrification features as a eigen vector matrix
+    will save the correlation matrix directly to designated folder, and all intermediary steps
+
+    Parameters
+    ----------
+
+    subject : string, subject name
+        subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
+
+    raw_data_path : string path to file ("/scratch/mmahaut/data/abide/downloaded_preprocessed" by default)
+        is the path to the folder where subject data will be found
+
+    processed_data_path : string, optional ("/scratch/mmahaut/data/abide/features_gyrification" is default)
+        path to the file where the gyrification eigen-vector matrix will be saved. If the path does not exist, folders will be added.
+    
+    matlab_runtime_path : string path to file ("/usr/local/MATLAB/MATLAB_Runtime/v95" by default)
+         path to the folder where Runtime's bin folder is found, used for the gyrification computing
+   
+    matlab_script_path : string path to file ("./for_redistribution_files_only" by default)
+        path to the folder where the .sh run_find_eig.sh and find_eig are found, used for gyrification computing
+
+    intermediary_data_path : string, optional ("/scratch/mmahaut/data/abide/intermediary" is default)
+        path to the file where all intermediary data will be saved, included registered rsfMRI and temporally splitted surface data
+
+    """
     prepare_matlab(subject, raw_data_path, intermediary_data_path)
     matlab_find_eig(
         subject,
@@ -227,7 +316,7 @@ def compute_gyrification_features(
 def download_abide_urls(
     subject,
     data_list,
-    destination_folder="/scratch/mmahaut/data/abide/downloaded_preprocessed",
+    destination_folder,
 ):
     """
     Here we build the urls, each file is then aquired and put in the right folder using wget 
@@ -235,7 +324,7 @@ def download_abide_urls(
     Parameters : 
     ----------
     subject : string, subject name
-    subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
+        subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
 
     data_list : a dictionary folowint this architecture
         ['rsfMRI']
@@ -254,6 +343,9 @@ def download_abide_urls(
             ['scripts'] = table of files to download
             ['surf'] = table of files to download
             ['stats'] = table of files to download
+
+    destination_folder : string path to file ("/scratch/mmahaut/data/abide/downloaded_preprocessed" by default)
+        is the path to the folder where all original preprocessed data will be downloaded
 
     Notes :
     -----
@@ -315,17 +407,18 @@ def register(
         path to the folder where is kept the data for each subject to be registered
 
     out_data : string
-        path to folder where new registered data should be kept
+        path to folder where newly registered data should be kept
 
     change_sub_dir :  boolean, optional, default False
         if activated will force SUBJECTS_DIR to be destination folder for each call to os.system
 
     contrast : {"t1", "dti", "t2", "bold"}
-
+        used by freesurfer's bbregister, the contrast used on the original image 
+        (t1 is White Matter brighter than Grey Matter, the others set Grey Matter as brightest)
 
     Notes
     -----
-    This function will only be called on subjects which have not allready been registered, 
+    This function will only be called on subjects which have not already been registered, 
     by checking they do not have a "_register" file in out_data.
     """
     cmd_base = ""
@@ -352,7 +445,7 @@ def register(
         os.system(cmd)
 
 
-def split(subject, derivative, out_data="./processed_ABIDE"):
+def split_dim_time(subject, derivative, out_data="./processed_ABIDE"):
     """
     Takes the .nii file found at the root of a given subject's folder in subject_folder
     will split it temporally into as many .nii files as they are time frames.
@@ -360,6 +453,22 @@ def split(subject, derivative, out_data="./processed_ABIDE"):
 
     will only split files for subjects which do not allready have a 'splited' directory
     in their subject folder, to avoid calling the same function on a subject multiple times.
+
+    Parameters
+    ----------
+
+    subject : string, subject name
+        subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
+
+    derivative : {"alff","degree_binarize","degree_weighted","dual_regression",
+               "eigenvector_binarize","eigenvector_weighted","falff","func_mask",
+               "func_mean","func_preproc","lfcd","reho","rois_aal","rois_cc200",
+               "rois_cc400","rois_dosenbach160","rois_ez","rois_ho","rois_tt","vmhc"}
+
+    out_data : string
+        path to folder where new splitted data will be kept. A folder named splitted will automatically be added to that path
+    
+    
     """
 
     destination = "{}/{}/splitted/".format(out_data, subject)
@@ -381,16 +490,38 @@ def split(subject, derivative, out_data="./processed_ABIDE"):
         )
 
 
-def project(
+def check_and_project_vol2surf(
     subject,
     derivative,
+    fs_subdir,
+    out_dir=,
     template="fsaverage5",
-    fs_subdir="/scratch/mmahaut/data/abide/downloaded_preprocessed",
-    data_list_files="./url_preparation/files_to_download.json",
-    out_dir="./processed_ABIDE",
+
 ):
     """
     Makes a splitted .nii files into splitted .gii files after checking it has not already been done for a given subject
+
+    Parameters
+    ----------
+
+    subject : string, subject name
+        subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
+
+    derivative : {"alff","degree_binarize","degree_weighted","dual_regression",
+               "eigenvector_binarize","eigenvector_weighted","falff","func_mask",
+               "func_mean","func_preproc","lfcd","reho","rois_aal","rois_cc200",
+               "rois_cc400","rois_dosenbach160","rois_ez","rois_ho","rois_tt","vmhc"}
+
+    fs_subdir : string path to file
+        is the path to the folder where subject data will be found
+
+    out_data : string
+        path to folder where the projected data will be saved. This must be the same folder where the splitted Nifti files are found
+    
+    template : string, optional ("fsaverage5" by default)       
+        name of the template used bu freesurfer functions, must be found in freesurfer's SUBJECTS_DIR
+
+    
     """
     split_dir = "{}/{}/splitted/".format(out_dir, subject)
     # here we check that no gii have already been built for this subject, that the projection has not allready been attempted
@@ -402,7 +533,7 @@ def project(
             print("in")
             filename = file[len(split_dir) :]
 
-            project_epi(
+            project_vol2surf(
                 fs_subdir,
                 subject,
                 file,
@@ -421,7 +552,7 @@ def project(
         )
 
 
-def project_epi(
+def project_vol2surf(
     fs_subdir,
     sub,
     nii_file,
@@ -432,17 +563,26 @@ def project_epi(
     sfwhm=0,
 ):
     """
-        Project one Nifti file (3D image) to surface saved as Gifti file.
+    Project one Nifti file (3D image) to surface saved as Gifti file.
+    Projection is done for left and right
+    
+    Parameters
+    ----------
+        fs_subdir: FreeSurfer subjects directory
 
-        Projection is done for left and right
-        :param fs_subdir: FreeSurfer subjects directory
-        :param sub: Subject name
-        :param nii_file: Splitted .nii directory
-        :param gii_dir: Output directory
-        :param gii_sfx: Gifti files suffix (add to the hemisphere name)
-        :param tgt_subject: Name of target subject
-        :param hem_list: Hemispheres (default: left and right)
-        :param sfwhm: Surface smoothing (default = 0mm)
+        sub: Subject name
+
+        nii_file: Splitted .nii directory
+
+        gii_dir: Output directory
+
+        gii_sfx: Gifti files suffix (add to the hemisphere name)
+
+        tgt_subject: Name of target subject
+
+        hem_list: Hemispheres (default: left and right)
+
+        sfwhm: Surface smoothing (default = 0mm)
     """
     for hem in hem_list:
         gii_file = "{}/{}.{}_{}.gii".format(gii_dir, filename, hem, tgt_subject)
@@ -467,6 +607,26 @@ def check_and_correlate(
 ):
     """
     Makes the correlation matrix between ROIs and Voxels only when this step has not already been done for a given subject
+
+    Parameters
+    ----------
+
+    subject : string, subject name
+        subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file  
+
+    template : string, optional ("fsaverage5" by default)       
+        name of the template used bu freesurfer functions, must be found in freesurfer's SUBJECTS_DIR  
+
+    fs_subdir : string path to file
+        is the path to the folder where subject data will be found
+
+    intermediary_data_path : string, optional ("/scratch/mmahaut/data/abide/intermediary" is default)
+        path to the file where all intermediary data will be saved and looked for, included gifti hemispheral surface files
+
+    out_dir : string
+        path to folder where the correlation matrix will be saved
+    
+
     """
     split_dir = "{}/{}/splitted/".format(intermediary_dir, subject)
     if not os.path.exists(
@@ -668,7 +828,19 @@ def prepare_matlab(
     out_dir="./processed_ABIDE",
 ):
     """
-    makes .mat files out of .white files to be used to get the eigenvectors
+    Makes .mat files out of .white files to be used to get the eigenvectors
+
+    Parameters
+    ----------
+
+    subject : string, subject name
+        subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
+
+    subject_folder : string path to file
+        is the path to the folder where subject data will be found
+
+    out_dir : string
+        path to folder where the .mat matrix will be saved. when using the complete pipeline, it should be the intermediary dir.
     """
     hem_list = ["lh", "rh"]
     for hem in hem_list:
@@ -686,7 +858,27 @@ def matlab_find_eig(
     subject, white_matlab_matrix, matlab_runtime_path, script_path, out_dir
 ):
     """
-    Calls on spangy to build a map of girifications
+    Calls on spangy to build a map of gyrifications
+
+    Parameters
+    ----------
+
+    subject : string, subject name
+        subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
+
+    white_matlab_matrix : string
+        path to the folder where the hemispheric .white data that has been converted to a .mat file can be found
+
+    matlab_runtime_path : string path to file
+         path to the folder where Runtime's bin folder is found, used for the gyrification computing
+   
+    script_path : string
+        path to the folder where the .sh run_find_eig.sh and find_eig are found, used for gyrification computing
+
+    out_dir : string
+        path to the file where the gyrification eigen-vector matrix will be saved. If the path does not exist, folders will be added.
+
+
     """
     if not os.path.exists(out_dir + "/{}_lheig_vec.npy".format(subject)):
         if not os.path.exists(out_dir):
