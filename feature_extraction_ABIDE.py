@@ -69,7 +69,7 @@ def extract_all_abide(
     """
     # opening .json
     subs_list_file = open(subject_list)
-    subs_list = json.load(subs_list_file))
+    subs_list = json.load(subs_list_file)
     data_list_file = open(data_list_files)
     data_list = json.load(data_list_file)
 
@@ -437,7 +437,7 @@ def register(
 
         cmd = (
             cmd_base
-            + "bbregister --s {0} --mov {1}/{0}/{0}_{2}.nii.gz --reg {1}/{0}/{0}_register --{3} --init-spm".format(
+            + "bbregister --s {0} --mov {1}/{0}/{0}_{2}.nii.gz --reg {1}/{0}/{0}_register --{3}".format(
                 subject, out_data, derivative, contrast
             )
         )
@@ -445,7 +445,7 @@ def register(
         os.system(cmd)
 
 
-def split_dim_time(subject, derivative, out_data="./processed_ABIDE"):
+def split_dim_time(subject, derivative, out_data):
     """
     Takes the .nii file found at the root of a given subject's folder in subject_folder
     will split it temporally into as many .nii files as they are time frames.
