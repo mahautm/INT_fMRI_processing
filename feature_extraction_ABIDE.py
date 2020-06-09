@@ -261,8 +261,7 @@ def compute_rfMRI_features(
         data_list["rsfMRI"]["derivative"],
         raw_data_path,
         out_dir=intermediary_data_path,
-        template,
-
+        template=template,
     )
     check_and_correlate(
         subject, template, raw_data_path, intermediary_data_path, processed_data_path
@@ -314,9 +313,7 @@ def compute_gyrification_features(
 
 
 def download_abide_urls(
-    subject,
-    data_list,
-    destination_folder,
+    subject, data_list, destination_folder,
 ):
     """
     Here we build the urls, each file is then aquired and put in the right folder using wget 
@@ -491,12 +488,7 @@ def split_dim_time(subject, derivative, out_data):
 
 
 def check_and_project_vol2surf(
-    subject,
-    derivative,
-    fs_subdir,
-    out_dir,
-    template="fsaverage5",
-
+    subject, derivative, fs_subdir, out_dir, template="fsaverage5",
 ):
     """
     Makes a splitted .nii files into splitted .gii files after checking it has not already been done for a given subject
