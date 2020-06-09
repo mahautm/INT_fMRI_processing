@@ -494,7 +494,7 @@ def check_and_project_vol2surf(
     subject,
     derivative,
     fs_subdir,
-    out_dir=,
+    out_dir,
     template="fsaverage5",
 
 ):
