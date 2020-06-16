@@ -312,6 +312,62 @@ def compute_gyrification_features(
     )
 
 
+def download_interTVA_from_frioul(
+    subject, data_list, destination_folder, intermediary_folder,
+):
+    """
+    TODO : change this comment, and the data_list to work with the pipeline
+    Parameters : 
+    ----------
+    subject : string, subject name
+        subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
+
+    data_list : a dictionary folowint this architecture
+        ['rsfMRI']
+
+            ['pipeline'] = {"ccs","cpac","dparsf","niak"} 
+            ['strategy'] = {"filt_global","filt_noglobal","nofilt_global","nofilt_noglobal"}
+            ['file identifier'] = the FILE_ID value from the summary spreadsheet
+            ['derivative'] = {"alff","degree_binarize","degree_weighted","dual_regression",
+               "eigenvector_binarize","eigenvector_weighted","falff","func_mask",
+               "func_mean","func_preproc","lfcd","reho","rois_aal","rois_cc200",
+               "rois_cc400","rois_dosenbach160","rois_ez","rois_ho","rois_tt","vmhc"}
+
+        ['freesurfer']
+            ['labels'] = table of files to download
+            ['mri'] = table of files to download
+            ['scripts'] = table of files to download
+            ['surf'] = table of files to download
+            ['stats'] = table of files to download
+
+    destination_folder : string path to file ("/scratch/mmahaut/data/intertva/downloaded_preprocessed" by default)
+        is the path to the folder where all original preprocessed data will be downloaded
+
+    Notes :
+    -----
+
+    """
+    # Adding pre-splitted image, with the strong belief that there are only 177 images, and that these are indeed the splitted images I want
+    if not os.path.exists("{}/{}/splitted/".format(intermediary_folder, subject)):
+        os.makedirs("{}/{}/splitted/".format(intermediary_folder, subject))
+
+    for number in range(177):
+        cmd = "scp mahaut.m@frioul.int.univ-amu.fr:/envau/work/banco/data/mri/interTVA/my_intertva/surf/data/sub35/glm/vol/usub-35_task-localizer_model-singletrial_denoised/beta_0{1}.nii.gz {2}/{0}/splitted/{0}_Res{1}".format(
+            subject, number, intermediary_folder
+        )
+    # Adding freesurfer directory
+    for key in data_list["freesurfer"]:
+        path = "{}/{}/{}".format(destination_folder, subject, key)
+        if not os.path.exists(path):
+            os.makedirs(path)
+        for file in data_list["freesurfer"][key]:
+            cmd = "scp mahaut.m@frioul.int.univ-amu.fr:/envau/work/banco/data/mri/interTVA/my_intertva/surf/data/sub35/fs/sub-35/surf/{2}/{3} {0}/{1}/{2}/{3}".format(
+                destination_folder, subject, key, file
+            )
+            os.system(cmd)
+    print("Downloaded all of {}'s required files".format(subject))
+
+
 def download_abide_urls(
     subject, data_list, destination_folder,
 ):
@@ -448,7 +504,7 @@ def split_dim_time(subject, derivative, out_data):
     will split it temporally into as many .nii files as they are time frames.
     These new files will be located in the same folder, in a new directory : '/splitted'
 
-    will only split files for subjects which do not allready have a 'splited' directory
+    will only split files for subjects which do not allready have a 'splitted' directory
     in their subject folder, to avoid calling the same function on a subject multiple times.
 
     Parameters
@@ -560,7 +616,7 @@ def project_vol2surf(
     
     Parameters
     ----------
-        fs_subdir: FreeSurfer subjects directory
+          : FreeSurfer subjects directory
 
         sub: Subject name
 
