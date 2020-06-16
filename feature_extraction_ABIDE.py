@@ -187,6 +187,99 @@ def extract_one_abide(
     )
 
 
+def extract_one_interTVA(
+    subject,
+    data_list,
+    raw_data_path="/scratch/mmahaut/data/intertva/downloaded_preprocessed",
+    template="fsaverage5",
+    rfmri_features_data_path="/scratch/mmahaut/data/intertva/features_rsfMRI",
+    gyrification_features_data_path="/scratch/mmahaut/data/intertva/features_gyrification",
+    matlab_runtime_path="/scratch/mmahaut/tools/MATLAB_Runtime/v95",
+    matlab_script_path="/scratch/mmahaut/scripts/INT_fMRI_processing/for_redistribution_files_only",
+    intermediary_data_path="/scratch/mmahaut/data/intertva/intermediary",
+):
+    """
+    Grouping of all functions required to produce the rsfMRI features as a correlation matrix between voxels and ROIs
+    and the gyrification features as a eigen vector matrix. All missing required subject data will be downloaded.
+    will save the correlation matrix directly to designated folder, and all intermediary steps
+
+    Parameters
+    ----------
+
+    subject : string, subject name
+        subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
+
+    data_list : a dictionary folowing this architecture
+        ['rsfMRI']
+
+            ['pipeline'] = {"ccs","cpac","dparsf","niak"} 
+            ['strategy'] = {"filt_global","filt_noglobal","nofilt_global","nofilt_noglobal"}
+            ['file identifier'] = the FILE_ID value from the summary spreadsheet
+            ['derivative'] = {"alff","degree_binarize","degree_weighted","dual_regression",
+               "eigenvector_binarize","eigenvector_weighted","falff","func_mask",
+               "func_mean","func_preproc","lfcd","reho","rois_aal","rois_cc200",
+               "rois_cc400","rois_dosenbach160","rois_ez","rois_ho","rois_tt","vmhc"}
+
+        ['freesurfer']
+            ['labels'] = table of files to download
+            ['mri'] = table of files to download
+            ['scripts'] = table of files to download
+            ['surf'] = table of files to download
+            ['stats'] = table of files to download
+    
+    raw_data_path : string path to file ("/scratch/mmahaut/data/abide/downloaded_preprocessed" by default)
+        is the path to the folder where all original preprocessed data will be downloaded
+    
+    force_destination_folder :  boolean, optional, default False
+        is a bool that if activated will force SUBJECTS_DIR to be destination folder during registration
+    
+    template : string, optional ("fsaverage5" by default)
+        name of the template used bu freesurfer functions, must be found in freesurfer's SUBJECTS_DIR
+    
+    rfmri_features_data_path : string, optional ("/scratch/mmahaut/data/abide/features_rsfMRI" is default)
+        path to the file where the correlation matrix will be saved. If the path does not exist, folders will be added.
+
+    gyrification_features_data_path : string, optional ("/scratch/mmahaut/data/abide/features_gyrification" is default)
+        path to the file where the gyrification eigen-vector matrix will be saved. If the path does not exist, folders will be added.
+
+    matlab_runtime_path : string path to file ("/usr/local/MATLAB/MATLAB_Runtime/v95" by default)
+         path to the folder where Runtime's bin folder is found, used for the gyrification computing
+   
+    matlab_script_path : string path to file ("./for_redistribution_files_only" by default)
+        path to the folder where the .sh run_find_eig.sh and find_eig are found, used for gyrification computing
+
+    intermediary_data_path : string, optional ("/scratch/mmahaut/data/abide/intermediary" is default)
+        path to the file where all intermediary data will be saved, included registered rsfMRI and temporally splitted surface data
+
+
+    Notes : 
+    -----
+    requires freesurfer to be setup (tested on v6.0.0-a), as well as FSL and matlab runtime (v95)
+
+    complet ABIDE subject list may be found here :
+    https://github.com/preprocessed-connectomes-project/abide/blob/master/preprocessing/yamls/subs_list.yml
+    """
+    download_interTVA_from_frioul(
+        subject, data_list, raw_data_path, intermediary_data_path
+    )
+    compute_rfMRI_features_interTVA(
+        subject,
+        data_list,
+        raw_data_path,
+        template,
+        rfmri_features_data_path,
+        intermediary_data_path,
+    )
+    compute_gyrification_features(
+        subject,
+        raw_data_path,
+        gyrification_features_data_path,
+        matlab_runtime_path,
+        matlab_script_path,
+        intermediary_data_path,
+    )
+
+
 def compute_rfMRI_features(
     subject,
     data_list,
@@ -256,6 +349,71 @@ def compute_rfMRI_features(
     split_dim_time(
         subject, data_list["rsfMRI"]["derivative"], intermediary_data_path,
     )
+    check_and_project_vol2surf(
+        subject,
+        data_list["rsfMRI"]["derivative"],
+        raw_data_path,
+        out_dir=intermediary_data_path,
+        template=template,
+    )
+    check_and_correlate(
+        subject, template, raw_data_path, intermediary_data_path, processed_data_path
+    )
+
+
+def compute_rfMRI_features_interTVA(
+    subject,
+    data_list,
+    raw_data_path="/scratch/mmahaut/data/abide/downloaded_preprocessed",
+    template="fsaverage5",
+    processed_data_path="/scratch/mmahaut/data/abide/features_rsfMRI",
+    intermediary_data_path="/scratch/mmahaut/data/abide/intermediary",
+):
+    """
+    Grouping of all functions required to produce the rsfMRI features as a correlation matrix between voxels and ROIs
+    will save the correlation matrix directly to designated folder, and all intermediary steps
+
+    Parameters
+    ----------
+
+    subject : string, subject name
+        subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
+
+    data_list : a dictionary folowing this architecture
+        ['rsfMRI']
+
+            ['pipeline'] = {"ccs","cpac","dparsf","niak"} 
+            ['strategy'] = {"filt_global","filt_noglobal","nofilt_global","nofilt_noglobal"}
+            ['file identifier'] = the FILE_ID value from the summary spreadsheet
+            ['derivative'] = {"alff","degree_binarize","degree_weighted","dual_regression",
+               "eigenvector_binarize","eigenvector_weighted","falff","func_mask",
+               "func_mean","func_preproc","lfcd","reho","rois_aal","rois_cc200",
+               "rois_cc400","rois_dosenbach160","rois_ez","rois_ho","rois_tt","vmhc"}
+
+        ['freesurfer']
+            ['labels'] = table of files to download
+            ['mri'] = table of files to download
+            ['scripts'] = table of files to download
+            ['surf'] = table of files to download
+            ['stats'] = table of files to download
+
+    raw_data_path : string path to file ("/scratch/mmahaut/data/abide/downloaded_preprocessed" by default)
+        is the path to the folder where subject data will be found
+
+    force_destination_folder :  boolean, optional, default False
+        is a bool that if activated will force SUBJECTS_DIR to be destination folder during registration
+    
+    template : string, optional ("fsaverage5" by default)
+        name of the template used bu freesurfer functions, must be found in freesurfer's SUBJECTS_DIR
+
+    processed_data_path : string, optional ("/scratch/mmahaut/data/abide/features_rsfMRI" is default)
+        path to the file where the correlation matrix will be saved. If the path does not exist, folders will be added.
+
+    intermediary_data_path : string, optional ("/scratch/mmahaut/data/abide/intermediary" is default)
+        path to the file where all intermediary data will be saved, included registered rsfMRI and temporally splitted surface data
+    
+
+    """
     check_and_project_vol2surf(
         subject,
         data_list["rsfMRI"]["derivative"],
@@ -351,7 +509,7 @@ def download_interTVA_from_frioul(
     if not os.path.exists("{}/{}/splitted/".format(intermediary_folder, subject)):
         os.makedirs("{}/{}/splitted/".format(intermediary_folder, subject))
 
-    for number in range(177):
+    for number in range(1, 178):
         cmd = "scp mahaut.m@frioul.int.univ-amu.fr:/envau/work/banco/data/mri/InterTVA/my_intertva/surf/data/{0}/glm/vol/u{0}_task-localizer_model-singletrial_denoised/beta_{1:0>4}.nii.gz {2}/{0}/splitted/{0}__Res{1:0>4}".format(
             subject, number, intermediary_folder
         )
