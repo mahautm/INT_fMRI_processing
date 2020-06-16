@@ -361,7 +361,7 @@ def download_interTVA_from_frioul(
         if not os.path.exists(path):
             os.makedirs(path)
         for file in data_list["freesurfer"][key]:
-            cmd = "scp mahaut.m@frioul.int.univ-amu.fr:/envau/work/banco/data/mri/interTVA/my_intertva/surf/data/sub35/fs/sub-35/{2}/{3} {0}/{1}/{2}/{3}".format(
+            cmd = "scp mahaut.m@frioul.int.univ-amu.fr:/envau/work/banco/data/mri/InterTVA/my_intertva/surf/data/sub35/fs/sub-35/{2}/{3} {0}/{1}/{2}/{3}".format(
                 destination_folder, subject, key, file
             )
             os.system(cmd)
