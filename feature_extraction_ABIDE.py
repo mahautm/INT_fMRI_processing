@@ -352,7 +352,7 @@ def download_interTVA_from_frioul(
         os.makedirs("{}/{}/splitted/".format(intermediary_folder, subject))
 
     for number in range(177):
-        cmd = "scp mahaut.m@frioul.int.univ-amu.fr:/envau/work/banco/data/mri/interTVA/my_intertva/surf/data/sub35/glm/vol/usub-35_task-localizer_model-singletrial_denoised/beta_0{1}.nii.gz {2}/{0}/splitted/{0}_Res{1}".format(
+        cmd = "scp mahaut.m@frioul.int.univ-amu.fr:/envau/work/banco/data/mri/InterTVA/my_intertva/surf/data/sub35/glm/vol/usub-35_task-localizer_model-singletrial_denoised/beta_0{1}.nii.gz {2}/{0}/splitted/{0}_Res{1}".format(
             subject, number, intermediary_folder
         )
     # Adding freesurfer directory
