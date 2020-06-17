@@ -738,7 +738,6 @@ def check_and_project_vol2surf(
         for file in glob.glob(
             split_dir + "{}_{}_Res*.nii.gz".format(subject, derivative)
         ):
-            print("in")
             filename = file[len(split_dir) :]
 
             project_vol2surf(
