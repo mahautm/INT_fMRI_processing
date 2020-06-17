@@ -262,14 +262,6 @@ def extract_one_interTVA(
     download_interTVA_from_frioul(
         subject, data_list, raw_data_path, intermediary_data_path
     )
-    compute_rfMRI_features_interTVA(
-        subject,
-        data_list,
-        raw_data_path,
-        template,
-        rfmri_features_data_path,
-        intermediary_data_path,
-    )
     compute_gyrification_features(
         subject,
         raw_data_path,
@@ -414,6 +406,7 @@ def compute_rfMRI_features_interTVA(
     
 
     """
+
     check_and_project_vol2surf(
         subject,
         data_list["rsfMRI"]["derivative"],
@@ -505,15 +498,15 @@ def download_interTVA_from_frioul(
     -----
 
     """
-    # Adding pre-splitted image, with the strong belief that there are only 177 images, and that these are indeed the splitted images I want
-    if not os.path.exists("{}/{}/splitted/".format(intermediary_folder, subject)):
-        os.makedirs("{}/{}/splitted/".format(intermediary_folder, subject))
+    # # Adding pre-splitted image, with the strong belief that there are only 177 images, and that these are indeed the splitted images I want
+    # if not os.path.exists("{}/{}/splitted/".format(intermediary_folder, subject)):
+    #     os.makedirs("{}/{}/splitted/".format(intermediary_folder, subject))
 
-    for number in range(1, 178):
-        cmd = "scp mahaut.m@frioul.int.univ-amu.fr:/envau/work/banco/data/mri/InterTVA/my_intertva/surf/data/{0}/glm/vol/u{0}_task-localizer_model-singletrial_denoised/beta_{1:0>4}.nii.gz {2}/{0}/splitted/{0}__Res{1:0>4}.nii.gz".format(
-            subject, number, intermediary_folder
-        )
-        os.system(cmd)
+    # for number in range(1, 178):
+    #     cmd = "scp mahaut.m@frioul.int.univ-amu.fr:/envau/work/banco/data/mri/InterTVA/my_intertva/surf/data/{0}/glm/vol/u{0}_task-localizer_model-singletrial_denoised/beta_{1:0>4}.nii.gz {2}/{0}/splitted/{0}__Res{1:0>4}.nii.gz".format(
+    #         subject, number, intermediary_folder
+    #     )
+    #     os.system(cmd)
 
     # Adding freesurfer directory
     for key in data_list["freesurfer"]:
@@ -1107,5 +1100,6 @@ if __name__ == "__main__":
     data_list_files = "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/files_to_download.json"
     data_list_file = open(data_list_files)
     data_list = json.load(data_list_file)
+    # extract_one_abide(sys.argv[1], data_list)
 
-    extract_one_abide(sys.argv[1], data_list)
+    extract_one_interTVA(sys.argv[1], data_list)

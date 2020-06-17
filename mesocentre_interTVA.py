@@ -47,6 +47,7 @@ for subject in subject_list:
             + "conda activate ABIDE\n"
             + "{} {}/{} {}".format(python_path, code_dir, script_name, subject)
         )
+
         fh.writelines(batch_cmd)
 
     os.system("sbatch %s" % slurmjob_path)
