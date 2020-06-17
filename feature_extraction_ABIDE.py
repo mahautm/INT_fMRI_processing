@@ -510,7 +510,7 @@ def download_interTVA_from_frioul(
         os.makedirs("{}/{}/splitted/".format(intermediary_folder, subject))
 
     for number in range(1, 178):
-        cmd = "scp mahaut.m@frioul.int.univ-amu.fr:/envau/work/banco/data/mri/InterTVA/my_intertva/surf/data/{0}/glm/vol/u{0}_task-localizer_model-singletrial_denoised/beta_{1:0>4}.nii.gz {2}/{0}/splitted/{0}__Res{1:0>4}".format(
+        cmd = "scp mahaut.m@frioul.int.univ-amu.fr:/envau/work/banco/data/mri/InterTVA/my_intertva/surf/data/{0}/glm/vol/u{0}_task-localizer_model-singletrial_denoised/beta_{1:0>4}.nii.gz {2}/{0}/splitted/{0}__Res{1:0>4}.nii.gz".format(
             subject, number, intermediary_folder
         )
         os.system(cmd)
