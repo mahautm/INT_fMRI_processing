@@ -498,7 +498,7 @@ def download_interTVA_from_frioul(
     -----
 
     """
-    # # Adding pre-splitted image, with the strong belief that there are only 177 images, and that these are indeed the splitted images I want
+    # To be removed, tfMRI data
     # if not os.path.exists("{}/{}/splitted/".format(intermediary_folder, subject)):
     #     os.makedirs("{}/{}/splitted/".format(intermediary_folder, subject))
 
@@ -517,7 +517,7 @@ def download_interTVA_from_frioul(
             cmd = "scp mahaut.m@frioul.int.univ-amu.fr:/envau/work/banco/data/mri/InterTVA/my_intertva/surf/data/{1}/fs/{1}/{2}/{3} {0}/{1}/{2}/{3}".format(
                 destination_folder, subject, key, file
             )
-            os.system(cmd)
+            print(os.system(cmd))
     print("Downloaded all of {}'s required files".format(subject))
 
 
