@@ -1043,7 +1043,7 @@ def prepare_matlab(
         path to folder where the .mat matrix will be saved. when using the complete pipeline, it should be the intermediary dir.
     """
     hem_list = ["lh", "rh"]
-    out_path = "{}/{}/"
+    out_path = "{}/{}/".format(out_dir, subject)
     if not os.path.exists(out_path):
         os.makedirs(out_path)
     for hem in hem_list:
