@@ -517,7 +517,7 @@ def download_interTVA_from_frioul(
             cmd = "scp mahaut.m@frioul.int.univ-amu.fr:/envau/work/banco/data/mri/InterTVA/my_intertva/surf/data/{1}/fs/{1}/{2}/{3} {0}/{1}/{2}/{3}".format(
                 destination_folder, subject, key, file
             )
-            print(os.system(cmd))
+            os.system(cmd)
     print("Downloaded all of {}'s required files".format(subject))
 
 
@@ -1043,14 +1043,16 @@ def prepare_matlab(
         path to folder where the .mat matrix will be saved. when using the complete pipeline, it should be the intermediary dir.
     """
     hem_list = ["lh", "rh"]
+    out_path = "{}/{}/"
+    if not os.path.exists(out_path):
+        os.makedirs(out_path)
     for hem in hem_list:
         geom_in = nib.freesurfer.io.read_geometry(
             "{}/{}/surf/{}.white".format(subject_folder, subject, hem)
         )
         geom_out = np.array((geom_in[0] + 1, geom_in[1] + 1))
         scio.savemat(
-            "{}/{}/{}_{}_white.mat".format(out_dir, subject, subject, hem),
-            {hem: geom_out},
+            out_path + "{}_{}_white.mat".format(subject, hem), {hem: geom_out},
         )
 
 
