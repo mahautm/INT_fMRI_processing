@@ -1115,6 +1115,7 @@ def align_gyrification(subject, out_dir, intermediary_dir, template="fsaverage5"
             "{}/{}/{}_{}eig_vec.mat".format(intermediary_dir, subject, subject, hem)
         )
         matrix = matlab_matrix["eigVec"]
+        matrix = np.transpose(matrix)
         out_matrix = np.empty([])
 
         # Splitting the gyrification matrix into independent .gii files and saving them
