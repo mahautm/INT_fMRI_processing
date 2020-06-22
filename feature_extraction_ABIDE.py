@@ -1137,7 +1137,7 @@ def align_gyrification(subject, out_dir, intermediary_dir, template="fsaverage5"
                 out_dir, subject, subject, template, i
             )
             # calling mri_surf2surf on each of those images to put them in fsaverage5 space
-            cmd = "mri_surf2surf --srcsubject {} --srcsurfval {} --trgsubject {} --trgsurfval {} --trgsurfreg sphere.reg --hemi {} -sfmt gifti --tfmt gifti --noreshape --no-cortex".format(
+            cmd = "mri_surf2surf --srcsubject {} --srcsurfval {} --trgsubject {} --trgsurfval {} --trgsurfreg sphere.reg --hemi {} --sfmt gifti --tfmt gifti --noreshape --no-cortex".format(
                 subject, gii_file_name, template, gii_corrected_file_name, hem
             )
             os.system(cmd)
