@@ -1114,7 +1114,7 @@ def align_gyrification(subject, out_dir, intermediary_dir, template="fsaverage5"
         matlab_matrix = scio.loadmat(
             "{}/{}/{}_{}eig_vec.mat".format(intermediary_dir, subject, subject, hem)
         )
-        matrix = matlab_matrix[hem]
+        matrix = matlab_matrix["eigVec"]
         out_matrix = np.array()
 
         # Splitting the gyrification matrix into independent .gii files and saving them
