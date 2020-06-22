@@ -1148,10 +1148,16 @@ def align_gyrification(subject, out_dir, intermediary_dir, template="fsaverage5"
             os.system(cmd)
             # putting the segmented matrix back together
             if out_matrix.shape == ():
-                out_matrix = nib.load(gii_corrected_file_name)
+                out_matrix = np.array(
+                    [nib.load(gii_corrected_file_name).darrays[0].data]
+                )
             else:
                 out_matrix = np.concatenate(
-                    (out_matrix, [nib.load(gii_corrected_file_name)]), axis=0
+                    (
+                        out_matrix,
+                        np.array([nib.load(gii_corrected_file_name).darrays[0].data]),
+                    ),
+                    axis=0,
                 )
 
         np.save(
