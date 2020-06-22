@@ -1,7 +1,7 @@
 """
-Filename : feature_extraction_ABIDE.pt
+Filename : feature_extraction_ABIDE.py
 Created Date : 20/05/2020
-Last Edited : 04/06/2020
+Last Edited : 19/06/2020
 Author : Mateo MAHAUT (mmahaut@ensc.fr) 
 Git : https://github.com/mahautm/INT_fMRI_processing.git
 
@@ -1082,7 +1082,7 @@ def matlab_find_eig(
 
 
     """
-    if not os.path.exists(out_dir + "/{}_lheig_vec.npy".format(subject)):
+    if not os.path.exists(out_dir + "/{}_lheig_vec.mat".format(subject)):
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
 
@@ -1097,6 +1097,55 @@ def matlab_find_eig(
         )
 
 
+def file_movement(out_dir, intermediary_dir):
+    # temporary function here to move files back to the intermediary folder, where they belong.
+    for file in glob.glob(out_dir + "/*.mat"):
+        print(file[(len(out_dir) + 1) : (len(file) - 15)])
+        shutil.move(
+            file,
+            intermediary_dir
+            + "/{}/".format(file[(len(out_dir) + 1) : (len(file) - 15)]),
+        )
+
+
+def align_gyrification(subject, out_dir, intermediary_dir, template="fsaverage5"):
+    hem_list = ["lh", "rh"]
+    for hem in hem_list:
+        matlab_matrix = scio.loadmat(
+            "{}/{}/{}_{}eig_vec.mat".format(intermediary_dir, subject, subject, hem)
+        )
+        matrix = matlab_matrix["eigenVal"]
+        out_matrix = np.array()
+
+        # Splitting the gyrification matrix into independent .gii files and saving them
+        for i in range(len(matrix)):
+            gii_image = nib.gifti.gifti.GiftiImage()
+            gii_data_array = nib.gifti.gifti.GiftiDataArray(data=matrix[i])
+            gii_image.add_gifti_data_array(gii_data_array)
+            gii_file_name = "{}/{}/splitted_gyr/{}_segmented_{}".format(
+                intermediary_dir, subject, subject, i
+            )
+            nib.save(gii_image, gii_file_name)
+
+            gii_corrected_file_name = "{}/{}/splitted_gyr/{}_segmented_{}_{}".format(
+                out_dir, subject, subject, template, i
+            )
+            # calling mri_surf2surf on each of those images to put them in fsaverage5 space
+            cmd = "mri_surf2surf --srcsubject {} --srcsurfval {} --trgsubject {} --trgsurfval {} --trgsurfreg sphere.reg --hemi {} -sfmt gifti --tfmt gifti --noreshape --no-cortex".format(
+                subject, gii_file_name, template, gii_corrected_file_name, hem
+            )
+            os.system(cmd)
+            # putting the segmented matrix back together
+            out_matrix.append(nib.load(gii_corrected_file_name))
+
+        np.save(
+            "{}/{}_{}eig_vec_{}.mat".format(out_dir, subject, hem, template), out_matrix
+        )
+
+
+########
+# Launch
+########
 if __name__ == "__main__":
     # execute only if run as a script
     data_list_files = "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/files_to_download.json"
