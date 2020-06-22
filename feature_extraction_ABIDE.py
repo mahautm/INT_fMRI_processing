@@ -1104,7 +1104,7 @@ def file_movement(out_dir, intermediary_dir):
         shutil.move(
             file,
             intermediary_dir
-            + "/{}/".format(file[(len(out_dir) + 1) : (len(file) - 15)]),
+            + "/{}/".format(file[(len(out_dir) + 1) : (len(file) - 14)]),
         )
 
 
