@@ -1115,7 +1115,7 @@ def align_gyrification(subject, out_dir, intermediary_dir, template="fsaverage5"
             "{}/{}/{}_{}eig_vec.mat".format(intermediary_dir, subject, subject, hem)
         )
         matrix = matlab_matrix["eigVec"]
-        out_matrix = np.array()
+        out_matrix = np.empty([])
 
         # Splitting the gyrification matrix into independent .gii files and saving them
         for i in range(len(matrix)):
@@ -1136,7 +1136,12 @@ def align_gyrification(subject, out_dir, intermediary_dir, template="fsaverage5"
             )
             os.system(cmd)
             # putting the segmented matrix back together
-            out_matrix.append(nib.load(gii_corrected_file_name))
+            if out_matrix.shape == ():
+                out_matrix = nib.load(gii_corrected_file_name)
+            else:
+                out_matrix = np.concatenate(
+                    (out_matrix, [nib.load(gii_corrected_file_name)]), axis=0
+                )
 
         np.save(
             "{}/{}_{}eig_vec_{}.mat".format(out_dir, subject, hem, template), out_matrix
