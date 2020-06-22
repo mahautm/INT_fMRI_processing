@@ -1125,6 +1125,12 @@ def align_gyrification(subject, out_dir, intermediary_dir, template="fsaverage5"
             gii_file_name = "{}/{}/splitted_gyr/{}_segmented_{}".format(
                 intermediary_dir, subject, subject, i
             )
+
+            if not os.path.exists(
+                "{}/{}/splitted_gyr/".format(intermediary_dir, subject)
+            ):
+                os.makedirs("{}/{}/splitted_gyr/".format(intermediary_dir, subject))
+
             nib.save(gii_image, gii_file_name)
 
             gii_corrected_file_name = "{}/{}/splitted_gyr/{}_segmented_{}_{}".format(
