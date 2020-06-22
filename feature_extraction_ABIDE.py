@@ -1120,7 +1120,7 @@ def align_gyrification(subject, out_dir, intermediary_dir, template="fsaverage5"
 
         # Splitting the gyrification matrix into independent .gii files and saving them
         for i in range(len(matrix)):
-            gii_image = nib.gifti.gifti.GiftiImage()
+            gii_image = nib.gifti.gifti.GiftiImage(shape=matrix.shape)
             gii_data_array = nib.gifti.gifti.GiftiDataArray(data=matrix[i])
             gii_image.add_gifti_data_array(gii_data_array)
             gii_file_name = "{}/{}/splitted_gyr/{}_segmented_{}.gii".format(
@@ -1138,8 +1138,8 @@ def align_gyrification(subject, out_dir, intermediary_dir, template="fsaverage5"
                 out_dir, subject, subject, template, i
             )
 
-            if not os.path.exists("{}/splitted_gyr/".format(out_dir, subject)):
-                os.makedirs("{}/splitted_gyr/".format(out_dir, subject))
+            if not os.path.exists("{}/splitted_gyr/".format(out_dir)):
+                os.makedirs("{}/splitted_gyr/".format(out_dir))
 
             # calling mri_surf2surf on each of those images to put them in fsaverage5 space
             cmd = "mri_surf2surf --srcsubject {} --srcsurfval {} --trgsubject {} --trgsurfval {} --trgsurfreg sphere.reg --hemi {} --sfmt gifti --tfmt gifti --noreshape --no-cortex".format(
