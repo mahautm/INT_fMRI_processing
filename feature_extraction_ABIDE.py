@@ -1122,7 +1122,7 @@ def align_gyrification(subject, out_dir, intermediary_dir, template="fsaverage5"
             gii_image = nib.gifti.gifti.GiftiImage()
             gii_data_array = nib.gifti.gifti.GiftiDataArray(data=matrix[i])
             gii_image.add_gifti_data_array(gii_data_array)
-            gii_file_name = "{}/{}/splitted_gyr/{}_segmented_{}".format(
+            gii_file_name = "{}/{}/splitted_gyr/{}_segmented_{}.npy".format(
                 intermediary_dir, subject, subject, i
             )
 
@@ -1133,7 +1133,7 @@ def align_gyrification(subject, out_dir, intermediary_dir, template="fsaverage5"
 
             nib.save(gii_image, gii_file_name)
 
-            gii_corrected_file_name = "{}/{}/splitted_gyr/{}_segmented_{}_{}".format(
+            gii_corrected_file_name = "{}/{}/splitted_gyr/{}_segmented_{}_{}.npy".format(
                 out_dir, subject, subject, template, i
             )
             # calling mri_surf2surf on each of those images to put them in fsaverage5 space
