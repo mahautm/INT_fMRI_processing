@@ -42,6 +42,7 @@ for subject in subject_list:
         fh.writelines("#SBATCH --mail-user={}\n".format(email))
         # making sure group is ok for data sharing within group
         batch_cmd = (
+            "export SUBJECTS_DIR=/scratch/mmahaut/data/intertva/downloaded_preprocessed\n"
             "chmod +x /scratch/mmahaut/scripts/INT_fMRI_processing/for_redistribution_files_only/run_find_eig.sh\n"
             'eval "$(/scratch/mmahaut/tools/Anaconda3/bin/conda shell.bash hook)"\n'
             + "conda activate ABIDE\n"
