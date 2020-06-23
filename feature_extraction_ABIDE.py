@@ -184,6 +184,7 @@ def extract_one_abide(
         matlab_runtime_path,
         matlab_script_path,
         intermediary_data_path,
+        template,
     )
 
 
@@ -269,6 +270,7 @@ def extract_one_interTVA(
         matlab_runtime_path,
         matlab_script_path,
         intermediary_data_path,
+        template,
     )
 
 
@@ -426,6 +428,7 @@ def compute_gyrification_features(
     matlab_runtime_path="/usr/local/MATLAB/MATLAB_Runtime/v95",
     matlab_script_path="./for_redistribution_files_only",
     intermediary_data_path="/scratch/mmahaut/data/abide/intermediary",
+    template="fsaverage5",
 ):
     """
     Grouping all functions required to produce the gyrification features as a eigen vector matrix
@@ -461,6 +464,10 @@ def compute_gyrification_features(
         matlab_script_path,
         processed_data_path,
     )
+    # TODO : modify and compile matlab so that the file movement can be removed
+
+    file_movement(processed_data_path, intermediary_data_path)
+    align_gyrification(subject, processed_data_path, intermediary_data_path, template)
 
 
 def download_interTVA_from_frioul(
@@ -1100,7 +1107,7 @@ def matlab_find_eig(
 def file_movement(out_dir, intermediary_dir):
     # temporary function here to move files back to the intermediary folder, where they belong.
     for file in glob.glob(out_dir + "/*.mat"):
-        print(file[(len(out_dir) + 1) : (len(file) - 15)])
+        print(file[(len(out_dir) + 1) : (len(file) - 14)])
         shutil.move(
             file,
             intermediary_dir
@@ -1173,6 +1180,6 @@ if __name__ == "__main__":
     data_list_files = "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/files_to_download.json"
     data_list_file = open(data_list_files)
     data_list = json.load(data_list_file)
-    # extract_one_abide(sys.argv[1], data_list)
+    extract_one_abide(sys.argv[1], data_list)
 
-    extract_one_interTVA(sys.argv[1], data_list)
+    # extract_one_interTVA(sys.argv[1], data_list)
