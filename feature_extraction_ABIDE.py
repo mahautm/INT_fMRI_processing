@@ -1134,12 +1134,12 @@ def align_gyrification(subject, out_dir, intermediary_dir, template="fsaverage5"
 
             nib.save(gii_image, gii_file_name)
 
-            gii_corrected_file_name = "{}/splitted_gyr/{}_segmented_{}_{}.gii".format(
-                out_dir, subject, subject, template, i
+            gii_corrected_file_name = "{}/{}/splitted_gyr/{}_segmented_{}_{}.gii".format(
+                intermediary_dir, subject, subject, template, i
             )
 
             if not os.path.exists("{}/splitted_gyr/".format(out_dir)):
-                os.makedirs("{}/splitted_gyr/".format(out_dir))
+                os.makedirs("{}/splitted_gyr/".format(intermediary_dir))
 
             # calling mri_surf2surf on each of those images to put them in fsaverage5 space
             cmd = "mri_surf2surf --srcsubject {} --srcsurfval {} --trgsubject {} --trgsurfval {} --trgsurfreg sphere.reg --hemi {} --sfmt gifti --tfmt gifti --noreshape --no-cortex".format(
