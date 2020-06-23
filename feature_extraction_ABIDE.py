@@ -464,9 +464,6 @@ def compute_gyrification_features(
         matlab_script_path,
         processed_data_path,
     )
-    # TODO : modify and compile matlab so that the file movement can be removed
-
-    file_movement(processed_data_path, intermediary_data_path)
     align_gyrification(subject, processed_data_path, intermediary_data_path, template)
 
 
@@ -1180,6 +1177,8 @@ if __name__ == "__main__":
     data_list_files = "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/files_to_download.json"
     data_list_file = open(data_list_files)
     data_list = json.load(data_list_file)
-    extract_one_abide(sys.argv[1], data_list)
 
-    # extract_one_interTVA(sys.argv[1], data_list)
+    if data_list["data"] == "ABIDE":
+        extract_one_abide(sys.argv[1], data_list)
+    elif data_list["data"] == "interTVA":
+        extract_one_interTVA(sys.argv[1], data_list)
