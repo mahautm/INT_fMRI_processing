@@ -462,7 +462,6 @@ def compute_gyrification_features(
         intermediary_data_path + "/" + subject,
         matlab_runtime_path,
         matlab_script_path,
-        processed_data_path,
     )
     align_gyrification(subject, processed_data_path, intermediary_data_path, template)
 
@@ -1059,9 +1058,7 @@ def prepare_matlab(
         )
 
 
-def matlab_find_eig(
-    subject, white_matlab_matrix, matlab_runtime_path, script_path, out_dir
-):
+def matlab_find_eig(subject, white_matlab_matrix, matlab_runtime_path, script_path):
     """
     Calls on spangy to build a map of gyrifications
 
@@ -1085,19 +1082,23 @@ def matlab_find_eig(
 
 
     """
-    if not os.path.exists(out_dir + "/{}_lheig_vec.mat".format(subject)):
-        if not os.path.exists(out_dir):
-            os.makedirs(out_dir)
+    if not os.path.exists(white_matlab_matrix + "/{}_lheig_vec.mat".format(subject)):
+        if not os.path.exists(white_matlab_matrix):
+            os.makedirs(white_matlab_matrix)
 
         cmd = "{}/run_find_eig.sh {} {} {} {}".format(
-            script_path, matlab_runtime_path, subject, white_matlab_matrix, out_dir
+            script_path,
+            matlab_runtime_path,
+            subject,
+            white_matlab_matrix,
+            white_matlab_matrix,
         )
         os.system(cmd)
         print("Gyrification matrix written for " + subject)
     else:
         print(
             "A .mat file already exists for {} in {} \n If you wish it to be generated again, you must remove it".format(
-                subject, out_dir
+                subject, white_matlab_matrix
             )
         )
 
