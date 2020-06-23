@@ -1123,8 +1123,8 @@ def align_gyrification(subject, out_dir, intermediary_dir, template="fsaverage5"
             gii_image = nib.gifti.gifti.GiftiImage()
             gii_data_array = nib.gifti.gifti.GiftiDataArray(data=matrix[i])
             gii_image.add_gifti_data_array(gii_data_array)
-            gii_file_name = "{}/{}/splitted_gyr/{}_segmented_{}.gii".format(
-                intermediary_dir, subject, subject, i
+            gii_file_name = "{}/{}/splitted_gyr/{}_{}_segmented_{}.gii".format(
+                intermediary_dir, subject, subject, hem, i
             )
 
             if not os.path.exists(
@@ -1134,8 +1134,8 @@ def align_gyrification(subject, out_dir, intermediary_dir, template="fsaverage5"
 
             nib.save(gii_image, gii_file_name)
 
-            gii_corrected_file_name = "{}/{}/splitted_gyr/{}_segmented_{}_{}.gii".format(
-                intermediary_dir, subject, subject, template, i
+            gii_corrected_file_name = "{}/{}/splitted_gyr/{}_{}_segmented_{}_{}.gii".format(
+                intermediary_dir, subject, subject, hem, template, i
             )
 
             if not os.path.exists("{}/splitted_gyr/".format(out_dir)):
