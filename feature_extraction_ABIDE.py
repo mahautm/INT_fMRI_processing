@@ -1096,7 +1096,9 @@ def matlab_find_eig(
         print("Gyrification matrix written for " + subject)
     else:
         print(
-            "A file already exists named {} in {} \n If you wish it to be generated again, you must remove it"
+            "A .mat file already exists for {} in {} \n If you wish it to be generated again, you must remove it".format(
+                subject, out_dir
+            )
         )
 
 
@@ -1141,7 +1143,7 @@ def align_gyrification(subject, out_dir, intermediary_dir, template="fsaverage5"
                 intermediary_dir, subject, subject, hem, template, i
             )
 
-            if not os.path.exists("{}/splitted_gyr/".format(out_dir)):
+            if not os.path.exists("{}/splitted_gyr/".format(intermediary_dir)):
                 os.makedirs("{}/splitted_gyr/".format(intermediary_dir))
 
             # calling mri_surf2surf on each of those images to put them in fsaverage5 space
