@@ -260,9 +260,7 @@ def extract_one_interTVA(
     complet ABIDE subject list may be found here :
     https://github.com/preprocessed-connectomes-project/abide/blob/master/preprocessing/yamls/subs_list.yml
     """
-    download_interTVA_from_frioul(
-        subject, data_list, raw_data_path, intermediary_data_path
-    )
+    download_interTVA_from_frioul(subject, data_list, raw_data_path)
     compute_gyrification_features(
         subject,
         raw_data_path,
@@ -332,7 +330,7 @@ def compute_rfMRI_features(
     
 
     """
-    register(
+    minimally_preproc_register(
         subject,
         data_list["rsfMRI"]["derivative"],
         raw_data_path,
@@ -466,9 +464,7 @@ def compute_gyrification_features(
     align_gyrification(subject, processed_data_path, intermediary_data_path, template)
 
 
-def download_interTVA_from_frioul(
-    subject, data_list, destination_folder, intermediary_folder,
-):
+def download_interTVA_from_frioul(subject, data_list, destination_folder):
     """
     TODO : change this comment, and the data_list to work with the pipeline
     Parameters : 
@@ -578,6 +574,12 @@ def download_abide_urls(
     )
     os.system(cmd)
 
+    # Adding minimally preprocessed file for registration
+    cmd = (
+        "wget -c -q -P {}/{} https://s3.amazonaws.com/fcp-indi/data/Projects/ABIDE_Initiative/Outputs/cpac/func_minimal/{}_func_minimal.nii.gz"
+    ).format(destination_folder, subject, subject,)
+    os.system(cmd)
+
     # Adding freesurfer directory
     for key in data_list["freesurfer"]:
         path = "{}/{}/{}".format(destination_folder, subject, key)
@@ -645,12 +647,43 @@ def register(
 
         cmd = (
             cmd_base
-            + "bbregister --s {0} --mov {1}/{0}/{0}_{2}.nii.gz --reg {1}/{0}/{0}_register --{3}".format(
+            + "bbregister --s {0} --mov {1}/{0}/{0}_{2}.nii.gz --reg {1}/{0}/{0}_register.dat --{3}".format(
                 subject, out_data, derivative, contrast
             )
         )
 
         os.system(cmd)
+
+
+def minimally_preproc_register(
+    subject="USM_0050450",
+    derivative="func_preproc",
+    subject_folder="/media/sf_StageINT/data/datareg",
+    out_data="/media/sf_StageINT/data/reg_check",
+    change_sub_dir=False,
+    contrast="t1",
+):
+    cmd_base = ""
+    if not os.path.exists(out_data) or not os.path.exists(
+        os.path.join(out_data, subject)
+    ):
+        os.makedirs(os.path.join(out_data, subject))
+    if not os.path.exists("{1}/{0}/{0}_register.lta".format(subject, out_data)):
+
+        if change_sub_dir:
+            cmd_base = "export SUBJECTS_DIR=" + subject_folder + "&& "
+
+        cmd = (
+            cmd_base
+            + "bbregister --s {0} --mov {3}/{0}/{0}_func_minimal.nii.gz --o {1}/{0}/{0}_func_minimal.nii.gz --reg {1}/{0}/{0}_register.dat --{2}".format(
+                subject, out_data, contrast, subject_folder
+            )
+        )
+        os.system(cmd)
+
+        cmd = "mri_vol2vol --reg {1}/{0}/{0}_register.dat --mov {3}/{0}/{0}_{2}.nii.gz --fstarg --o {1}/{0}/{0}_{2}.nii.gz --no-resample".format(
+            subject, out_data, derivative, subject_folder
+        )
 
 
 def split_dim_time(subject, derivative, out_data):
