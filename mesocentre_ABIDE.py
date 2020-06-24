@@ -38,7 +38,7 @@ for subject in subject_list:
         # number of cores for this job
         fh.writelines("#SBATCH --ntasks-per-node=1\n")  # ??
         # email alerts
-        if subject = "NYU_0050995":
+        if subject == "NYU_0050995":
             fh.writelines("#SBATCH --mail-type=END\n")
         fh.writelines("#SBATCH --mail-user={}\n".format(email))
         # making sure group is ok for data sharing within group
