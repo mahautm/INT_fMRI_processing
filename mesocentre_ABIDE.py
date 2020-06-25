@@ -10,7 +10,7 @@ python_path = "python3.7"
 slurm_dir = "/scratch/mmahaut/scripts/slurm"
 code_dir = "/scratch/mmahaut/scripts/INT_fMRI_processing"
 subs_list_file_path = (
-    "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list_test.json"
+    "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list_asd.json"
 )
 script_name = "feature_extraction_ABIDE.py"
 

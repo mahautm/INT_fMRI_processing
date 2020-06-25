@@ -1284,6 +1284,7 @@ def gyrification_sign(
                 ),
                 gyr_mat,
             )
+            print("sign check done for {} {}".format(subject, hem))
     else:
         print("The reference subject does not require to be sign-checked with itself.")
 
