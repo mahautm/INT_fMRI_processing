@@ -1276,7 +1276,7 @@ def gyrification_sign(
                 # Le signe du produit scalaire nous indique si les deux vecteurs propres ont le même signe
                 prod_scal = np.vdot(gyr_mat[i], ref_gyr_mat[i])
                 if prod_scal < 0:
-                    gyr_mat[i] = -1 * gyr_mat
+                    gyr_mat[i] = -1 * gyr_mat[i]
 
             np.save(
                 "{}/{}_{}eig_vec_{}_onref{}.npy".format(
