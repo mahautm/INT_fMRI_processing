@@ -91,6 +91,7 @@ def extract_all_abide(
 
 def extract_one_abide(
     subject,
+    ref_subject,
     data_list,
     raw_data_path="/scratch/mmahaut/data/abide/downloaded_preprocessed",
     force_destination_folder=False,
@@ -179,6 +180,7 @@ def extract_one_abide(
     )
     compute_gyrification_features(
         subject,
+        ref_subject,
         raw_data_path,
         gyrification_features_data_path,
         matlab_runtime_path,
@@ -190,6 +192,7 @@ def extract_one_abide(
 
 def extract_one_interTVA(
     subject,
+    ref_subject,
     data_list,
     raw_data_path="/scratch/mmahaut/data/intertva/downloaded_preprocessed",
     template="fsaverage5",
@@ -263,6 +266,7 @@ def extract_one_interTVA(
     download_interTVA_from_frioul(subject, data_list, raw_data_path)
     compute_gyrification_features(
         subject,
+        ref_subject,
         raw_data_path,
         gyrification_features_data_path,
         matlab_runtime_path,
@@ -421,6 +425,7 @@ def compute_rfMRI_features_interTVA(
 
 def compute_gyrification_features(
     subject,
+    ref_subject,
     raw_data_path="/scratch/mmahaut/data/abide/downloaded_preprocessed",
     processed_data_path="/scratch/mmahaut/data/abide/features_gyrification",
     matlab_runtime_path="/usr/local/MATLAB/MATLAB_Runtime/v95",
@@ -461,7 +466,10 @@ def compute_gyrification_features(
         matlab_runtime_path,
         matlab_script_path,
     )
-    align_gyrification(subject, processed_data_path, intermediary_data_path, template)
+    align_gyrification(subject, intermediary_data_path, template),
+    gyrification_sign(
+        subject, ref_subject, processed_data_path, intermediary_data_path, template
+    )
 
 
 def download_interTVA_from_frioul(subject, data_list, destination_folder):
@@ -1171,63 +1179,77 @@ def file_movement2(
 
 
 def align_gyrification(subject, intermediary_dir, template="fsaverage5"):
+
     hem_list = ["lh", "rh"]
     for hem in hem_list:
-        matlab_matrix = scio.loadmat(
-            "{}/{}/{}_{}eig_vec.mat".format(intermediary_dir, subject, subject, hem)
-        )
-        matrix = matlab_matrix["eigVec"]
-        matrix = np.transpose(matrix)
-        out_matrix = np.empty([])
-
-        # Splitting the gyrification matrix into independent .gii files and saving them
-        for i in range(len(matrix)):
-            gii_image = nib.gifti.gifti.GiftiImage()
-            gii_data_array = nib.gifti.gifti.GiftiDataArray(data=matrix[i])
-            gii_image.add_gifti_data_array(gii_data_array)
-            gii_file_name = "{}/{}/splitted_gyr/{}_{}_segmented_{}.gii".format(
-                intermediary_dir, subject, subject, hem, i
-            )
-
-            if not os.path.exists(
-                "{}/{}/splitted_gyr/".format(intermediary_dir, subject)
-            ):
-                os.makedirs("{}/{}/splitted_gyr/".format(intermediary_dir, subject))
-
-            nib.save(gii_image, gii_file_name)
-
-            gii_corrected_file_name = "{}/{}/splitted_gyr/{}_{}_segmented_{}_{}.gii".format(
-                intermediary_dir, subject, subject, hem, template, i
-            )
-
-            if not os.path.exists("{}/splitted_gyr/".format(intermediary_dir)):
-                os.makedirs("{}/splitted_gyr/".format(intermediary_dir))
-
-            # calling mri_surf2surf on each of those images to put them in fsaverage5 space
-            cmd = "mri_surf2surf --srcsubject {} --srcsurfval {} --trgsubject {} --trgsurfval {} --trgsurfreg sphere.reg --hemi {} --sfmt gifti --tfmt gifti --noreshape --no-cortex".format(
-                subject, gii_file_name, template, gii_corrected_file_name, hem
-            )
-            os.system(cmd)
-            # putting the segmented matrix back together
-            if out_matrix.shape == ():
-                out_matrix = np.array(
-                    [nib.load(gii_corrected_file_name).darrays[0].data]
-                )
-            else:
-                out_matrix = np.concatenate(
-                    (
-                        out_matrix,
-                        np.array([nib.load(gii_corrected_file_name).darrays[0].data]),
-                    ),
-                    axis=0,
-                )
-
-        np.save(
+        if not os.path.exists(
             "{}/{}/{}_{}eig_vec_{}.npy".format(
                 intermediary_dir, subject, subject, hem, template
-            ),
-            out_matrix,
-        )
+            )
+        ):
+            matlab_matrix = scio.loadmat(
+                "{}/{}/{}_{}eig_vec.mat".format(intermediary_dir, subject, subject, hem)
+            )
+            matrix = matlab_matrix["eigVec"]
+            matrix = np.transpose(matrix)
+            out_matrix = np.empty([])
+
+            # Splitting the gyrification matrix into independent .gii files and saving them
+            for i in range(len(matrix)):
+                gii_image = nib.gifti.gifti.GiftiImage()
+                gii_data_array = nib.gifti.gifti.GiftiDataArray(data=matrix[i])
+                gii_image.add_gifti_data_array(gii_data_array)
+                gii_file_name = "{}/{}/splitted_gyr/{}_{}_segmented_{}.gii".format(
+                    intermediary_dir, subject, subject, hem, i
+                )
+
+                if not os.path.exists(
+                    "{}/{}/splitted_gyr/".format(intermediary_dir, subject)
+                ):
+                    os.makedirs("{}/{}/splitted_gyr/".format(intermediary_dir, subject))
+
+                nib.save(gii_image, gii_file_name)
+
+                gii_corrected_file_name = "{}/{}/splitted_gyr/{}_{}_segmented_{}_{}.gii".format(
+                    intermediary_dir, subject, subject, hem, template, i
+                )
+
+                if not os.path.exists("{}/splitted_gyr/".format(intermediary_dir)):
+                    os.makedirs("{}/splitted_gyr/".format(intermediary_dir))
+
+                # calling mri_surf2surf on each of those images to put them in fsaverage5 space
+                cmd = "mri_surf2surf --srcsubject {} --srcsurfval {} --trgsubject {} --trgsurfval {} --trgsurfreg sphere.reg --hemi {} --sfmt gifti --tfmt gifti --noreshape --no-cortex".format(
+                    subject, gii_file_name, template, gii_corrected_file_name, hem
+                )
+                os.system(cmd)
+                # putting the segmented matrix back together
+                if out_matrix.shape == ():
+                    out_matrix = np.array(
+                        [nib.load(gii_corrected_file_name).darrays[0].data]
+                    )
+                else:
+                    out_matrix = np.concatenate(
+                        (
+                            out_matrix,
+                            np.array(
+                                [nib.load(gii_corrected_file_name).darrays[0].data]
+                            ),
+                        ),
+                        axis=0,
+                    )
+
+            np.save(
+                "{}/{}/{}_{}eig_vec_{}.npy".format(
+                    intermediary_dir, subject, subject, hem, template
+                ),
+                out_matrix,
+            )
+        else:
+            print(
+                "{}/{}/{}_{}eig_vec_{}.npy already exists. Remove from file to run again".format(
+                    intermediary_dir, subject, subject, hem, template
+                )
+            )
 
 
 def gyrification_sign(
@@ -1235,14 +1257,13 @@ def gyrification_sign(
 ):
     # we select a subject as the reference subject
     if not subject == ref_subject:
-        ref_gyr_mat = np.load(
-            "{}/{}/{}_{}eig_vec_{}.npy".format(
-                intermediary_dir, ref_subject, ref_subject, hem, template
-            )
-        )
-
         hem_list = ["lh", "rh"]
         for hem in hem_list:
+            ref_gyr_mat = np.load(
+                "{}/{}/{}_{}eig_vec_{}.npy".format(
+                    intermediary_dir, ref_subject, ref_subject, hem, template
+                )
+            )
             gyr_mat = np.load(
                 "{}/{}/{}_{}eig_vec_{}.npy".format(
                     intermediary_dir, subject, subject, hem, template
@@ -1255,7 +1276,7 @@ def gyrification_sign(
                 # Le signe du produit scalaire nous indique si les deux vecteurs propres ont le même signe
                 prod_scal = np.vdot(gyr_mat[i], ref_gyr_mat[i])
                 if prod_scal < 0:
-                    gyr_mat = -1 * gyr_mat
+                    gyr_mat[i] = -1 * gyr_mat
 
             np.save(
                 "{}/{}_{}eig_vec_{}_onref{}.npy".format(
@@ -1263,6 +1284,8 @@ def gyrification_sign(
                 ),
                 gyr_mat,
             )
+    else:
+        print("The reference subject does not require to be sign-checked with itself.")
 
 
 ########
@@ -1275,6 +1298,6 @@ if __name__ == "__main__":
     data_list = json.load(data_list_file)
 
     if data_list["data"] == "ABIDE":
-        extract_one_abide(sys.argv[1], data_list)
+        extract_one_abide(sys.argv[1], sys.argv[2], data_list)
     elif data_list["data"] == "interTVA":
-        extract_one_interTVA(sys.argv[1], data_list)
+        extract_one_interTVA(sys.argv[1], sys.argv[2], data_list)

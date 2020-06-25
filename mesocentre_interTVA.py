@@ -16,7 +16,7 @@ script_name = "feature_extraction_ABIDE.py"
 
 subs_list_file = open(subs_list_file_path)
 subject_list = json.load(subs_list_file)
-
+ref_subject = subject_list[0]
 
 for subject in subject_list:
     job_name = "{}_extraction".format(subject)
@@ -38,7 +38,7 @@ for subject in subject_list:
         # number of cores for this job
         fh.writelines("#SBATCH --ntasks-per-node=1\n")  # ??
         # email alerts
-        fh.writelines("#SBATCH --mail-type=BEGIN,END\n")
+        fh.writelines("#SBATCH --mail-type=END\n")
         fh.writelines("#SBATCH --mail-user={}\n".format(email))
         # making sure group is ok for data sharing within group
         batch_cmd = (
@@ -46,7 +46,9 @@ for subject in subject_list:
             "chmod +x /scratch/mmahaut/scripts/INT_fMRI_processing/for_redistribution_files_only/run_find_eig.sh\n"
             'eval "$(/scratch/mmahaut/tools/Anaconda3/bin/conda shell.bash hook)"\n'
             + "conda activate ABIDE\n"
-            + "{} {}/{} {}".format(python_path, code_dir, script_name, subject)
+            + "{} {}/{} {} {}".format(
+                python_path, code_dir, script_name, subject, ref_subject
+            )
         )
 
         fh.writelines(batch_cmd)
