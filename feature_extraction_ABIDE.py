@@ -1155,7 +1155,11 @@ def file_movement(out_dir, intermediary_dir):
             + "/{}/".format(file[(len(out_dir) + 1) : (len(file) - 14)]),
         )
 
-def file_movement2(out_dir="/scratch/mmahaut/data/abide/features_rsfMRI", intermediary_dir="/scratch/mmahaut/data/abide/intermediary"):
+
+def file_movement2(
+    out_dir="/scratch/mmahaut/data/abide/features_rsfMRI",
+    intermediary_dir="/scratch/mmahaut/data/abide/intermediary",
+):
     # temporary function here to move files back to the intermediary folder, where they belong.
     for file in glob.glob(out_dir + "/*.npy"):
         print(file[(len(out_dir) + 1) : (len(file) - 24)])
@@ -1163,7 +1167,7 @@ def file_movement2(out_dir="/scratch/mmahaut/data/abide/features_rsfMRI", interm
             file,
             intermediary_dir
             + "/{}/".format(file[(len(out_dir) + 1) : (len(file) - 24)]),
-        )        
+        )
 
 
 def align_gyrification(subject, intermediary_dir, template="fsaverage5"):
@@ -1219,34 +1223,47 @@ def align_gyrification(subject, intermediary_dir, template="fsaverage5"):
                 )
 
         np.save(
-            "{}/{}/{}_{}eig_vec_{}.npy".format(intermediary_dir,subject, subject, hem, template), out_matrix
+            "{}/{}/{}_{}eig_vec_{}.npy".format(
+                intermediary_dir, subject, subject, hem, template
+            ),
+            out_matrix,
         )
 
 
-def gyrification_sign(subject, ref_subject, out_dir, intermediary_dir, template="fsaverage5"):
+def gyrification_sign(
+    subject, ref_subject, out_dir, intermediary_dir, template="fsaverage5"
+):
     # we select a subject as the reference subject
     if not subject == ref_subject:
         ref_gyr_mat = np.load(
-            "{}/{}/{}_{}eig_vec_{}.npy".format(intermediary_dir, ref_subject, ref_subject, hem, template)
+            "{}/{}/{}_{}eig_vec_{}.npy".format(
+                intermediary_dir, ref_subject, ref_subject, hem, template
+            )
         )
 
         hem_list = ["lh", "rh"]
         for hem in hem_list:
             gyr_mat = np.load(
-                "{}/{}/{}_{}eig_vec_{}.npy".format(intermediary_dir,subject, subject, hem, template)
+                "{}/{}/{}_{}eig_vec_{}.npy".format(
+                    intermediary_dir, subject, subject, hem, template
+                )
             )
             # if not len(gyr_mat) == len(ref_gyr_mat):
             #     print("Warning : subject being worked on and reference subject do not have the same number of lines")
-            
 
-            
             for i in range(len(gyr_mat)):
-                #Le signe du produit scalaire nous indique si les deux vecteurs propres ont le même signe
-                prod_scal = np.vdot(gyr_mat[i],ref_gyr_mat[i])
-                if prod_scal<0
+                # Le signe du produit scalaire nous indique si les deux vecteurs propres ont le même signe
+                prod_scal = np.vdot(gyr_mat[i], ref_gyr_mat[i])
+                if prod_scal < 0:
                     gyr_mat = -1 * gyr_mat
-            
-            np.save("{}/{}_{}eig_vec_{}_onref{}.npy".format(out_dir, subject, hem, template, ref_subject), gyr_mat)
+
+            np.save(
+                "{}/{}_{}eig_vec_{}_onref{}.npy".format(
+                    out_dir, subject, hem, template, ref_subject
+                ),
+                gyr_mat,
+            )
+
 
 ########
 # Launch
