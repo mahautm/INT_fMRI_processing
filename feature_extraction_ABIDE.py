@@ -1162,11 +1162,11 @@ def file_movement2(
 ):
     # temporary function here to move files back to the intermediary folder, where they belong.
     for file in glob.glob(out_dir + "/*.npy"):
-        print(file[(len(out_dir) + 1) : (len(file) - 24)])
+        print(file[(len(out_dir) + 1) : (len(file) - 25)])
         shutil.move(
             file,
             intermediary_dir
-            + "/{}/".format(file[(len(out_dir) + 1) : (len(file) - 24)]),
+            + "/{}/".format(file[(len(out_dir) + 1) : (len(file) - 25)]),
         )
 
 
