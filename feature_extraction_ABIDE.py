@@ -1157,7 +1157,7 @@ def file_movement(out_dir, intermediary_dir):
 
 
 def file_movement2(
-    out_dir="/scratch/mmahaut/data/abide/features_rsfMRI",
+    out_dir="/scratch/mmahaut/data/abide/features_gyrification",
     intermediary_dir="/scratch/mmahaut/data/abide/intermediary",
 ):
     # temporary function here to move files back to the intermediary folder, where they belong.
