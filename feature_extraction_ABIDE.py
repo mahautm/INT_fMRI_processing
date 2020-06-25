@@ -668,7 +668,7 @@ def minimally_preproc_register(
         os.path.join(out_data, subject)
     ):
         os.makedirs(os.path.join(out_data, subject))
-    if not os.path.exists("{1}/{0}/{0}_register.lta".format(subject, out_data)):
+    if not os.path.exists("{1}/{0}/{0}_register.dat".format(subject, out_data)):
 
         if change_sub_dir:
             cmd_base = "export SUBJECTS_DIR=" + subject_folder + "&& "
@@ -680,9 +680,18 @@ def minimally_preproc_register(
             )
         )
         os.system(cmd)
-
+        print("register.dat has been calculated on minimally preprocessed data")
         cmd = "mri_vol2vol --reg {1}/{0}/{0}_register.dat --mov {3}/{0}/{0}_{2}.nii.gz --fstarg --o {1}/{0}/{0}_{2}.nii.gz --no-resample".format(
             subject, out_data, derivative, subject_folder
+        )
+        os.system(cmd)
+
+        print("register.dat has been applied on volume")
+    else:
+        print(
+            "a register.dat file allready exists at {1}/{0}\n if you wish to run again, remove that file.".format(
+                subject, out_data
+            )
         )
 
 
