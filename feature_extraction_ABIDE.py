@@ -171,21 +171,21 @@ def extract_one_abide(
     compute_rfMRI_features(
         subject,
         data_list,
-        contrast,
         raw_data_path,
-        force_destination_folder,
-        template,
         rfmri_features_data_path,
         intermediary_data_path,
+        contrast,
+        force_destination_folder,
+        template,
     )
     compute_gyrification_features(
         subject,
         ref_subject,
         raw_data_path,
         gyrification_features_data_path,
+        intermediary_data_path,
         matlab_runtime_path,
         matlab_script_path,
-        intermediary_data_path,
         template,
     )
 
@@ -194,9 +194,8 @@ def extract_one_interTVA(
     subject,
     ref_subject,
     data_list,
-    raw_data_path="/scratch/mmahaut/data/intertva/downloaded_preprocessed",
+    raw_data_path,
     template="fsaverage5",
-    rfmri_features_data_path="/scratch/mmahaut/data/intertva/features_rsfMRI",
     gyrification_features_data_path="/scratch/mmahaut/data/intertva/features_gyrification",
     matlab_runtime_path="/scratch/mmahaut/tools/MATLAB_Runtime/v95",
     matlab_script_path="/scratch/mmahaut/scripts/INT_fMRI_processing/for_redistribution_files_only",
@@ -269,9 +268,9 @@ def extract_one_interTVA(
         ref_subject,
         raw_data_path,
         gyrification_features_data_path,
+        intermediary_data_path,
         matlab_runtime_path,
         matlab_script_path,
-        intermediary_data_path,
         template,
     )
 
@@ -279,12 +278,12 @@ def extract_one_interTVA(
 def compute_rfMRI_features(
     subject,
     data_list,
+    raw_data_path,
+    processed_data_path,
+    intermediary_data_path,
     contrast="t1",
-    raw_data_path="/scratch/mmahaut/data/abide/downloaded_preprocessed",
     force_destination_folder=False,
     template="fsaverage5",
-    processed_data_path="/scratch/mmahaut/data/abide/features_rsfMRI",
-    intermediary_data_path="/scratch/mmahaut/data/abide/intermediary",
 ):
     """
     Grouping of all functions required to produce the rsfMRI features as a correlation matrix between voxels and ROIs
@@ -426,11 +425,11 @@ def compute_rfMRI_features_interTVA(
 def compute_gyrification_features(
     subject,
     ref_subject,
-    raw_data_path="/scratch/mmahaut/data/abide/downloaded_preprocessed",
-    processed_data_path="/scratch/mmahaut/data/abide/features_gyrification",
+    raw_data_path,
+    processed_data_path,
+    intermediary_data_path="/scratch/mmahaut/data/abide/intermediary",
     matlab_runtime_path="/usr/local/MATLAB/MATLAB_Runtime/v95",
     matlab_script_path="./for_redistribution_files_only",
-    intermediary_data_path="/scratch/mmahaut/data/abide/intermediary",
     template="fsaverage5",
 ):
     """
@@ -664,12 +663,7 @@ def register(
 
 
 def minimally_preproc_register(
-    subject="USM_0050450",
-    derivative="func_preproc",
-    subject_folder="/media/sf_StageINT/data/datareg",
-    out_data="/media/sf_StageINT/data/reg_check",
-    change_sub_dir=False,
-    contrast="t1",
+    subject, derivative, subject_folder, out_data, change_sub_dir=False, contrast="t1",
 ):
     cmd_base = ""
     if not os.path.exists(out_data) or not os.path.exists(
@@ -1075,9 +1069,7 @@ def correlation(subdir, sub, template, split_dir, intermediary_dir, out_dir):
 
 
 def prepare_matlab(
-    subject,
-    subject_folder="/scratch/mmahaut/data/abide/downloaded_preprocessed",
-    out_dir="./processed_ABIDE",
+    subject, subject_folder, out_dir,
 ):
     """
     Makes .mat files out of .white files to be used to get the eigenvectors
@@ -1153,29 +1145,29 @@ def matlab_find_eig(subject, white_matlab_matrix, matlab_runtime_path, script_pa
         )
 
 
-def file_movement(out_dir, intermediary_dir):
-    # temporary function here to move files back to the intermediary folder, where they belong.
-    for file in glob.glob(out_dir + "/*.mat"):
-        print(file[(len(out_dir) + 1) : (len(file) - 14)])
-        shutil.move(
-            file,
-            intermediary_dir
-            + "/{}/".format(file[(len(out_dir) + 1) : (len(file) - 14)]),
-        )
+# def file_movement(out_dir, intermediary_dir):
+#     # temporary function here to move files back to the intermediary folder, where they belong.
+#     for file in glob.glob(out_dir + "/*.mat"):
+#         print(file[(len(out_dir) + 1) : (len(file) - 14)])
+#         shutil.move(
+#             file,
+#             intermediary_dir
+#             + "/{}/".format(file[(len(out_dir) + 1) : (len(file) - 14)]),
+#         )
 
 
-def file_movement2(
-    out_dir="/scratch/mmahaut/data/abide/features_gyrification",
-    intermediary_dir="/scratch/mmahaut/data/abide/intermediary",
-):
-    # temporary function here to move files back to the intermediary folder, where they belong.
-    for file in glob.glob(out_dir + "/*.npy"):
-        print(file[(len(out_dir) + 1) : (len(file) - 25)])
-        shutil.move(
-            file,
-            intermediary_dir
-            + "/{}/".format(file[(len(out_dir) + 1) : (len(file) - 25)]),
-        )
+# def file_movement2(
+#     out_dir="/scratch/mmahaut/data/abide/features_gyrification",
+#     intermediary_dir="/scratch/mmahaut/data/abide/intermediary",
+# ):
+#     # temporary function here to move files back to the intermediary folder, where they belong.
+#     for file in glob.glob(out_dir + "/*.npy"):
+#         print(file[(len(out_dir) + 1) : (len(file) - 25)])
+#         shutil.move(
+#             file,
+#             intermediary_dir
+#             + "/{}/".format(file[(len(out_dir) + 1) : (len(file) - 25)]),
+#         )
 
 
 def align_gyrification(subject, intermediary_dir, template="fsaverage5"):
@@ -1299,6 +1291,30 @@ if __name__ == "__main__":
     data_list = json.load(data_list_file)
 
     if data_list["data"] == "ABIDE":
-        extract_one_abide(sys.argv[1], sys.argv[2], data_list)
+        extract_one_abide(
+            sys.argv[1],
+            sys.argv[2],
+            data_list,
+            raw_data_path="/scratch/mmahaut/data/abide/downloaded_preprocessed",
+            force_destination_folder=False,
+            template="fsaverage5",
+            contrast="t1",
+            rfmri_features_data_path="/scratch/mmahaut/data/abide/features_rsfMRI",
+            gyrification_features_data_path="/scratch/mmahaut/data/abide/features_gyrification",
+            matlab_runtime_path="/scratch/mmahaut/tools/MATLAB_Runtime/v95",
+            matlab_script_path="/scratch/mmahaut/scripts/INT_fMRI_processing/for_redistribution_files_only",
+            intermediary_data_path="/scratch/mmahaut/data/abide/intermediary",
+        )
     elif data_list["data"] == "interTVA":
-        extract_one_interTVA(sys.argv[1], sys.argv[2], data_list)
+        extract_one_interTVA(
+            sys.argv[1],
+            sys.argv[2],
+            data_list,
+            raw_data_path="/scratch/mmahaut/data/intertva/downloaded_preprocessed",
+            template="fsaverage5",
+            gyrification_features_data_path="/scratch/mmahaut/data/intertva/features_gyrification",
+            matlab_runtime_path="/scratch/mmahaut/tools/MATLAB_Runtime/v95",
+            matlab_script_path="/scratch/mmahaut/scripts/INT_fMRI_processing/for_redistribution_files_only",
+            intermediary_data_path="/scratch/mmahaut/data/intertva/intermediary",
+        )
+
