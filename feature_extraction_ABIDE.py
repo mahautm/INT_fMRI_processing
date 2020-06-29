@@ -1,7 +1,7 @@
 """
 Filename : feature_extraction_ABIDE.py
 Created Date : 20/05/2020
-Last Edited : 19/06/2020
+Last Edited : 29/06/2020
 Author : Mateo MAHAUT (mmahaut@ensc.fr) 
 Git : https://github.com/mahautm/INT_fMRI_processing.git
 
@@ -473,7 +473,6 @@ def compute_gyrification_features(
 
 def download_interTVA_from_frioul(subject, data_list, destination_folder):
     """
-    TODO : change this comment, and the data_list to work with the pipeline
     Parameters : 
     ----------
     subject : string, subject name
@@ -605,6 +604,9 @@ def register(
     subject, derivative, subject_folder, out_data, change_sub_dir=False, contrast="t1",
 ):
     """
+    /!\ This function is NOT used in the pipeline anymore. ABIDE data processed like this did not give good results.
+    Go for minimally_preproc_register instead.
+
     This function copies the original .nii file to the out_dir,
     then calls bbregister on the .nii file found at the root of each subject's folder
     it registers the .nii image to match its freesurfer files
@@ -665,6 +667,42 @@ def register(
 def minimally_preproc_register(
     subject, derivative, subject_folder, out_data, change_sub_dir=False, contrast="t1",
 ):
+
+    """
+    This function copies the original .nii file to the out_dir,
+    then calls bbregister on the minimally preprocessed .nii file found at the root of each subject's folder
+    the matrix used to transformthat .nii image to match its freesurfer files is also applied to the normally
+    processed data, making a new file in the intermediary data folder.
+
+    Parameters
+    ----------
+
+    subject : string, subject name
+        subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
+    
+    derivative : {"alff","degree_binarize","degree_weighted","dual_regression",
+               "eigenvector_binarize","eigenvector_weighted","falff","func_mask",
+               "func_mean","func_preproc","lfcd","reho","rois_aal","rois_cc200",
+               "rois_cc400","rois_dosenbach160","rois_ez","rois_ho","rois_tt","vmhc"}
+
+    subject_folder : string
+        path to the folder where is kept the data for each subject to be registered
+
+    out_data : string
+        path to folder where newly registered data should be kept
+
+    change_sub_dir :  boolean, optional, default False
+        if activated will force SUBJECTS_DIR to be destination folder for each call to os.system
+
+    contrast : {"t1", "dti", "t2", "bold"}
+        used by freesurfer's bbregister, the contrast used on the original image 
+        (t1 is White Matter brighter than Grey Matter, the others set Grey Matter as brightest)
+
+    Notes
+    -----
+    This function will only be called on subjects which have not already been registered, 
+    by checking they do not have a "_register" file in out_data.
+    """
     cmd_base = ""
     if not os.path.exists(out_data) or not os.path.exists(
         os.path.join(out_data, subject)
@@ -1171,7 +1209,23 @@ def matlab_find_eig(subject, white_matlab_matrix, matlab_runtime_path, script_pa
 
 
 def align_gyrification(subject, intermediary_dir, template="fsaverage5"):
+"""
+Surfaces are all maped on the chosen template surface, giving us neat matrices with matching dimensions !
+Existig matrix is segmented and each eigenvector is projected on fsaverage5.
 
+Parameters
+----------
+    subject : string, subject name
+        subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
+
+    intermediary_data_path : string, optional ("/scratch/mmahaut/data/abide/intermediary" is default)
+        path to the file where all intermediary data will be saved and looked for, included gifti hemispheral surface files
+
+    template : string, optional ("fsaverage5" by default)       
+        name of the template used bu freesurfer functions, must be found in freesurfer's SUBJECTS_DIR  
+
+
+"""
     hem_list = ["lh", "rh"]
     for hem in hem_list:
         if not os.path.exists(
@@ -1247,6 +1301,27 @@ def align_gyrification(subject, intermediary_dir, template="fsaverage5"):
 def gyrification_sign(
     subject, ref_subject, out_dir, intermediary_dir, template="fsaverage5"
 ):
+"""
+Make eigen-vector signs coherent throughout all corresponding eigenvectors by matching them with a given reference subject.
+
+Parameters
+----------
+    subject : string, subject name
+        subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
+    
+    ref_subject : string, reference subject name
+        subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file, all eigenvector sign will match
+
+    out_dir : string
+        path to the file where the gyrification eigen-vector matrix will be saved. If the path does not exist, folders will be added.
+    
+    intermediary_data_path : string, optional ("/scratch/mmahaut/data/abide/intermediary" is default)
+        path to the file where all intermediary data will be saved and looked for, included gifti hemispheral surface files
+
+    template : string, optional ("fsaverage5" by default)       
+        name of the template used bu freesurfer functions, must be found in freesurfer's SUBJECTS_DIR  
+
+"""
     # we select a subject as the reference subject
     if not subject == ref_subject:
         hem_list = ["lh", "rh"]
