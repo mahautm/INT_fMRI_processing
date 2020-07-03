@@ -1323,37 +1323,66 @@ Parameters
 
 """
     # we select a subject as the reference subject
+
     if not subject == ref_subject:
-        hem_list = ["lh", "rh"]
-        for hem in hem_list:
-            ref_gyr_mat = np.load(
-                "{}/{}/{}_{}eig_vec_{}.npy".format(
-                    intermediary_dir, ref_subject, ref_subject, hem, template
-                )
-            )
-            gyr_mat = np.load(
-                "{}/{}/{}_{}eig_vec_{}.npy".format(
-                    intermediary_dir, subject, subject, hem, template
-                )
-            )
-            # if not len(gyr_mat) == len(ref_gyr_mat):
-            #     print("Warning : subject being worked on and reference subject do not have the same number of lines")
+        lh_gyr = hemisphere_sign_check(subject, ref_subject, out_dir, intermediary_dir, "lh", template)
+        rh_gyr = hemisphere_sign_check(subject, ref_subject, out_dir, intermediary_dir, "rh", template)
 
-            for i in range(len(gyr_mat)):
-                # Le signe du produit scalaire nous indique si les deux vecteurs propres ont le même signe
-                prod_scal = np.vdot(gyr_mat[i], ref_gyr_mat[i])
-                if prod_scal < 0:
-                    gyr_mat[i] = -1 * gyr_mat[i]
-
-            np.save(
-                "{}/{}_{}eig_vec_{}_onref{}.npy".format(
-                    out_dir, subject, hem, template, ref_subject
-                ),
-                gyr_mat,
-            )
-            print("sign check done for {} {}".format(subject, hem))
+        full_brain_gyr = np.concatenate((lh_gyr,rh_gyr))
+        # !! TODO : The names are begining to be long. It could be interesting to have either a metadata file,
+        #  or a text file with the information saved in folder root
+        np.save(
+            "{}/{}_eig_vec_{}_onref_{}.npy".format(
+                out_dir, subject, template, ref_subject
+            ),
+            full_brain_gyr,
+        )
+        print("sign check done for {}".format(subject))
     else:
         print("The reference subject does not require to be sign-checked with itself.")
+
+
+def hemisphere_sign_check(
+    subject, ref_subject, out_dir, intermediary_dir, hem, template="fsaverage5"
+):
+"""
+Make eigen-vector signs coherent throughout all corresponding eigenvectors by matching them with a given reference subject.
+
+Parameters
+----------
+    subject : string, subject name
+        subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
+    
+    ref_subject : string, reference subject name
+        subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file, all eigenvector sign will match
+
+    out_dir : string
+        path to the file where the gyrification eigen-vector matrix will be saved. If the path does not exist, folders will be added.
+    
+    intermediary_data_path : string, optional ("/scratch/mmahaut/data/abide/intermediary" is default)
+        path to the file where all intermediary data will be saved and looked for, included gifti hemispheral surface files
+
+    template : string, optional ("fsaverage5" by default)       
+        name of the template used bu freesurfer functions, must be found in freesurfer's SUBJECTS_DIR  
+
+"""
+    ref_gyr_mat = np.load(
+        "{}/{}/{}_{}eig_vec_{}.npy".format(
+            intermediary_dir, ref_subject, ref_subject, hem, template
+        )
+    )
+    gyr_mat = np.load(
+        "{}/{}/{}_{}eig_vec_{}.npy".format(
+            intermediary_dir, subject, subject, hem, template
+        )
+    )
+
+    for i in range(len(gyr_mat)):
+        # Le signe du produit scalaire nous indique si les deux vecteurs propres ont le même signe
+        prod_scal = np.vdot(gyr_mat[i], ref_gyr_mat[i])
+        if prod_scal < 0:
+            gyr_mat[i] = -1 * gyr_mat[i]
+    return gyr_mat;
 
 
 ########
