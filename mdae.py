@@ -22,24 +22,24 @@ from keras.models import load_model
 def load_data(
     sub, view, ref_sub="USM_0050475", orig_path="/scratch/mmahaut/data/abide/"
 ):
-    hemlist = ["lh","rh"]
     # Import anatomical gyrification data
     if view == 1:
-            for hem in hemlist:
-                data_path = os.path.join(
-                    orig_path,
-                    "features_gyrification/{}_eig_vec_fsaverage5_onref_{}.npy".format(
-                        sub, hem, ref_sub
-                    ),
-                )
-                view_gyr = np.load(data_path)
+
+        data_path = os.path.join(
+            orig_path,
+            "features_gyrification/{}_eig_vec_fsaverage5_onref_{}.npy".format(
+                sub, ref_sub
+            ),
+        )
+        view_gyr = np.load(data_path)
         return view_gyr
 
     # Import Resting-State fMRI data
     if view == 2:
         view_rsfmri = np.load(
             os.path.join(
-                path, "features_rsfMRI/correlation_matrix_fsaverage5_{}.npy".format(sub)
+                orig_path,
+                "features_rsfMRI/correlation_matrix_fsaverage5_{}.npy".format(sub),
             )
         )
         return view_rsfmri
@@ -48,11 +48,11 @@ def load_data(
     if view == 3:
         view_rsfmri = np.load(
             os.path.join(
-                path, "rsfmri/{}/correlation_matrix_fsaverage5.npy".format(sub)
+                orig_path, "rsfmri/{}/correlation_matrix_fsaverage5.npy".format(sub)
             )
         )
         view_tfmri = np.load(
-            os.path.join(path, "tfmri/{}/gii_matrix_fsaverage5.npy".format(sub))
+            os.path.join(orig_path, "tfmri/{}/gii_matrix_fsaverage5.npy".format(sub))
         )
         fmri_data = np.concatenate([view_tfmri, view_rsfmri], axis=1)
         return fmri_data

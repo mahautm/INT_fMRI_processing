@@ -604,7 +604,7 @@ def register(
     subject, derivative, subject_folder, out_data, change_sub_dir=False, contrast="t1",
 ):
     """
-    /!\ This function is NOT used in the pipeline anymore. ABIDE data processed like this did not give good results.
+    !! This function is NOT used in the pipeline anymore. ABIDE data processed like this did not give good results.
     Go for minimally_preproc_register instead.
 
     This function copies the original .nii file to the out_dir,
@@ -1209,23 +1209,23 @@ def matlab_find_eig(subject, white_matlab_matrix, matlab_runtime_path, script_pa
 
 
 def align_gyrification(subject, intermediary_dir, template="fsaverage5"):
-"""
-Surfaces are all maped on the chosen template surface, giving us neat matrices with matching dimensions !
-Existig matrix is segmented and each eigenvector is projected on fsaverage5.
+    """
+    Surfaces are all maped on the chosen template surface, giving us neat matrices with matching dimensions !
+    Existig matrix is segmented and each eigenvector is projected on fsaverage5.
 
-Parameters
-----------
-    subject : string, subject name
-        subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
+    Parameters
+    ----------
+        subject : string, subject name
+            subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
 
-    intermediary_data_path : string, optional ("/scratch/mmahaut/data/abide/intermediary" is default)
-        path to the file where all intermediary data will be saved and looked for, included gifti hemispheral surface files
+        intermediary_data_path : string, optional ("/scratch/mmahaut/data/abide/intermediary" is default)
+            path to the file where all intermediary data will be saved and looked for, included gifti hemispheral surface files
 
-    template : string, optional ("fsaverage5" by default)       
-        name of the template used bu freesurfer functions, must be found in freesurfer's SUBJECTS_DIR  
+        template : string, optional ("fsaverage5" by default)       
+            name of the template used bu freesurfer functions, must be found in freesurfer's SUBJECTS_DIR  
 
 
-"""
+    """
     hem_list = ["lh", "rh"]
     for hem in hem_list:
         if not os.path.exists(
@@ -1301,34 +1301,38 @@ Parameters
 def gyrification_sign(
     subject, ref_subject, out_dir, intermediary_dir, template="fsaverage5"
 ):
-"""
-Make eigen-vector signs coherent throughout all corresponding eigenvectors by matching them with a given reference subject.
+    """
+    Make eigen-vector signs coherent throughout all corresponding eigenvectors by matching them with a given reference subject.
 
-Parameters
-----------
-    subject : string, subject name
-        subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
-    
-    ref_subject : string, reference subject name
-        subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file, all eigenvector sign will match
+    Parameters
+    ----------
+        subject : string, subject name
+            subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
+        
+        ref_subject : string, reference subject name
+            subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file, all eigenvector sign will match
 
-    out_dir : string
-        path to the file where the gyrification eigen-vector matrix will be saved. If the path does not exist, folders will be added.
-    
-    intermediary_data_path : string, optional ("/scratch/mmahaut/data/abide/intermediary" is default)
-        path to the file where all intermediary data will be saved and looked for, included gifti hemispheral surface files
+        out_dir : string
+            path to the file where the gyrification eigen-vector matrix will be saved. If the path does not exist, folders will be added.
+        
+        intermediary_data_path : string, optional ("/scratch/mmahaut/data/abide/intermediary" is default)
+            path to the file where all intermediary data will be saved and looked for, included gifti hemispheral surface files
 
-    template : string, optional ("fsaverage5" by default)       
-        name of the template used bu freesurfer functions, must be found in freesurfer's SUBJECTS_DIR  
+        template : string, optional ("fsaverage5" by default)       
+            name of the template used bu freesurfer functions, must be found in freesurfer's SUBJECTS_DIR  
 
-"""
+    """
     # we select a subject as the reference subject
 
     if not subject == ref_subject:
-        lh_gyr = hemisphere_sign_check(subject, ref_subject, out_dir, intermediary_dir, "lh", template)
-        rh_gyr = hemisphere_sign_check(subject, ref_subject, out_dir, intermediary_dir, "rh", template)
+        lh_gyr = hemisphere_sign_check(
+            subject, ref_subject, out_dir, intermediary_dir, "lh", template
+        )
+        rh_gyr = hemisphere_sign_check(
+            subject, ref_subject, out_dir, intermediary_dir, "rh", template
+        )
 
-        full_brain_gyr = np.concatenate((lh_gyr,rh_gyr))
+        full_brain_gyr = np.concatenate((lh_gyr, rh_gyr))
         # !! TODO : The names are begining to be long. It could be interesting to have either a metadata file,
         #  or a text file with the information saved in folder root
         np.save(
@@ -1345,27 +1349,27 @@ Parameters
 def hemisphere_sign_check(
     subject, ref_subject, out_dir, intermediary_dir, hem, template="fsaverage5"
 ):
-"""
-Make eigen-vector signs coherent throughout all corresponding eigenvectors by matching them with a given reference subject.
+    """
+    Make eigen-vector signs coherent throughout all corresponding eigenvectors by matching them with a given reference subject.
 
-Parameters
-----------
-    subject : string, subject name
-        subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
-    
-    ref_subject : string, reference subject name
-        subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file, all eigenvector sign will match
+    Parameters
+    ----------
+        subject : string, subject name
+            subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file
+        
+        ref_subject : string, reference subject name
+            subject name to call function on, as found in freesurfer's SUBJECTS_DIR or in the subs_list file, all eigenvector sign will match
 
-    out_dir : string
-        path to the file where the gyrification eigen-vector matrix will be saved. If the path does not exist, folders will be added.
-    
-    intermediary_data_path : string, optional ("/scratch/mmahaut/data/abide/intermediary" is default)
-        path to the file where all intermediary data will be saved and looked for, included gifti hemispheral surface files
+        out_dir : string
+            path to the file where the gyrification eigen-vector matrix will be saved. If the path does not exist, folders will be added.
+        
+        intermediary_data_path : string, optional ("/scratch/mmahaut/data/abide/intermediary" is default)
+            path to the file where all intermediary data will be saved and looked for, included gifti hemispheral surface files
 
-    template : string, optional ("fsaverage5" by default)       
-        name of the template used bu freesurfer functions, must be found in freesurfer's SUBJECTS_DIR  
+        template : string, optional ("fsaverage5" by default)       
+            name of the template used bu freesurfer functions, must be found in freesurfer's SUBJECTS_DIR  
 
-"""
+    """
     ref_gyr_mat = np.load(
         "{}/{}/{}_{}eig_vec_{}.npy".format(
             intermediary_dir, ref_subject, ref_subject, hem, template
@@ -1382,7 +1386,7 @@ Parameters
         prod_scal = np.vdot(gyr_mat[i], ref_gyr_mat[i])
         if prod_scal < 0:
             gyr_mat[i] = -1 * gyr_mat[i]
-    return gyr_mat;
+    return gyr_mat
 
 
 ########
