@@ -46,13 +46,18 @@ def load_data(
 
     # Import concatenated fMRI data
     if view == 3:
+        data_path = os.path.join(
+            orig_path,
+            "features_gyrification/{}_eig_vec_fsaverage5_onref_{}.npy".format(
+                sub, ref_sub
+            ),
+        )
+        view_gyr = np.load(data_path)
         view_rsfmri = np.load(
             os.path.join(
-                orig_path, "rsfmri/{}/correlation_matrix_fsaverage5.npy".format(sub)
+                orig_path,
+                "features_rsfMRI/correlation_matrix_fsaverage5_{}.npy".format(sub),
             )
         )
-        view_tfmri = np.load(
-            os.path.join(orig_path, "tfmri/{}/gii_matrix_fsaverage5.npy".format(sub))
-        )
-        fmri_data = np.concatenate([view_tfmri, view_rsfmri], axis=1)
+        fmri_data = np.concatenate([view_gyr, view_rsfmri], axis=1)
         return fmri_data
