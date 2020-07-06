@@ -2,7 +2,7 @@
   "rsfMRI": {
     "pipeline": "cpac",
     "strategy": "filt_global",
-    "derivative": ""
+    "derivative": "func_preproc"
   },
   "freesurfer": {
     "label": [
@@ -25,5 +25,5 @@
       "lh.sphere.reg"
     ]
   },
-  "data": "interTVA"
+  "data": "ABIDE"
 }
