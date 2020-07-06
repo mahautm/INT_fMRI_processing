@@ -30,7 +30,7 @@ def load_data(sub, view):
         data_path =  os.path.join(path, "tfmri/{}/gii_matrix_fsaverage5.npy".format(sub))
         if not os.path.exists(data_path):
             cmd = "rsync mahaut.m@frioul.univ-amu.fr"
-	    os.system(cmd)
+            os.system(cmd)
         view_tfmri = np.load(data_path)
         return view_tfmri
 
