@@ -27,7 +27,7 @@ def load_data(sub, view):
 
     # Import Task fMRI data
     if view == 1:
-        data_path =  os.path.join(path, "tfmri/{}/gii_matrix_fsaverage5.npy".format(sub))
+        data_path = os.path.join(path, "tfmri/{}/gii_matrix_fsaverage5.npy".format(sub))
         if not os.path.exists(data_path):
             cmd = "rsync mahaut.m@frioul.univ-amu.fr"
             os.system(cmd)
@@ -58,7 +58,7 @@ def load_data(sub, view):
 
 
 # Path
-path = "/scratch/mmahaut/data/intertva/past_data/"
+path = "d:/alpha/Cours/StageINT/fmri/"
 
 print("View 1: task-fMRI")
 print("View 2: resting-state fMRI")
