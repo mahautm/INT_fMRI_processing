@@ -72,13 +72,14 @@ def load_data(
                 )
             )
         elif data_orig == "interTVA":
+            # in the past_data directory, for interTVA, subjects are solely identified by their number,
+            #  we therefore remove the 'sub-' prefix at the begining of the names, as well as the 0 in single digit cases
+            simplified_sub_name = sub_list[sub_index][5:] if sub_list[sub_index][4] = 0 else sub_list[sub_index][4:]
             view_rsfmri = np.load(
                 os.path.join(
                     orig_path,
                     "past_data/rsfmri/{}/correlation_matrix_fsaverage5.npy".format(
-                        sub_list[sub_index][4:]
-                        # in the past_data directory, for interTVA, subjects are solely identified by their number,
-                        #  we therefore remove the 'sub-' prefix at the begining of the names
+                        simplified_sub_name
                     ),
                 )
             )
