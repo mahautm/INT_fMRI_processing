@@ -1324,7 +1324,18 @@ def gyrification_sign(
     """
     # we select a subject as the reference subject
 
-    if not subject == ref_subject:
+    if subject == ref_subject:
+        lh_gyr = np.load(
+            "{}/{}/{}_{}eig_vec_{}.npy".format(
+                intermediary_dir, subject, subject, "lh", template
+            )
+        )
+        rh_gyr = np.load(
+            "{}/{}/{}_{}eig_vec_{}.npy".format(
+                intermediary_dir, subject, subject, "rh", template
+            )
+        )
+    else:
         lh_gyr = hemisphere_sign_check(
             subject, ref_subject, out_dir, intermediary_dir, "lh", template
         )
@@ -1332,18 +1343,14 @@ def gyrification_sign(
             subject, ref_subject, out_dir, intermediary_dir, "rh", template
         )
 
-        full_brain_gyr = np.concatenate((lh_gyr, rh_gyr))
-        # !! TODO : The names are begining to be long. It could be interesting to have either a metadata file,
-        #  or a text file with the information saved in folder root
-        np.save(
-            "{}/{}_eig_vec_{}_onref_{}.npy".format(
-                out_dir, subject, template, ref_subject
-            ),
-            full_brain_gyr,
-        )
-        print("sign check done for {}".format(subject))
-    else:
-        print("The reference subject does not require to be sign-checked with itself.")
+    full_brain_gyr = np.concatenate((lh_gyr, rh_gyr))
+    # !! TODO : The names are begining to be long. It could be interesting to have either a metadata file,
+    #  or a text file with the information saved in folder root
+    np.save(
+        "{}/{}_eig_vec_{}_onref_{}.npy".format(out_dir, subject, template, ref_subject),
+        full_brain_gyr,
+    )
+    print("sign check done for {}".format(subject))
 
 
 def hemisphere_sign_check(
