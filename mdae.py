@@ -21,7 +21,7 @@ from keras.models import load_model
 
 
 def load_data(
-    sub_index, view, ref_sub="sub-04", orig_path="/scratch/mmahaut/data/intertva/"
+    sub_index, view, ref_sub="USM_0050475", orig_path="/scratch/mmahaut/data/abide/"
 ):
     """
     The first three view are copies of Akrem's loader, but adapted to the file architecture
