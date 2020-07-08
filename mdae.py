@@ -76,7 +76,7 @@ def load_data(
             #  we therefore remove the 'sub-' prefix at the begining of the names, as well as the 0 in single digit cases
             simplified_sub_name = (
                 sub_list[sub_index][5:]
-                if sub_list[sub_index][4] == 0
+                if sub_list[sub_index][4] == "0"
                 else sub_list[sub_index][4:]
             )
             view_rsfmri = np.load(
