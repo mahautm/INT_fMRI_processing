@@ -1351,7 +1351,6 @@ def gyrification_sign(
                 )
             )
         else:
-            # Transposition mentioned in comments ocures in the hemisphere_sign_check function
             lh_gyr = hemisphere_sign_check(
                 subject, ref_subject, out_dir, intermediary_dir, "lh", template
             )
@@ -1359,7 +1358,7 @@ def gyrification_sign(
                 subject, ref_subject, out_dir, intermediary_dir, "rh", template
             )
 
-        full_brain_gyr = np.concatenate((lh_gyr, rh_gyr))
+        full_brain_gyr = np.concatenate((lh_gyr.transpose(), rh_gyr.transpose()))
         # !! TODO : The names are begining to be long. It could be interesting to have either a metadata file,
         #  or a text file with the information saved in folder root
         np.save(
@@ -1424,7 +1423,7 @@ def hemisphere_sign_check(
             gyr_mat[i] = -1 * gyr_mat[i]
 
     # Transposition is required to correspond to other modality formats ie (voxel, feature)
-    return gyr_mat.transpose()
+    return gyr_mat
 
 
 ########
