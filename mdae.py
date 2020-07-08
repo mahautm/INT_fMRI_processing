@@ -149,9 +149,7 @@ if __name__ == "__main__":
             "Warning !! : Please provide data origin as parameter when calling script: either 'ABIDE' or 'interTVA' "
         )
 
-    sub_list_files = (
-        "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list.json"
-    )
+    sub_list_files = "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list_asd.json"
     sub_list_file = open(sub_list_files)
     sub_list = json.load(sub_list_file)
 
