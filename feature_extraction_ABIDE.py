@@ -1213,6 +1213,8 @@ def align_gyrification(subject, intermediary_dir, template="fsaverage5"):
     Surfaces are all maped on the chosen template surface, giving us neat matrices with matching dimensions !
     Existig matrix is segmented and each eigenvector is projected on fsaverage5.
 
+
+
     Parameters
     ----------
         subject : string, subject name
@@ -1225,6 +1227,10 @@ def align_gyrification(subject, intermediary_dir, template="fsaverage5"):
             name of the template used bu freesurfer functions, must be found in freesurfer's SUBJECTS_DIR  
 
 
+    Notes
+    -----
+        The input matrices loaded from chosen path are transposed from a (voxel, eigenvector) shape on input to (eigenvector, voxel) on output
+        (this makes line operation in for loops more relevant, and is useful for the gyrification_sign() function later in the pipeline)
     """
     hem_list = ["lh", "rh"]
     for hem in hem_list:
@@ -1238,6 +1244,8 @@ def align_gyrification(subject, intermediary_dir, template="fsaverage5"):
             )
             matrix = matlab_matrix["eigVec"]
             matrix = np.transpose(matrix)
+            # Transposition is done so that the lines in the for loop correspond to the different eigenvectors.
+            # That transposition is not reversed at the end of the function, as this is also relevant during sign checking
             out_matrix = np.empty([])
 
             # Splitting the gyrification matrix into independent .gii files and saving them
@@ -1320,37 +1328,53 @@ def gyrification_sign(
 
         template : string, optional ("fsaverage5" by default)       
             name of the template used bu freesurfer functions, must be found in freesurfer's SUBJECTS_DIR  
+    
+    Notes
+    -----
+        The input matrix that is loaded from given path will have a (eigenvector, voxel) shape, but will be transposed to 
+        (voxel, eigenvector) shape so as to match the format of the other modalities when entering the auto-encoder
 
     """
     # we select a subject as the reference subject
+    if not os.path.exists(
+        "{}/{}_eig_vec_{}_onref_{}.npy".format(out_dir, subject, template, ref_subject)
+    ):
+        if subject == ref_subject:
+            lh_gyr = np.load(
+                "{}/{}/{}_{}eig_vec_{}.npy".format(
+                    intermediary_dir, subject, subject, "lh", template
+                )
+            )
+            rh_gyr = np.load(
+                "{}/{}/{}_{}eig_vec_{}.npy".format(
+                    intermediary_dir, subject, subject, "rh", template
+                )
+            )
+        else:
+            # Transposition mentioned in comments ocures in the hemisphere_sign_check function
+            lh_gyr = hemisphere_sign_check(
+                subject, ref_subject, out_dir, intermediary_dir, "lh", template
+            )
+            rh_gyr = hemisphere_sign_check(
+                subject, ref_subject, out_dir, intermediary_dir, "rh", template
+            )
 
-    if subject == ref_subject:
-        lh_gyr = np.load(
-            "{}/{}/{}_{}eig_vec_{}.npy".format(
-                intermediary_dir, subject, subject, "lh", template
-            )
+        full_brain_gyr = np.concatenate((lh_gyr, rh_gyr))
+        # !! TODO : The names are begining to be long. It could be interesting to have either a metadata file,
+        #  or a text file with the information saved in folder root
+        np.save(
+            "{}/{}_eig_vec_{}_onref_{}.npy".format(
+                out_dir, subject, template, ref_subject
+            ),
+            full_brain_gyr,
         )
-        rh_gyr = np.load(
-            "{}/{}/{}_{}eig_vec_{}.npy".format(
-                intermediary_dir, subject, subject, "rh", template
-            )
-        )
+        print("sign check done for {}".format(subject))
     else:
-        lh_gyr = hemisphere_sign_check(
-            subject, ref_subject, out_dir, intermediary_dir, "lh", template
+        print(
+            "{}/{}_eig_vec_{}_onref_{}.npy file already exists. If you wish to run agein, remove file from directory".format(
+                out_dir, subject, template, ref_subject
+            )
         )
-        rh_gyr = hemisphere_sign_check(
-            subject, ref_subject, out_dir, intermediary_dir, "rh", template
-        )
-
-    full_brain_gyr = np.concatenate((lh_gyr, rh_gyr))
-    # !! TODO : The names are begining to be long. It could be interesting to have either a metadata file,
-    #  or a text file with the information saved in folder root
-    np.save(
-        "{}/{}_eig_vec_{}_onref_{}.npy".format(out_dir, subject, template, ref_subject),
-        full_brain_gyr,
-    )
-    print("sign check done for {}".format(subject))
 
 
 def hemisphere_sign_check(
@@ -1375,6 +1399,11 @@ def hemisphere_sign_check(
 
         template : string, optional ("fsaverage5" by default)       
             name of the template used bu freesurfer functions, must be found in freesurfer's SUBJECTS_DIR  
+    
+    Notes
+    -----
+        The input matrix that is loaded from given path will have a (eigenvector, voxel) shape, but will be transposed to 
+        (voxel, eigenvector) shape so as to match the format of the other modalities when entering the auto-encoder
 
     """
     ref_gyr_mat = np.load(
@@ -1393,7 +1422,9 @@ def hemisphere_sign_check(
         prod_scal = np.vdot(gyr_mat[i], ref_gyr_mat[i])
         if prod_scal < 0:
             gyr_mat[i] = -1 * gyr_mat[i]
-    return gyr_mat
+
+    # Transposition is required to correspond to other modality formats ie (voxel, feature)
+    return gyr_mat.transpose()
 
 
 ########
