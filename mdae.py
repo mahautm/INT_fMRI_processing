@@ -6,7 +6,7 @@ from keras.callbacks import EarlyStopping
 import matplotlib.pyplot as plt
 
 plt.switch_backend("agg")
-import sys as os
+import sys
 import os
 import json
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
