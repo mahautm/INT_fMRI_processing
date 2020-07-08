@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 plt.switch_backend("agg")
 import sys as os
 import os
+import json
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.decomposition import PCA
 from sklearn.metrics import mean_squared_error
@@ -19,20 +20,23 @@ from keras.callbacks import ModelCheckpoint
 from keras.models import load_model
 
 
-def load_data(
-    sub, view, ref_sub="USM_0050475", orig_path="/scratch/mmahaut/data/abide/"
-):
+def load_data(sub, view, ref_sub="sub-04", orig_path="/scratch/mmahaut/data/intertva/"):
     """
     The first three view are copies of Akrem's loader, but adapted to the file architecture
     found in the mesocentre, from the feature_extraction_ABIDE.py script.
 
-    views 4 & 5 are additions to take into account the new modality, preparing for its testing
+    views 4 & 5 are additions that take into account the new modality, and prepare for its testing
 
     Parameters
     ----------
     sub:
     view: int {1,2,3,4,5}
-        which version of the autoencoder you want 
+        View 1: task fMRI
+        View 2: resting-state fMRI
+        View 3: concatenated views (task-fMRI + rest-fMRI)    
+        View 4: gyrification anatomical MRI modality
+        View 5: concatenated views (gyr-MRI + rest-fMRI)
+
     ref_sub: default "USM_0050475"
         the subject the gyrification matrices were based on during the sign homogeneity phase
     
@@ -51,7 +55,7 @@ def load_data(
         return view_gyr
 
     # Import Resting-State fMRI data
-    if view == 2:
+    elif view == 2:
         view_rsfmri = np.load(
             os.path.join(
                 orig_path,
@@ -61,7 +65,7 @@ def load_data(
         return view_rsfmri
 
     # Import concatenated fMRI data
-    if view == 3:
+    elif view == 3:
         data_path = os.path.join(
             orig_path,
             "features_gyr/{}_eig_vec_fsaverage5_onref_{}.npy".format(sub, ref_sub),
@@ -76,7 +80,7 @@ def load_data(
         fmri_data = np.concatenate([view_gyr, view_rsfmri], axis=1)
         return fmri_data
 
-    if view == 4:
+    elif view == 4:
         data_path = os.path.join(
             orig_path,
             "features_gyrification/{}_eig_vec_fsaverage5_onref_{}.npy".format(
@@ -86,7 +90,7 @@ def load_data(
         view_gyr = np.load(data_path)
         return view_gyr
 
-    if view == 5:
+    elif view == 5:
         data_path = os.path.join(
             orig_path,
             "features_gyrification/{}_eig_vec_fsaverage5_onref_{}.npy".format(
@@ -104,10 +108,15 @@ def load_data(
         return fmri_data
 
 
-print("View 1: gyrification anatomical MRI")
-print("View 2: resting-state fMRI")
-print("View 3: concatenated views (gyr-MRI + rest-fMRI)")
+# print("View 1: gyrification anatomical MRI")
+# print("View 2: resting-state fMRI")
+# print("View 3: concatenated views (gyr-MRI + rest-fMRI)")
 
+sub_list_files = (
+    "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list.json"
+)
+sub_list_file = open(sub_list_files)
+sub_list = json.load(sub_list_file)
 
 # activation functions
 hidden_layer = "linear"
@@ -154,9 +163,11 @@ std_rmse_rsfmri_test = []
 
 # missing data
 # !! change here for ABIDE
-missing_data = [36]
-index_subjects = np.arange(3, 43)
-index_subjects = np.delete(index_subjects, np.argwhere(index_subjects == missing_data))
+
+
+# missing_data = [36]
+# index_subjects = np.arange(3, 43)
+# index_subjects = np.delete(index_subjects, np.argwhere(index_subjects == missing_data))
 
 dimensions = [
     1,
@@ -192,7 +203,7 @@ for dim in batch_1:
         os.makedirs(directory)
     # Cross Validation
     kf = KFold(n_splits=10)
-    print(kf.get_n_splits(index_subjects))
+    print(kf.get_n_splits(sub_list))
     print("number of splits:", kf)
     print("number of features:", dimensions)
     cvscores_mse_test = []
@@ -208,31 +219,29 @@ for dim in batch_1:
     cvscores_rmse_rsfmri_train = []
     cvscores_rmse_rsfmri_test = []
     fold = 0
-    for train_index, test_index in kf.split(index_subjects):
+    for train_index, test_index in kf.split(sub_list):
         fold += 1
         # create directory
         directory = "{}/fold_{}".format(dim, fold)
         if not os.path.exists(directory):
             os.makedirs(directory)
         print(f"Fold #{fold}")
-        print(
-            "TRAIN:", index_subjects[train_index], "TEST:", index_subjects[test_index]
-        )
+        print("TRAIN:", sub_list[train_index], "TEST:", sub_list[test_index])
         # load training and testing data
         print("Load training data...")
         train_gyr_data = np.concatenate(
-            [load_data(sub, 4) for sub in index_subjects[train_index]]
+            [load_data(sub, 4) for sub in sub_list[train_index]]
         )
         train_rsfmri_data = np.concatenate(
-            [load_data(sub, 2) for sub in index_subjects[train_index]]
+            [load_data(sub, 2) for sub in sub_list[train_index]]
         )
         print("Shape of the training data:", train_gyr_data.shape)
         print("Load testdata...")
         test_gyr_data = np.concatenate(
-            [load_data(sub, 4) for sub in index_subjects[test_index]]
+            [load_data(sub, 4) for sub in sub_list[test_index]]
         )
         test_rsfmri_data = np.concatenate(
-            [load_data(sub, 2) for sub in index_subjects[test_index]]
+            [load_data(sub, 2) for sub in sub_list[test_index]]
         )
         print("Shape of the test data:", test_gyr_data.shape)
         # Data normalization to range [-1, 1]
