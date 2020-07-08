@@ -1398,11 +1398,6 @@ def hemisphere_sign_check(
 
         template : string, optional ("fsaverage5" by default)       
             name of the template used bu freesurfer functions, must be found in freesurfer's SUBJECTS_DIR  
-    
-    Notes
-    -----
-        The input matrix that is loaded from given path will have a (eigenvector, voxel) shape, but will be transposed to 
-        (voxel, eigenvector) shape so as to match the format of the other modalities when entering the auto-encoder
 
     """
     ref_gyr_mat = np.load(
@@ -1422,7 +1417,6 @@ def hemisphere_sign_check(
         if prod_scal < 0:
             gyr_mat[i] = -1 * gyr_mat[i]
 
-    # Transposition is required to correspond to other modality formats ie (voxel, feature)
     return gyr_mat
 
 
