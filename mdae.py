@@ -138,7 +138,7 @@ def load_data(
 # print("View 2: resting-state fMRI")
 # print("View 3: concatenated views (gyr-MRI + rest-fMRI)")
 if __name__ == "__main__":
-    data_orig = sys.argv[1]
+    data_orig = os.argv[1]
     if data_orig != "ABIDE" and data_orig != "interTVA":
         print(
             "Please provide data origin as parameter when calling script: either 'ABIDE' or 'interTVA' "
