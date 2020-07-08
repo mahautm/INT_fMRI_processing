@@ -62,7 +62,7 @@ def load_data(
 
     # Import Resting-State fMRI data
     elif view == 2:
-        if data_orig == "ABIDE"
+        if data_orig == "ABIDE":
             view_rsfmri = np.load(
                 os.path.join(
                     orig_path,
