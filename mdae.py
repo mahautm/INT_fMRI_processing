@@ -144,12 +144,14 @@ def load_data(
 # print("View 3: concatenated views (gyr-MRI + rest-fMRI)")
 if __name__ == "__main__":
     data_orig = sys.argv[1]
-    if data_orig != "ABIDE" and data_orig != "interTVA":
+    if data_orig == "ABIDE":
+        sub_list_files = "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list_asd.json"
+    elif data_orig == "interTVA":
+        sub_list_files = "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list.json"
+    else:
         print(
             "Warning !! : Please provide data origin as parameter when calling script: either 'ABIDE' or 'interTVA' "
         )
-
-    sub_list_files = "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list_asd.json"
     sub_list_file = open(sub_list_files)
     sub_list = json.load(sub_list_file)
 
