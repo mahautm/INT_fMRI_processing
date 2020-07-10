@@ -71,6 +71,7 @@ def load_data(
                     ),
                 )
             )
+
         elif data_orig == "interTVA":
             # in the past_data directory, for interTVA, subjects are solely identified by their number,
             #  we therefore remove the 'sub-' prefix at the begining of the names, as well as the 0 in single digit cases
@@ -238,7 +239,7 @@ if __name__ == "__main__":
         if not os.path.exists(directory):
             os.makedirs(directory)
         # Cross Validation
-        kf = KFold(n_splits=10)
+        kf = KFold(n_splits=15)
         print(kf.get_n_splits(index_subjects))
         print("number of splits:", kf)
         print("number of features:", dimensions)
