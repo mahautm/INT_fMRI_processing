@@ -21,9 +21,47 @@ def load_data(fold):
 
     XZ = np.array(X)
 
-    Y = [81.25, 81.25, 93.75, 93.75, 93.75, 62.5, 81.25, 100, 100, 87.5, 87.5, 68.75, 68.75, 87.5, 93.75, 100, 62.5,
-         87.5, 93.75, 87.5, 81.25, 81.25, 81.25, 93.75, 50, 62.5, 93.75, 81.25, 81.25, 87.5, 68.75, 81.25, 87.5, 87.5,
-         87.5, 75, 93.75, 93.75, 93.75]
+    Y = [
+        81.25,
+        81.25,
+        93.75,
+        93.75,
+        93.75,
+        62.5,
+        81.25,
+        100,
+        100,
+        87.5,
+        87.5,
+        68.75,
+        68.75,
+        87.5,
+        93.75,
+        100,
+        62.5,
+        87.5,
+        93.75,
+        87.5,
+        81.25,
+        81.25,
+        81.25,
+        93.75,
+        50,
+        62.5,
+        93.75,
+        81.25,
+        81.25,
+        87.5,
+        68.75,
+        81.25,
+        87.5,
+        87.5,
+        87.5,
+        75,
+        93.75,
+        93.75,
+        93.75,
+    ]
     YZ = np.array(Y)
     x = np.array(Y)
     YZ = (x - min(x)) / (max(x) - min(x))
@@ -32,7 +70,7 @@ def load_data(fold):
 
 def load_graph():
     graph = None
-    with open("adj_matrix.pck", "rb") as f:
+    with open("/scratch/mmahaut/scripts/INT_fMRI_processing/adj_matrix.pck", "rb") as f:
         graph = pickle.load(f)
     return graph
 
@@ -50,7 +88,13 @@ def create_objective_function(X, Y, graph, delta):
 
 def create_objective_function_vec(X, Y, graph, delta):
     def objective_function(beta):
-        val = 0.5 * ((np.trace(np.transpose(X, axes=(0, 2, 1)) @ beta, axis1=1, axis2=2) - Y) ** 2).sum()
+        val = (
+            0.5
+            * (
+                (np.trace(np.transpose(X, axes=(0, 2, 1)) @ beta, axis1=1, axis2=2) - Y)
+                ** 2
+            ).sum()
+        )
         val += delta * 0.5 * np.trace(beta.T @ graph @ beta)
         return val
 
@@ -70,8 +114,12 @@ def create_gradient_function(X, Y, graph, delta):
 
 def create_gradient_function_vec(X, Y, graph, delta):
     def gradient_function(beta):
-        grad = (X * (np.trace(np.transpose(X, axes=(0, 2, 1)) @ beta, axis1=1, axis2=2) - Y)[:, np.newaxis,
-                    np.newaxis]).sum(axis=0)
+        grad = (
+            X
+            * (np.trace(np.transpose(X, axes=(0, 2, 1)) @ beta, axis1=1, axis2=2) - Y)[
+                :, np.newaxis, np.newaxis
+            ]
+        ).sum(axis=0)
         grad += delta * graph @ beta
         return grad
 
@@ -98,7 +146,10 @@ def create_group_sparsity_projector(delta):
         norms = np.linalg.norm(beta, axis=1)
         idx = np.where(norms > delta)
         res = beta * 0.0
-        res[idx, :] = beta[idx, :] - np.squeeze(np.sign(beta[idx, :])) * delta * mu / norms[idx, np.newaxis]
+        res[idx, :] = (
+            beta[idx, :]
+            - np.squeeze(np.sign(beta[idx, :])) * delta * mu / norms[idx, np.newaxis]
+        )
         return res
 
     return group_sparsity_projector
@@ -110,8 +161,15 @@ def estimate_beta(X, Y, params):
     gradient = create_gradient_function_vec(X, Y, params["graph"], params["delta"])
     sparse_projector = create_group_sparsity_projector(params["soft_thresh"])
 
-    (res, mu) = cvm.monotone_fista_support(objective, gradient, X[4] * 0.0, params["mu"],
-                                           params["mu_min"], params["iterations"], sparse_projector)
+    (res, mu) = cvm.monotone_fista_support(
+        objective,
+        gradient,
+        X[4] * 0.0,
+        params["mu"],
+        params["mu_min"],
+        params["iterations"],
+        sparse_projector,
+    )
     return res
 
 
@@ -134,12 +192,15 @@ def cross_validation_error(X, Y, params, nbfolds=5):
         beta = estimate_beta(XE, YE, params)
 
         # Estimate the results
-        results[spl] = np.trace(np.transpose(XT, axes=(0, 2, 1)) @ beta, axis1=1, axis2=2)
+        results[spl] = np.trace(
+            np.transpose(XT, axes=(0, 2, 1)) @ beta, axis1=1, axis2=2
+        )
 
     return results
 
-mse=[]
-rsquared=[]
+
+mse = []
+rsquared = []
 # Calcul du Laplacien du graphe
 graph = load_graph()
 degree = np.array(graph.sum(axis=0))
@@ -170,15 +231,20 @@ if __name__ == "__main__":
         XE = X[idx[train_index], :, :]
         YE = Y[idx[train_index]]
         # Ensemble de test
-        XT = X[idx[test_index],:,:]
+        XT = X[idx[test_index], :, :]
         YT = Y[idx[test_index]]
         beta = estimate_beta(XE, YE, params)
         file = "fold_{}/beta.npy".format(fold)
         np.save(file, beta)
         # Estimate the results
-        results[idx[test_index]] = np.trace(np.transpose(XT, axes=(0, 2, 1)) @ beta, axis1=1, axis2=2)
+        results[idx[test_index]] = np.trace(
+            np.transpose(XT, axes=(0, 2, 1)) @ beta, axis1=1, axis2=2
+        )
         print(results[idx[test_index]])
-        print("MSE, fold_{}".format(fold), mean_squared_error(YT, results[idx[test_index]]))
+        print(
+            "MSE, fold_{}".format(fold),
+            mean_squared_error(YT, results[idx[test_index]]),
+        )
         print("R2 score, fold_{}".format(fold), r2_score(YT, results[idx[test_index]]))
         file = "fold_{}/mse.npy".format(fold)
         np.save(file, mean_squared_error(YT, results[idx[test_index]]))
@@ -186,7 +252,7 @@ if __name__ == "__main__":
         np.save(file, r2_score(YT, results[idx[test_index]]))
         mse.append([mean_squared_error(YT, results[idx[test_index]])])
         rsquared.append([r2_score(YT, results[idx[test_index]])])
- 
+
 
 print("mean mse {}".format(np.mean([mse])))
 file = "mean_mse.npy"
@@ -196,22 +262,9 @@ file = "mean_rsquared.npy"
 np.save(file, np.mean([rsquared]))
 print(results)
 print("Mean Error = {}".format(np.linalg.norm(results - Y) ** 0.2 / Y.shape[0]))
-print("MSE = {}".format( mean_squared_error(Y, results)))
+print("MSE = {}".format(mean_squared_error(Y, results)))
 file = "mse.npy"
-np.save(file,mean_squared_error(Y, results))
+np.save(file, mean_squared_error(Y, results))
 file = "r2_score.npy"
-np.save(file,r2_score(Y, results))
-
-
-
-
-
-
-
-
-
-
-
-
-
+np.save(file, r2_score(Y, results))
 
