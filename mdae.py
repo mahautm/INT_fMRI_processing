@@ -21,7 +21,7 @@ from keras.models import load_model
 
 
 def load_data(
-    sub_index, view, ref_sub="USM_0050475", orig_path="/scratch/mmahaut/data/abide/"
+    sub_index, view, ref_sub="sub-04", orig_path="/scratch/mmahaut/data/intertva/"
 ):
     """
     The first three view are copies of Akrem's loader, but adapted to the file architecture
@@ -354,7 +354,7 @@ if __name__ == "__main__":
                 [normalized_train_gyr_data, normalized_train_rsfmri_data],
                 [normalized_train_gyr_data, normalized_train_rsfmri_data],
                 epochs=70,
-                batch_size=1000,
+                batch_size=100,
                 shuffle=True,
                 validation_data=(
                     [normalized_test_gyr_data, normalized_test_rsfmri_data],
