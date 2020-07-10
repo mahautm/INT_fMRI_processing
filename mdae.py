@@ -272,19 +272,40 @@ if __name__ == "__main__":
             )
             # load training and testing data
             print("Load training data...")
+
+            # Adding parameters for different datasets :
+            if data_orig == "ABIDE":
+                orig_path = "/scratch/mmahaut/data/abide/"
+                ref_subject = "USM_0050475"
+            elif data_orig == "interTVA":
+                orig_path = "/scratch/mmahaut/data/intertva/"
+                ref_subject = "sub-04"
+
             train_gyr_data = np.concatenate(
-                [load_data(sub_index, 4) for sub_index in index_subjects[train_index]]
+                [
+                    load_data(sub_index, 4, ref_subject, orig_path)
+                    for sub_index in index_subjects[train_index]
+                ]
             )
             train_rsfmri_data = np.concatenate(
-                [load_data(sub_index, 2) for sub_index in index_subjects[train_index]]
+                [
+                    load_data(sub_index, 2, ref_subject, orig_path)
+                    for sub_index in index_subjects[train_index]
+                ]
             )
             print("Shape of the training data:", train_gyr_data.shape)
             print("Load testdata...")
             test_gyr_data = np.concatenate(
-                [load_data(sub_index, 4) for sub_index in index_subjects[test_index]]
+                [
+                    load_data(sub_index, 4, ref_subject, orig_path)
+                    for sub_index in index_subjects[test_index]
+                ]
             )
             test_rsfmri_data = np.concatenate(
-                [load_data(sub_index, 2) for sub_index in index_subjects[test_index]]
+                [
+                    load_data(sub_index, 2, ref_subject, orig_path)
+                    for sub_index in index_subjects[test_index]
+                ]
             )
             print("Shape of the test data:", test_gyr_data.shape)
             # Data normalization to range [-1, 1]
