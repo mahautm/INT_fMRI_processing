@@ -1,7 +1,6 @@
 import os
 import os.path as op
 import datetime
-import feature_extraction_ABIDE as fea
 import json
 
 email = "mmahaut@ensc.fr"

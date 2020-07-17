@@ -6,8 +6,22 @@ from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 
+import json
 
 # import matplotlib.pyplot as plt
+def load_data_ABIDE(
+    sub_file="/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list_asd_classified.json",
+):
+    #
+
+    # Hasn't been tested yet, no normalisation step (which kind of seems legit for classification)
+    classified_file = open(sub_file)
+    classified_dict = json.load(classified_file)
+    Y = []
+    for key, value in classified_dict:
+        Y.append([1] if value == "asd" else [0])
+    YZ = np.array(Y)
+    return XZ, YZ
 
 
 def load_data(fold):
@@ -266,5 +280,4 @@ print("MSE = {}".format(mean_squared_error(Y, results)))
 file = "mse.npy"
 np.save(file, mean_squared_error(Y, results))
 file = "r2_score.npy"
-np.save(file, r2_score(Y, results))
 

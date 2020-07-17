@@ -15,7 +15,7 @@ from sklearn.metrics import mean_squared_error
 from math import sqrt
 from keras.optimizers import SGD, Adadelta, Adam
 import numpy as np
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, StratifiedKFold
 from keras.callbacks import ModelCheckpoint
 from keras.models import load_model
 import keras.backend as K
@@ -234,13 +234,28 @@ if __name__ == "__main__":
     batch_2 = dimensions[6:12]
     batch_3 = dimensions[12:17]
     batch_4 = dimensions[17:21]
+
+    # In the ABIDE case, we need to get the Y data to ensure proper repartition of asd and non-asd subjects
+    Y = []
+    if data_orig == "ABIDE":
+        sub_file = "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list_asd_classified.json"
+        classified_file = open(sub_file)
+        classified_dict = json.load(classified_file)
+        # no normalisation step (which kind of seems legit for classification)
+        for key, value in classified_dict:
+            Y.append([1] if value == "asd" else [0])
+
     for dim in batch_1:
         # create directory
         directory = "{}".format(dim)
         if not os.path.exists(directory):
             os.makedirs(directory)
         # Cross Validation
-        kf = KFold(n_splits=15)
+        if data_orig == "ABIDE":
+            kf = StratifiedKFold(n_splits=10)
+        else:
+            kf = KFold(n_splits=10)
+
         print(kf.get_n_splits(index_subjects))
         print("number of splits:", kf)
         print("number of features:", dimensions)
@@ -259,6 +274,8 @@ if __name__ == "__main__":
         fold = 0
         for train_index, test_index in kf.split(index_subjects):
             fold += 1
+            # create directory
+            # os.system("sbatch /scratch/mmahaut/scripts/slurm/mdae_step.sh dim")
             # create directory
             directory = "{}/fold_{}".format(dim, fold)
             if not os.path.exists(directory):
