@@ -21,6 +21,7 @@ def load_data(
     # Hasn't been tested yet,
     X = get_x_data(params, dimension, fold)
     XZ = np.array(X)
+
     Y = []
     if params["data_source"] == "ABIDE":
         classified_file = open(sub_file)
@@ -92,7 +93,7 @@ def get_x_data(
     for subject in subject_list:
         x_sub_data_path = os.path.join(
             input_file_path,
-            dimension,
+            str(dimension),
             "fold_{}".format(fold),
             "/X_{}.npy".format(subject),
         )
