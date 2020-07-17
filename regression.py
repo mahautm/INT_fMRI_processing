@@ -81,7 +81,7 @@ def get_x_data(
     params,
     dimension,
     fold,
-    input_file_path="/scratch/mmahaut/data/intertva/ae_output",
+    input_file_path="/scratch/mmahaut/data/intertva/ae_output_tfmri",
     subject_list_path="/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list.json",
 ):
     """
@@ -98,7 +98,7 @@ def get_x_data(
             "/X_{}.npy".format(subject),
         )
         if not os.path.exists(x_sub_data_path):
-            build_x_data(dimension, fold, subject)
+            build_x_data(dimension, fold, subject, out_file=input_file_path)
 
         x_sub_data = np.load(x_sub_data_path)
         X.append(x_sub_data)
@@ -111,7 +111,7 @@ def build_x_data(
     dimension,
     fold,
     subject,
-    model_file_path="/scratch/mmahaut/data/intertva/ae_gyrification",
+    model_file_path="/scratch/mmahaut/data/intertva/ae",
     rsfmri_data_file_path="/scratch/mmahaut/data/intertva/features_rsfmri",
     modality_data_file_path="/scratch/mmahaut/data/intertva/past_data/tfmri",
     out_file="",
@@ -148,6 +148,9 @@ def build_x_data(
         )
         prediction = model.predict([gyr_data, rsfmri_data])
 
+    x_sub_data_path = os.path.join(
+        out_file, str(dimension), "fold_{}".format(fold), "/X_{}.npy".format(subject),
+    )
     np.save(prediction, "X_{}".format(subject))
 
 
