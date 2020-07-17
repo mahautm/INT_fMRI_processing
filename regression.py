@@ -19,8 +19,8 @@ def load_data(
     sub_file="/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list_asd_classified.json",
 ):
     # Hasn't been tested yet,
-    XZ = get_x_data(params, dimension, fold)
-
+    X = get_x_data(params, dimension, fold)
+    XZ = np.array(X)
     Y = []
     if params["data_source"] == "ABIDE":
         classified_file = open(sub_file)
@@ -360,7 +360,7 @@ if __name__ == "__main__":
 
     for dim in batch_1:
         # 10-fold validation
-        idx = np.arange(0, len(subjects))
+        idx = np.arange(len(subjects))
 
         # idx = np.arange(39)
         kf = KFold(n_splits=10)
