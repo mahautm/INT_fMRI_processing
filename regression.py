@@ -122,8 +122,9 @@ def build_x_data(
     # encoder_rsfmri = tf.keras.models.load_model(os.path.join(model_file_path,"/{}/fold_{}/encoder_rsfmri.h5").format(dimension,fold))
     # encoder_tfmri = tf.keras.models.load_model(os.path.join(model_file_path,"/{}/fold_{}/encoder_tfmri.h5").format(dimension,fold))
     model = tf.keras.models.load_model(
-        os.path.join(model_file_path, "/{}/fold_{}/encoder_shared_layer.h5").format(
-            dimension, fold
+        os.path.join(
+            model_file_path,
+            "/{}/fold_{}/encoder_shared_layer.h5".format(dimension, fold),
         )
     )
 
