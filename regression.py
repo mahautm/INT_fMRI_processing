@@ -122,10 +122,9 @@ def build_x_data(
     # encoder_rsfmri = tf.keras.models.load_model(os.path.join(model_file_path,"/{}/fold_{}/encoder_rsfmri.h5").format(dimension,fold))
     # encoder_tfmri = tf.keras.models.load_model(os.path.join(model_file_path,"/{}/fold_{}/encoder_tfmri.h5").format(dimension,fold))
     model = tf.keras.models.load_model(
-        os.path.join(
-            model_file_path,
-            "/{}/fold_{}/encoder_shared_layer.h5".format(dimension, fold),
-        )
+        "{}/{}/fold_{}/encoder_shared_layer.h5".format(
+            model_file_path, dimension, fold
+        ),
     )
 
     # rsfmri data was not built with the feature extraction script, and therefore might need to be fetched on frioul
