@@ -22,6 +22,7 @@ import keras.backend as K
 
 
 def run_slurm_job_mdae(
+    data_orig,
     dimension,
     fold,
     email="mmahaut@ensc.fr",
@@ -38,8 +39,8 @@ def run_slurm_job_mdae(
     # # An arbitrary reference subject has to be chosen. Here we just take the first.
     # ref_subject = subject_list[0]
 
-    job_name = "dim{}_fold{}_mdae".format(subject)
-    slurmjob_path = op.join(slurm_dir, "{}.sh".format(job_name))
+    job_name = "{}_dim{}_fold{}_mdae".format(data_orig, dimension, fold)
+    slurmjob_path = os.path.join(slurm_dir, "{}.sh".format(job_name))
     create_slurmjob_cmd = "touch {}".format(slurmjob_path)
     os.system(create_slurmjob_cmd)
 
@@ -52,6 +53,7 @@ def run_slurm_job_mdae(
         fh.writelines("#SBATCH --time=24:00:00\n")
         fh.writelines("#SBATCH --account=b125\n")
         fh.writelines("#SBATCH --partition=volta\n")
+        fh.writelines("#SBATCH --gres-flags=enforce-binding\n")
         # number of nodes for this job
         fh.writelines("#SBATCH --nodes=1\n")
         # number of cores for this job
@@ -64,8 +66,8 @@ def run_slurm_job_mdae(
         batch_cmd = (
             'eval "$(/scratch/mmahaut/tools/Anaconda3/bin/conda shell.bash hook)"\n'
             + "conda activate tf_gpu"
-            + "{} {}/{} {} {}".format(
-                python_path, code_dir, script_name, dimension, fold
+            + "{} {}/{} {} {} {}".format(
+                python_path, code_dir, script_name, data_orig, dimension, fold
             )
         )
         fh.writelines(batch_cmd)
@@ -76,6 +78,8 @@ def run_slurm_job_mdae(
 if __name__ == "__main__":
 
     data_orig = sys.argv[1]
+    # sys.argv[2] Default is gyrification, tfMRI must be written otherwise !!check what happens when empty
+    data_type = sys.argv[2]
 
     dimensions = [
         1,
@@ -100,10 +104,8 @@ if __name__ == "__main__":
         48,
         50,
     ]
-    batch_1 = dimensions[0:6]
-    batch_2 = dimensions[6:12]
-    batch_3 = dimensions[12:17]
-    batch_4 = dimensions[17:21]
+
+    # IJCNN paper points to 20 being the best dimension, with 5 to rsfMRI and 15 to tfMRI
 
     # In the ABIDE case, we need to get the Y data to ensure proper repartition of asd and non-asd subjects
     Y = []
@@ -125,9 +127,15 @@ if __name__ == "__main__":
         for dim in dimensions:
             for train_index, test_index in kf.split(index_subjects, Y):
                 fold += 1
-                np.save("/train_index.npy", train_index)
-                np.save("/test_index.npy", test_index)
-                run_slurm_job_mdae(dim, fold)
+                np.save(
+                    "/scratch/mmahaut/data/abide/ae_gyrification/train_index.npy",
+                    train_index,
+                )
+                np.save(
+                    "/scratch/mmahaut/data/abide/ae_gyrification/test_index.npy",
+                    test_index,
+                )
+                run_slurm_job_mdae(data_orig, dim, fold)
 
     elif data_orig == "interTVA":
         kf = KFold(n_splits=10)
@@ -141,9 +149,16 @@ if __name__ == "__main__":
             fold = 0
             for train_index, test_index in kf.split(index_subjects):
                 fold += 1
-                np.save("/train_index.npy", train_index)
-                np.save("/test_index.npy", test_index)
-                run_slurm_job_mdae(dim, fold)
+                ae_type = "ae" if data_type == "tfMRI" else "ae_gyrification"
+                np.save(
+                    "/scratch/mmahaut/data/intertva/{}/train_index.npy".format(ae_type),
+                    train_index,
+                )
+                np.save(
+                    "/scratch/mmahaut/data/intertva/{}/test_index.npy".format(ae_type),
+                    test_index,
+                )
+                run_slurm_job_mdae(data_orig, dim, fold)
     else:
         print(
             "Warning !! : Please provide data origin as parameter when calling script: either 'ABIDE' or 'interTVA' "

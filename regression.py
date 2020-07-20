@@ -408,17 +408,17 @@ if __name__ == "__main__":
             rsquared.append([r2_score(YT, results[idx[test_index]])])
 
 
-print("mean mse {}".format(np.mean([mse])))
-file = "mean_mse.npy"
-np.save(file, np.mean([mse]))
-print("mean r squared {}".format(np.mean([rsquared])))
-file = "mean_rsquared.npy"
-np.save(file, np.mean([rsquared]))
-print(results)
-print("Mean Error = {}".format(np.linalg.norm(results - Y) ** 0.2 / Y.shape[0]))
-print("MSE = {}".format(mean_squared_error(Y, results)))
-file = "mse.npy"
-np.save(file, mean_squared_error(Y, results))
-file = "r2_score.npy"
-np.save(file, r2_score(Y, results))
+        print("mean mse {}".format(np.mean([mse])))
+        file = "mean_mse.npy"
+        np.save(file, np.mean([mse]))
+        print("mean r squared {}".format(np.mean([rsquared])))
+        file = "mean_rsquared.npy"
+        np.save(file, np.mean([rsquared]))
+        print(results)
+        print("Mean Error = {}".format(np.linalg.norm(results - Y) ** 0.2 / Y.shape[0]))
+        print("MSE = {}".format(mean_squared_error(Y, results)))
+        file = "mse.npy"
+        np.save(file, mean_squared_error(Y, results))
+        file = "r2_score.npy"
+        np.save(file, r2_score(Y, results))
 
