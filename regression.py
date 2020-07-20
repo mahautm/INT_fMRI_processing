@@ -160,6 +160,8 @@ def load_intertva_rsfmri(subject, path):
         path, "correlation_matrix_fsaverage5_{}.npy".format(subject)
     )
     if not os.path.exists(full_path):
+        print("rsfmri file downloaded from frioul for {}".format(subject))
+
         cmd = "scp mahaut.m@frioul.int.univ-amu.fr:/hpc/banco/sellami.a/InterTVA/rsfmri/{}/glm/noisefiltering/correlation_matrix_fsaverage5.npy {}".format(
             subject, full_path
         )
