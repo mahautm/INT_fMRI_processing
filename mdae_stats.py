@@ -80,7 +80,7 @@ def get_model_stats(data_orig, data_type, number_folds="10"):
 
     # Training
     for dim in dimensions:
-        for fold in range(number_folds):
+        for fold in range(1, number_folds):
             (
                 train_index,
                 test_index,
