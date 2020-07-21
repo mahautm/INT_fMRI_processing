@@ -54,7 +54,7 @@ def run_slurm_job_mdae(
         fh.writelines("#SBATCH -e {}/{}_%j.err\n".format(logs_dir, job_name))
         fh.writelines("#SBATCH --time=3:00:00\n")
         fh.writelines("#SBATCH --account=b125\n")
-        fh.writelines("#SBATCH --partition=volta\n")
+        fh.writelines("#SBATCH --partition=kepler\n")
         fh.writelines("#SBATCH --gres-flags=enforce-binding\n")
         # number of nodes for this job
         fh.writelines("#SBATCH --nodes=1\n")
@@ -67,9 +67,6 @@ def run_slurm_job_mdae(
         # making sure group is ok for data sharing within group
         batch_cmd = (
             'eval "$(/scratch/mmahaut/tools/Anaconda3/bin/conda shell.bash hook)"\n'
-            + "module purge\n"
-            + "module load userspace/all\n"
-            + "module load cuda/9.1\n"
             + "conda activate tf_gpu\n"
             + "{} {}/{} {} {} {} {}".format(
                 python_path,
