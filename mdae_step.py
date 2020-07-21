@@ -22,7 +22,11 @@ import keras.backend as K
 
 
 def load_data(
-    sub_index, view, ref_sub="sub-04", orig_path="/scratch/mmahaut/data/intertva/"
+    sub_index,
+    view,
+    sub_list,
+    ref_sub="sub-04",
+    orig_path="/scratch/mmahaut/data/intertva/",
 ):
     """
     The first three view are copies of Akrem's loader, but adapted to the file architecture
@@ -142,13 +146,20 @@ def load_data(
 
 
 def build_normalised_data(
-    data_type, ref_subject, orig_path, index_subjects, train_index, test_index,
+    data_type,
+    ref_subject,
+    orig_path,
+    sub_list,
+    index_subjects,
+    train_index,
+    test_index,
 ):
     train_gyr_data = np.concatenate(
         [
             load_data(
                 sub_index,
                 4 if data_type == "gyrification" else 1,
+                sub_list,
                 ref_subject,
                 orig_path,
             )
@@ -157,7 +168,7 @@ def build_normalised_data(
     )
     train_rsfmri_data = np.concatenate(
         [
-            load_data(sub_index, 2, ref_subject, orig_path)
+            load_data(sub_index, 2, sub_list, ref_subject, orig_path)
             for sub_index in index_subjects[train_index]
         ]
     )
@@ -168,6 +179,7 @@ def build_normalised_data(
             load_data(
                 sub_index,
                 4 if data_type == "gyrification" else 1,
+                sub_list,
                 ref_subject,
                 orig_path,
             )
@@ -176,7 +188,7 @@ def build_normalised_data(
     )
     test_rsfmri_data = np.concatenate(
         [
-            load_data(sub_index, 2, ref_subject, orig_path)
+            load_data(sub_index, 2, sub_list, ref_subject, orig_path)
             for sub_index in index_subjects[test_index]
         ]
     )
@@ -233,6 +245,7 @@ def build_path_and_vars(data_orig, data_type, dim, fold):
         orig_path,
         base_path,
         index_subjects,
+        sub_list,
     )
 
 
@@ -250,6 +263,7 @@ if __name__ == "__main__":
         orig_path,
         base_path,
         index_subjects,
+        sub_list,
     ) = build_path_and_vars(data_orig, data_type, dim, fold)
 
     # activation functions
@@ -272,7 +286,13 @@ if __name__ == "__main__":
         normalized_train_rsfmri_data,
         normalized_test_rsfmri_data,
     ) = build_normalised_data(
-        data_type, ref_subject, orig_path, index_subjects, train_index, test_index,
+        data_type,
+        ref_subject,
+        orig_path,
+        sub_list,
+        index_subjects,
+        train_index,
+        test_index,
     )
 
     # Apply linear autoencoder

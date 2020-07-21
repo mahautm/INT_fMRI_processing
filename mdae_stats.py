@@ -88,6 +88,7 @@ def get_model_stats(data_orig, data_type, number_folds="10"):
                 orig_path,
                 base_path,
                 index_subjects,
+                sub_list,
             ) = mds.build_path_and_vars(data_orig, data_type, dim, fold)
             (
                 normalized_train_gyr_data,
@@ -98,6 +99,7 @@ def get_model_stats(data_orig, data_type, number_folds="10"):
                 data_type,
                 ref_subject,
                 orig_path,
+                sub_list,
                 index_subjects,
                 train_index,
                 test_index,
