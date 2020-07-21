@@ -22,6 +22,7 @@ import keras.backend as K
 
 
 def load_data(
+    data_orig,
     sub_index,
     view,
     sub_list,
@@ -146,6 +147,7 @@ def load_data(
 
 
 def build_normalised_data(
+    data_orig,
     data_type,
     ref_subject,
     orig_path,
@@ -157,6 +159,7 @@ def build_normalised_data(
     train_gyr_data = np.concatenate(
         [
             load_data(
+                data_orig,
                 sub_index,
                 4 if data_type == "gyrification" else 1,
                 sub_list,
@@ -168,7 +171,7 @@ def build_normalised_data(
     )
     train_rsfmri_data = np.concatenate(
         [
-            load_data(sub_index, 2, sub_list, ref_subject, orig_path)
+            load_data(data_orig, sub_index, 2, sub_list, ref_subject, orig_path)
             for sub_index in index_subjects[train_index]
         ]
     )
@@ -177,6 +180,7 @@ def build_normalised_data(
     test_gyr_data = np.concatenate(
         [
             load_data(
+                data_orig,
                 sub_index,
                 4 if data_type == "gyrification" else 1,
                 sub_list,
@@ -188,7 +192,7 @@ def build_normalised_data(
     )
     test_rsfmri_data = np.concatenate(
         [
-            load_data(sub_index, 2, sub_list, ref_subject, orig_path)
+            load_data(data_orig, sub_index, 2, sub_list, ref_subject, orig_path)
             for sub_index in index_subjects[test_index]
         ]
     )
@@ -286,6 +290,7 @@ if __name__ == "__main__":
         normalized_train_rsfmri_data,
         normalized_test_rsfmri_data,
     ) = build_normalised_data(
+        data_orig,
         data_type,
         ref_subject,
         orig_path,

@@ -96,6 +96,7 @@ def get_model_stats(data_orig, data_type, number_folds="10"):
                 normalized_train_rsfmri_data,
                 normalized_test_rsfmri_data,
             ) = mds.build_normalised_data(
+                data_orig,
                 data_type,
                 ref_subject,
                 orig_path,
