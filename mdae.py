@@ -33,8 +33,7 @@ def run_slurm_job_mdae(
     python_path="python",
     slurm_dir="/scratch/mmahaut/scripts/slurm",
     code_dir="/scratch/mmahaut/scripts/INT_fMRI_processing",
-    subs_list_file_path="/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list_asd.json",
-    script_name="feature_extraction_ABIDE.py",
+    script_name="mdae_step.py",
 ):
 
     # subs_list_file = open(subs_list_file_path)

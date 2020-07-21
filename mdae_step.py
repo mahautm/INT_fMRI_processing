@@ -154,6 +154,7 @@ if __name__ == "__main__":
         orig_path = "/scratch/mmahaut/data/abide/"
         base_path = "/scratch/mmahaut/data/abide/ae_gyrification"
         sub_list_files = "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list_asd.json"
+
         train_index = np.load("{}/train_index.npy".format(base_path))
         test_index = np.load("{}/test_index.npy".format(base_path))
 
@@ -164,12 +165,8 @@ if __name__ == "__main__":
         base_path = "/scratch/mmahaut/data/intertva/{}".format(ae_type)
         sub_list_files = "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list.json"
 
-        np.save(
-            "{}/train_index.npy".format(base_path), train_index,
-        )
-        np.save(
-            "{}/test_index.npy".format(base_path), test_index,
-        )
+        train_index = np.load("{}/train_index.npy".format(base_path))
+        test_index = np.load("{}/test_index.npy".format(base_path))
     else:
         print(
             "Warning !! : Please provide data origin as parameter when calling script: either 'ABIDE' or 'interTVA' "
