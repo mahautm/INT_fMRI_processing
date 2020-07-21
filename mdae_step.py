@@ -145,7 +145,7 @@ if __name__ == "__main__":
     # Expects 3 arguements, {"ABIDE", "interTVA"}, dimension of encoding layer, fold
 
     data_orig = sys.argv[1]
-    data_type = "gyrification"  # could be "tfMRI"
+    data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
 
     # That might be too many different paths. To solve that, one way would be to use os more,
     # Another would be to build a parameter object to drag everywhere, in between ? At least it is all in one place...
@@ -177,10 +177,10 @@ if __name__ == "__main__":
     sub_list_file = open(sub_list_files)
     sub_list = json.load(sub_list_file)
 
-    dim = sys.argv[2]
-    fold = sys.argv[3]
+    dim = sys.argv[3]
+    fold = sys.argv[4]
 
-    dim_directory = "{}/{}".format(base_path, dim)
+    dim_directory = "{}/{}".format(base_path, str(dim))
     fold_directory = "{}/fold_{}".format(dim_directory, fold)
 
     if not os.path.exists(dim_directory):
@@ -509,16 +509,27 @@ if __name__ == "__main__":
     # Save MSE, RMSE (gyr +rsfmr)
     print("shape of vector mse train", np.array([cvscores_mse_train]).shape)
     print(cvscores_mse_train)
-    np.save("{}/cvscores_mse_train.npy".format(dim), np.array([cvscores_mse_train]))
+    np.save(
+        "{}/cvscores_mse_train.npy".format(fold_directory),
+        np.array([cvscores_mse_train]),
+    )
     print("shape of  mse vector(test):", np.array([cvscores_mse_test]).shape)
     print(cvscores_mse_test)
-    np.save("{}/cvscores_mse_test.npy".format(dim), np.array([cvscores_mse_test]))
+    np.save(
+        "{}/cvscores_mse_test.npy".format(fold_directory), np.array([cvscores_mse_test])
+    )
     print("shape of rmse vector (train):", np.array([cvscores_rmse_train]).shape)
     print(cvscores_rmse_train)
-    np.save("{}/cvscores_rmse_train.npy".format(dim), np.array([cvscores_rmse_train]))
+    np.save(
+        "{}/cvscores_rmse_train.npy".format(fold_directory),
+        np.array([cvscores_rmse_train]),
+    )
     print("shape of rmse vector (test):", np.array([cvscores_rmse_test]).shape)
     print(cvscores_rmse_test)
-    np.save("{}/cvscores_rmse_test.npy".format(dim), np.array([cvscores_rmse_test]))
+    np.save(
+        "{}/cvscores_rmse_test.npy".format(fold_directory),
+        np.array([cvscores_rmse_test]),
+    )
     print(
         "%.3f%% (+/- %.5f%%)" % (np.mean(cvscores_mse_test), np.std(cvscores_mse_test))
     )
@@ -535,23 +546,26 @@ if __name__ == "__main__":
     print("shape of vector mse train (gyr)", np.array([cvscores_mse_gyr_train]).shape)
     print(cvscores_mse_gyr_train)
     np.save(
-        "{}/cvscores_mse_gyr_train.npy".format(dim), np.array([cvscores_mse_gyr_train]),
+        "{}/cvscores_mse_gyr_train.npy".format(fold_directory),
+        np.array([cvscores_mse_gyr_train]),
     )
     print("shape of  mse vector(test):", np.array([cvscores_mse_gyr_test]).shape)
     print(cvscores_mse_gyr_test)
     np.save(
-        "{}/cvscores_mse_gyr_test.npy".format(dim), np.array([cvscores_mse_gyr_test]),
+        "{}/cvscores_mse_gyr_test.npy".format(fold_directory),
+        np.array([cvscores_mse_gyr_test]),
     )
     print("shape of rmse vector (train):", np.array([cvscores_rmse_gyr_train]).shape)
     print(cvscores_rmse_gyr_train)
     np.save(
-        "{}/cvscores_rmse_gyr_train.npy".format(dim),
+        "{}/cvscores_rmse_gyr_train.npy".format(fold_directory),
         np.array([cvscores_rmse_gyr_test]),
     )
     print("shape of rmse vector gyr (test):", np.array([cvscores_rmse_gyr_test]).shape)
     print(cvscores_rmse_gyr_test)
     np.save(
-        "{}/cvscores_rmse_gyr_test.npy".format(dim), np.array([cvscores_rmse_gyr_test]),
+        "{}/cvscores_rmse_gyr_test.npy".format(fold_directory),
+        np.array([cvscores_rmse_gyr_test]),
     )
     mse_gyr_train.append(np.mean(cvscores_mse_gyr_train))
     std_mse_gyr_train.append(np.std(cvscores_mse_gyr_train))

@@ -1,24 +1,26 @@
-import keras
-from keras.layers import Input, Dense, concatenate
-from keras.models import Model
-from keras.layers import Dropout
-from keras.callbacks import EarlyStopping
+# import keras
+# from keras.layers import Input, Dense, concatenate
+# from keras.models import Model
+# from keras.layers import Dropout
+# from keras.callbacks import EarlyStopping
 import matplotlib.pyplot as plt
 
 plt.switch_backend("agg")
 import sys
 import os
 import json
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
-from sklearn.decomposition import PCA
-from sklearn.metrics import mean_squared_error
-from math import sqrt
-from keras.optimizers import SGD, Adadelta, Adam
+
+# from sklearn.preprocessing import StandardScaler, MinMaxScaler
+# from sklearn.decomposition import PCA
+# from sklearn.metrics import mean_squared_error
+# from math import sqrt
+# from keras.optimizers import SGD, Adadelta, Adam
 import numpy as np
 from sklearn.model_selection import KFold, StratifiedKFold
-from keras.callbacks import ModelCheckpoint
-from keras.models import load_model
-import keras.backend as K
+
+# from keras.callbacks import ModelCheckpoint
+# from keras.models import load_model
+# import keras.backend as K
 
 
 def run_slurm_job_mdae(
@@ -59,13 +61,16 @@ def run_slurm_job_mdae(
         # number of cores for this job
         fh.writelines("#SBATCH --ntasks-per-node=10\n")  # ??
         # email alerts
-        # if subject == "NYU_0050995":
-        #     fh.writelines("#SBATCH --mail-type=END\n")
+        if fold == 1:
+            fh.writelines("#SBATCH --mail-type=END\n")
         fh.writelines("#SBATCH --mail-user={}\n".format(email))
         # making sure group is ok for data sharing within group
         batch_cmd = (
             'eval "$(/scratch/mmahaut/tools/Anaconda3/bin/conda shell.bash hook)"\n'
-            + "conda activate tf_gpu"
+            + "module purge\n"
+            + "module load userspace/all\n"
+            + "module load cuda/9.1\n"
+            + "conda activate tf_gpu\n"
             + "{} {}/{} {} {} {}".format(
                 python_path, code_dir, script_name, data_orig, dimension, fold
             )
@@ -160,7 +165,7 @@ if __name__ == "__main__":
                     "/scratch/mmahaut/data/intertva/{}/test_index.npy".format(ae_type),
                     test_index,
                 )
-                run_slurm_job_mdae(data_orig, dim, fold)
+                run_slurm_job_mdae(data_orig, data_type, dim, fold)
     else:
         print(
             "Warning !! : Please provide data origin as parameter when calling script: either 'ABIDE' or 'interTVA' "
