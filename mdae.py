@@ -139,6 +139,7 @@ if __name__ == "__main__":
 
         index_subjects = np.arange(0, len(sub_list))
         for dim in dimensions:
+            fold = 0
             for train_index, test_index in kf.split(index_subjects, Y):
                 fold += 1
                 np.save(
