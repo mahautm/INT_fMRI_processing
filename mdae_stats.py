@@ -380,6 +380,7 @@ def get_model_stats(data_orig, data_type, number_folds="10"):
 
 if __name__ == "__main__":
     # The dimensions are used accross 3 scripts, there should be a parameter file that is loaded, probably in json format
+    dimensions = [20]
     data_orig = sys.argv[1]
     data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
     get_model_stats(data_orig, data_type, 10)
