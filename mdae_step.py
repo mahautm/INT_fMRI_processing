@@ -141,124 +141,9 @@ def load_data(
         return fmri_data
 
 
-if __name__ == "__main__":
-    # Expects 3 arguements, {"ABIDE", "interTVA"}, dimension of encoding layer, fold
-
-    data_orig = sys.argv[1]
-    data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
-
-    # That might be too many different paths. To solve that, one way would be to use os more,
-    # Another would be to build a parameter object to drag everywhere, in between ? At least it is all in one place...
-    if data_orig == "ABIDE":
-        ref_subject = "USM_0050475"
-        orig_path = "/scratch/mmahaut/data/abide/"
-        base_path = "/scratch/mmahaut/data/abide/ae_gyrification"
-        sub_list_files = "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list_asd.json"
-
-        train_index = np.load("{}/train_index.npy".format(base_path))
-        test_index = np.load("{}/test_index.npy".format(base_path))
-
-    elif data_orig == "interTVA":
-        ref_subject = "sub-04"
-        orig_path = "/scratch/mmahaut/data/intertva/"
-        ae_type = "ae" if data_type == "tfMRI" else "ae_gyrification"
-        base_path = "/scratch/mmahaut/data/intertva/{}".format(ae_type)
-        sub_list_files = "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list.json"
-
-        train_index = np.load("{}/train_index.npy".format(base_path))
-        test_index = np.load("{}/test_index.npy".format(base_path))
-    else:
-        print(
-            "Warning !! : Please provide data origin as parameter when calling script: either 'ABIDE' or 'interTVA' "
-        )
-    sub_list_file = open(sub_list_files)
-    sub_list = json.load(sub_list_file)
-
-    dim = int(sys.argv[3])
-    fold = int(sys.argv[4])
-
-    dim_directory = "{}/{}".format(base_path, str(dim))
-    fold_directory = "{}/fold_{}".format(dim_directory, fold)
-
-    if not os.path.exists(dim_directory):
-        os.makedirs(dim_directory)
-    if not os.path.exists(fold_directory):
-        os.makedirs(fold_directory)
-
-    index_subjects = np.arange(0, len(sub_list))
-
-    # activation functions
-    hidden_layer = "linear"
-    output_layer = "linear"
-
-    # MSE (gyr+ rsfmri)
-    mse_train = []
-    mse_test = []
-    # RMSE (gyr+ rsfmri)
-    rmse_train = []
-    rmse_test = []
-    #
-    # Standard deviation MSE (gyr+ rsfmri)
-    std_mse_train = []
-    std_mse_test = []
-    # Standard deviation RMSE (gyr+ rsfmri)
-    std_rmse_train = []
-    std_rmse_test = []
-    # MSE (gyr)
-    mse_gyr_train = []
-    mse_gyr_test = []
-    # RMSE (gyr)
-    rmse_gyr_train = []
-    rmse_gyr_test = []
-    # std mse (gyr)
-    std_mse_gyr_train = []
-    std_mse_gyr_test = []
-    # std rmse (gyr)
-    std_rmse_gyr_train = []
-    std_rmse_gyr_test = []
-
-    # MSE (rsfmri)
-    mse_rsfmri_train = []
-    mse_rsfmri_test = []
-    # RMSE (rsfmri)
-    rmse_rsfmri_train = []
-    rmse_rsfmri_test = []
-    # std mse (rsfmri)
-    std_mse_rsfmri_train = []
-    std_mse_rsfmri_test = []
-    # std rmse (rsfmri)
-    std_rmse_rsfmri_train = []
-    std_rmse_rsfmri_test = []
-
-    # Past prints, do not work anymore
-    # print(kf.get_n_splits(index_subjects))
-    # print("number of splits:", kf)
-    # print("number of features:", dimensions)
-
-    cvscores_mse_test = []
-    cvscores_rmse_test = []
-    cvscores_mse_train = []
-    cvscores_rmse_train = []
-    cvscores_mse_gyr_train = []
-    cvscores_mse_gyr_test = []
-    cvscores_rmse_gyr_train = []
-    cvscores_rmse_gyr_test = []
-    cvscores_mse_rsfmri_train = []
-    cvscores_mse_rsfmri_test = []
-    cvscores_rmse_rsfmri_train = []
-    cvscores_rmse_rsfmri_test = []
-
-    # create directory
-    # os.system("sbatch /scratch/mmahaut/scripts/slurm/mdae_step.sh dim")
-    # create directory
-
-    print(f"Fold #{fold}")
-    print(
-        "TRAIN:", index_subjects[train_index], "TEST:", index_subjects[test_index],
-    )
-    # load training and testing data
-    print("Load training data...")
-
+def build_normalised_data(
+    data_type, ref_subject, orig_path, index_subjects, train_index, test_index,
+):
     train_gyr_data = np.concatenate(
         [
             load_data(
@@ -295,14 +180,100 @@ if __name__ == "__main__":
             for sub_index in index_subjects[test_index]
         ]
     )
-    print("Shape of the test data:", test_gyr_data.shape)
-    # Data normalization to range [-1, 1]
-    print("Data normalization to range [0, 1]")
     scaler = MinMaxScaler()
+
     normalized_train_gyr_data = scaler.fit_transform(train_gyr_data)
     normalized_test_gyr_data = scaler.fit_transform(test_gyr_data)
     normalized_train_rsfmri_data = scaler.fit_transform(train_rsfmri_data)
     normalized_test_rsfmri_data = scaler.fit_transform(test_rsfmri_data)
+
+    return (
+        normalized_train_gyr_data,
+        normalized_test_gyr_data,
+        normalized_train_rsfmri_data,
+        normalized_test_rsfmri_data,
+    )
+
+
+def build_path_and_vars(data_orig, data_type, dim, fold):
+
+    # Warning from previous script : That might be too many different paths. To solve that, one way would be to use os more,
+    # Another would be to build a parameter object to drag everywhere, in between ? At least it is all in one place...
+    if data_orig == "ABIDE":
+        ref_subject = "USM_0050475"
+        orig_path = "/scratch/mmahaut/data/abide/"
+        base_path = "/scratch/mmahaut/data/abide/ae_gyrification"
+        sub_list_files = "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list_asd.json"
+
+        train_index = np.load("{}/train_index.npy".format(base_path))
+        test_index = np.load("{}/test_index.npy".format(base_path))
+
+    elif data_orig == "interTVA":
+        ref_subject = "sub-04"
+        orig_path = "/scratch/mmahaut/data/intertva/"
+        ae_type = "ae" if data_type == "tfMRI" else "ae_gyrification"
+        base_path = "/scratch/mmahaut/data/intertva/{}".format(ae_type)
+        sub_list_files = "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list.json"
+
+        train_index = np.load("{}/train_index.npy".format(base_path))
+        test_index = np.load("{}/test_index.npy".format(base_path))
+    else:
+        print(
+            "Warning !! : Please provide data origin as parameter when calling script: either 'ABIDE' or 'interTVA' "
+        )
+    sub_list_file = open(sub_list_files)
+    sub_list = json.load(sub_list_file)
+
+    index_subjects = np.arange(0, len(sub_list))
+
+    return (
+        train_index,
+        test_index,
+        ref_subject,
+        orig_path,
+        base_path,
+        index_subjects,
+    )
+
+
+if __name__ == "__main__":
+    # Expects 3 arguements, {"ABIDE", "interTVA"}, dimension of encoding layer, fold
+
+    data_orig = sys.argv[1]
+    data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
+    dim = int(sys.argv[3])
+    fold = int(sys.argv[4])
+    (
+        train_index,
+        test_index,
+        ref_subject,
+        orig_path,
+        base_path,
+        index_subjects,
+    ) = build_path_and_vars(data_orig, data_type, dim, fold)
+
+    # activation functions
+    hidden_layer = "linear"
+    output_layer = "linear"
+    # create directory
+    # os.system("sbatch /scratch/mmahaut/scripts/slurm/mdae_step.sh dim")
+    # create directory
+
+    print(f"Fold #{fold}")
+    print(
+        "TRAIN:", index_subjects[train_index], "TEST:", index_subjects[test_index],
+    )
+    # load training and testing data
+    print("Load training data...")
+
+    (
+        normalized_train_gyr_data,
+        normalized_test_gyr_data,
+        normalized_train_rsfmri_data,
+        normalized_test_rsfmri_data,
+    ) = build_normalised_data(
+        data_type, ref_subject, orig_path, index_subjects, train_index, test_index,
+    )
 
     # Apply linear autoencoder
     # Inputs Shape
@@ -403,10 +374,14 @@ if __name__ == "__main__":
     # create the decoder model
     # decoder_rsfmri = Model(encoded_input, decoder_rsfmri_layer3(decoder_rsfmri_layer2(decoder_rsfmri_layer1(encoded_input))))
     # decoder_rsfmri.summary()
-    multimodal_autoencoder.save("{}/multimodal_autoencoder.h5".format(fold_directory))
-    encoder_shared_layer.save("{}/encoder_shared_layer.h5".format(fold_directory))
-    encoder_gyr.save("{}/encoder_gyr.h5".format(fold_directory))
-    encoder_rsfmri.save("{}/encoder_rsfmri.h5".format(fold_directory))
+    multimodal_autoencoder.save(
+        "{}/{}/fold_{}/multimodal_autoencoder.h5".format(base_path, dim, fold)
+    )
+    encoder_shared_layer.save(
+        "{}/{}/fold_{}/encoder_shared_layer.h5".format(base_path, dim, fold)
+    )
+    encoder_gyr.save("{}/{}/fold_{}/encoder_gyr.h5".format(base_path, dim, fold))
+    encoder_rsfmri.save("{}/{}/fold_{}/encoder_rsfmri.h5".format(base_path, dim, fold))
     # decoder_gyr.save('{}/fold_{}/decoder_gyr.h5'.format(dim, fold))
     # decoder_rsfmri.save('{}/fold_{}/decoder_rsfmri.h5'.format(dim, fold))
     # plot our loss
@@ -417,245 +392,7 @@ if __name__ == "__main__":
     plt.ylabel("loss")
     plt.xlabel("epoch")
     plt.legend()
-    plt.savefig("{}/loss.png".format(fold_directory))
-    plt.savefig("{}}/loss.pdf".format(fold_directory))
+    plt.savefig("{}/{}/fold_{}/loss.png".format(base_path, dim, fold))
+    plt.savefig("{}/{}/fold_{}/loss.pdf".format(base_path, dim, fold))
     plt.close()
-
-    # Reconstruction of training data
-    print("Reconstruction of training data... ")
-    [X_train_new_gyr, X_train_new_rsfmri] = multimodal_autoencoder.predict(
-        [normalized_train_gyr_data, normalized_train_rsfmri_data]
-    )
-
-    # Training
-
-    # gyr
-    print("Max value of predicted training gyr data ", np.max(X_train_new_gyr))
-    print("Min value of predicted training gyr data", np.min(X_train_new_gyr))
-    print("Reconstructed gyr matrix shape:", X_train_new_gyr.shape)
-    val_mse_train_gyr = mean_squared_error(normalized_train_gyr_data, X_train_new_gyr)
-    cvscores_mse_gyr_train.append(val_mse_train_gyr)
-    print("Reconstruction MSE of gyr:", val_mse_train_gyr)
-    val_rmse_gyr = sqrt(val_mse_train_gyr)
-    print("Reconstruction RMSE of gyr : ", val_rmse_gyr)
-    cvscores_rmse_gyr_train.append(val_rmse_gyr)
-
-    # rsfmri
-
-    print(
-        "Max value of predicted training rsfmri data ", np.max(X_train_new_rsfmri),
-    )
-    print(
-        "Min value of predicted training rsfmri data", np.min(X_train_new_rsfmri),
-    )
-    print("Reconstructed rsfmri matrix shape:", X_train_new_rsfmri.shape)
-    val_mse_train_rsfmri = mean_squared_error(
-        normalized_train_rsfmri_data, X_train_new_rsfmri
-    )
-    cvscores_mse_rsfmri_train.append(val_mse_train_rsfmri)
-    print("Reconstruction MSE of rsfmri:", val_mse_train_rsfmri)
-    val_rmse_rsfmri = sqrt(val_mse_train_rsfmri)
-    print("Reconstruction RMSE of rsfmri : ", val_rmse_rsfmri)
-    cvscores_rmse_rsfmri_train.append(val_rmse_rsfmri)
-
-    # sum of MSE (gyr + rsfmri)
-    cvscores_mse_train.append(np.sum([val_mse_train_gyr, val_mse_train_rsfmri]))
-    # sum of RMSE (gyr + rsfmri)
-    cvscores_rmse_train.append(sqrt(np.sum([val_mse_train_gyr, val_mse_train_rsfmri])))
-
-    # Reconstruction of test data
-    print("Reconstruction of test data... ")
-    [X_test_new_gyr, X_test_new_rsfmri] = multimodal_autoencoder.predict(
-        [normalized_test_gyr_data, normalized_test_rsfmri_data]
-    )
-
-    # Test
-    # gyr
-    print("Max value of predicted testing gyr data ", np.max(X_test_new_gyr))
-    print("Min value of predicted testing gyr data", np.min(X_test_new_gyr))
-    print("Reconstructed gyr matrix shape:", X_test_new_gyr.shape)
-    val_mse_test_gyr = mean_squared_error(normalized_test_gyr_data, X_test_new_gyr)
-    cvscores_mse_gyr_test.append(val_mse_test_gyr)
-    print("Reconstruction MSE of gyr:", val_mse_test_gyr)
-    val_rmse_gyr = sqrt(val_mse_test_gyr)
-    print("Reconstruction RMSE of gyr : ", val_rmse_gyr)
-    cvscores_rmse_gyr_test.append(val_rmse_gyr)
-
-    # rsfmri
-
-    print("Max value of predicted testing rsfmri data ", np.max(X_test_new_rsfmri))
-    print("Min value of predicted testing rsfmri data", np.min(X_test_new_rsfmri))
-    print("Reconstructed rsfmri matrix shape:", X_test_new_rsfmri.shape)
-    val_mse_test_rsfmri = mean_squared_error(
-        normalized_test_rsfmri_data, X_test_new_rsfmri
-    )
-    cvscores_mse_rsfmri_test.append(val_mse_test_rsfmri)
-    print("Reconstruction MSE of rsfmri:", val_mse_test_rsfmri)
-    val_rmse_rsfmri = sqrt(val_mse_test_rsfmri)
-    print("Reconstruction RMSE of rsfmri : ", val_rmse_rsfmri)
-    cvscores_rmse_rsfmri_test.append(val_rmse_rsfmri)
-
-    # sum of MSE (gyr + rsfmri)
-    cvscores_mse_test.append(np.sum([val_mse_test_gyr, val_mse_test_rsfmri]))
-    # sum of MSE (gyr + rsfmri)
-    cvscores_rmse_test.append(sqrt(np.sum([val_mse_test_gyr, val_mse_test_rsfmri])))
-
-    # Attempt to prevent memory leak on skylake machine, legacy from when this was a loop
-    # K.clear_session()
-
-    # Save MSE, RMSE (gyr +rsfmr)
-    print("shape of vector mse train", np.array([cvscores_mse_train]).shape)
-    print(cvscores_mse_train)
-    np.save(
-        "{}/cvscores_mse_train.npy".format(fold_directory),
-        np.array([cvscores_mse_train]),
-    )
-    print("shape of  mse vector(test):", np.array([cvscores_mse_test]).shape)
-    print(cvscores_mse_test)
-    np.save(
-        "{}/cvscores_mse_test.npy".format(fold_directory), np.array([cvscores_mse_test])
-    )
-    print("shape of rmse vector (train):", np.array([cvscores_rmse_train]).shape)
-    print(cvscores_rmse_train)
-    np.save(
-        "{}/cvscores_rmse_train.npy".format(fold_directory),
-        np.array([cvscores_rmse_train]),
-    )
-    print("shape of rmse vector (test):", np.array([cvscores_rmse_test]).shape)
-    print(cvscores_rmse_test)
-    np.save(
-        "{}/cvscores_rmse_test.npy".format(fold_directory),
-        np.array([cvscores_rmse_test]),
-    )
-    print(
-        "%.3f%% (+/- %.5f%%)" % (np.mean(cvscores_mse_test), np.std(cvscores_mse_test))
-    )
-    mse_train.append(np.mean(cvscores_mse_train))
-    std_mse_train.append(np.std(cvscores_mse_train))
-    mse_test.append(np.mean(cvscores_mse_test))
-    std_mse_test.append(np.std(cvscores_mse_test))
-    rmse_train.append(np.mean(cvscores_rmse_train))
-    std_rmse_train.append(np.std(cvscores_rmse_train))
-    rmse_test.append(np.mean(cvscores_rmse_test))
-    std_rmse_test.append(np.std(cvscores_rmse_test))
-
-    # Save MSE, RMSE (gyr)
-    print("shape of vector mse train (gyr)", np.array([cvscores_mse_gyr_train]).shape)
-    print(cvscores_mse_gyr_train)
-    np.save(
-        "{}/cvscores_mse_gyr_train.npy".format(fold_directory),
-        np.array([cvscores_mse_gyr_train]),
-    )
-    print("shape of  mse vector(test):", np.array([cvscores_mse_gyr_test]).shape)
-    print(cvscores_mse_gyr_test)
-    np.save(
-        "{}/cvscores_mse_gyr_test.npy".format(fold_directory),
-        np.array([cvscores_mse_gyr_test]),
-    )
-    print("shape of rmse vector (train):", np.array([cvscores_rmse_gyr_train]).shape)
-    print(cvscores_rmse_gyr_train)
-    np.save(
-        "{}/cvscores_rmse_gyr_train.npy".format(fold_directory),
-        np.array([cvscores_rmse_gyr_test]),
-    )
-    print("shape of rmse vector gyr (test):", np.array([cvscores_rmse_gyr_test]).shape)
-    print(cvscores_rmse_gyr_test)
-    np.save(
-        "{}/cvscores_rmse_gyr_test.npy".format(fold_directory),
-        np.array([cvscores_rmse_gyr_test]),
-    )
-    mse_gyr_train.append(np.mean(cvscores_mse_gyr_train))
-    std_mse_gyr_train.append(np.std(cvscores_mse_gyr_train))
-    mse_gyr_test.append(np.mean(cvscores_mse_gyr_test))
-    std_mse_gyr_test.append(np.std(cvscores_mse_gyr_test))
-    rmse_gyr_train.append(np.mean(cvscores_rmse_gyr_train))
-    std_rmse_gyr_train.append(np.std(cvscores_rmse_gyr_train))
-    rmse_gyr_test.append(np.mean(cvscores_rmse_gyr_test))
-    std_rmse_gyr_test.append(np.std(cvscores_rmse_gyr_test))
-
-    ################################# cut !
-    # Save MSE, RMSE (rsfmri)
-    print(
-        "shape of vector mse train (rsfmri)",
-        np.array([cvscores_mse_rsfmri_train]).shape,
-    )
-    print(cvscores_mse_rsfmri_train)
-    np.save(
-        "{}/cvscores_mse_rsfmri_train.npy".format(fold_directory),
-        np.array([cvscores_mse_rsfmri_train]),
-    )
-    print("shape of  mse vector(test):", np.array([cvscores_mse_rsfmri_test]).shape)
-    print(cvscores_mse_rsfmri_test)
-    np.save(
-        "{}/cvscores_mse_rsfmri_test.npy".format(fold_directory),
-        np.array([cvscores_mse_rsfmri_test]),
-    )
-    print(
-        "shape of rmse vector (train):", np.array([cvscores_rmse_rsfmri_train]).shape,
-    )
-    print(cvscores_rmse_rsfmri_train)
-    np.save(
-        "{}/cvscores_rmse_rsfmri_train.npy".format(fold_directory),
-        np.array([cvscores_rmse_rsfmri_test]),
-    )
-    print(
-        "shape of rmse vector rsfmri (test):",
-        np.array([cvscores_rmse_rsfmri_test]).shape,
-    )
-    print(cvscores_rmse_rsfmri_test)
-    np.save(
-        "{}/cvscores_rmse_rsfmri_test.npy".format(fold_directory),
-        np.array([cvscores_rmse_rsfmri_test]),
-    )
-    mse_rsfmri_train.append(np.mean(cvscores_mse_rsfmri_train))
-    std_mse_rsfmri_train.append(np.std(cvscores_mse_rsfmri_train))
-    mse_rsfmri_test.append(np.mean(cvscores_mse_rsfmri_test))
-    std_mse_rsfmri_test.append(np.std(cvscores_mse_rsfmri_test))
-    rmse_rsfmri_train.append(np.mean(cvscores_rmse_rsfmri_train))
-    std_rmse_rsfmri_train.append(np.std(cvscores_rmse_rsfmri_train))
-    rmse_rsfmri_test.append(np.mean(cvscores_rmse_rsfmri_test))
-    std_rmse_rsfmri_test.append(np.std(cvscores_rmse_rsfmri_test))
-    ######################## From here on it is all at root, and not even at dim level
-    # save MSE, RMSE, and STD vectors for training and test sets
-    np.save("{}/mse_train_mean.npy".format(fold_directory), np.array([mse_train]))
-    np.save("{}/rmse_train_mean.npy".format(fold_directory), np.array([rmse_train]))
-    np.save(
-        "{}/std_mse_train_mean.npy".format(fold_directory), np.array([std_mse_train])
-    )
-    np.save(
-        "{}/std_rmse_train_mean.npy".format(fold_directory), np.array([std_rmse_train])
-    )
-    np.save("{}/mse_test_mean.npy".format(fold_directory), np.array([mse_test]))
-    np.save("{}/rmse_test_mean.npy".format(fold_directory), np.array([rmse_test]))
-    np.save("{}/std_mse_test_mean.npy".format(fold_directory), np.array([std_mse_test]))
-    np.save(
-        "{}/std_rmse_test_mean.npy".format(fold_directory), np.array([std_rmse_test])
-    )
-
-    # save MSE, RMSE, and STD vectors for training and test sets (rsfmri)
-
-    np.save(
-        "{}/mse_test_mean_rsfmri.npy".format(fold_directory),
-        np.array([mse_rsfmri_test]),
-    )
-    np.save(
-        "{}/rmse_test_mean_rsfmri.npy".format(fold_directory),
-        np.array([rmse_rsfmri_test]),
-    )
-    np.save(
-        "{}/mse_train_mean_rsfmri.npy".format(fold_directory),
-        np.array([mse_rsfmri_train]),
-    )
-    np.save(
-        "{}/rmse_train_mean_rsfmri.npy".format(fold_directory),
-        np.array([rmse_rsfmri_train]),
-    )
-    np.save(
-        "{}/std_mse_mean_rsfmri.npy".format(fold_directory),
-        np.array([std_mse_rsfmri_test]),
-    )
-    np.save(
-        "{}/std_rmse_mean_rsfmri.npy".format(fold_directory),
-        np.array([std_rmse_rsfmri_test]),
-    )
 
