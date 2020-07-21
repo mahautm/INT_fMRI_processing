@@ -500,8 +500,8 @@ if __name__ == "__main__":
     # sum of MSE (gyr + rsfmri)
     cvscores_rmse_test.append(sqrt(np.sum([val_mse_test_gyr, val_mse_test_rsfmri])))
 
-    # Attempt to prevent memory leak on skylake machine
-    K.clear_session()
+    # Attempt to prevent memory leak on skylake machine, legacy from when this was a loop
+    # K.clear_session()
 
     # Save MSE, RMSE (gyr +rsfmr)
     print("shape of vector mse train", np.array([cvscores_mse_train]).shape)
