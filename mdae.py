@@ -81,31 +81,33 @@ if __name__ == "__main__":
     # sys.argv[2] Default is gyrification, tfMRI must be written otherwise !!check what happens when empty
     data_type = sys.argv[2]
 
-    dimensions = [
-        1,
-        3,
-        5,
-        8,
-        10,
-        13,
-        15,
-        18,
-        20,
-        23,
-        25,
-        28,
-        30,
-        33,
-        35,
-        38,
-        40,
-        42,
-        45,
-        48,
-        50,
-    ]
+    # dimensions = [
+    #     1,
+    #     3,
+    #     5,
+    #     8,
+    #     10,
+    #     13,
+    #     15,
+    #     18,
+    #     20,
+    #     23,
+    #     25,
+    #     28,
+    #     30,
+    #     33,
+    #     35,
+    #     38,
+    #     40,
+    #     42,
+    #     45,
+    #     48,
+    #     50,
+    # ]
 
     # IJCNN paper points to 20 being the best dimension, with 5 to rsfMRI and 15 to tfMRI
+
+    dimensions = [20]
 
     # In the ABIDE case, we need to get the Y data to ensure proper repartition of asd and non-asd subjects
     Y = []

@@ -147,24 +147,28 @@ if __name__ == "__main__":
     data_orig = sys.argv[1]
     data_type = "gyrification"  # could be "tfMRI"
 
+    # That might be too many different paths. To solve that, one way would be to use os more,
+    # Another would be to build a parameter object to drag everywhere, in between ? At least it is all in one place...
     if data_orig == "ABIDE":
+        ref_subject = "USM_0050475"
+        orig_path = "/scratch/mmahaut/data/abide/"
+        base_path = "/scratch/mmahaut/data/abide/ae_gyrification"
         sub_list_files = "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list_asd.json"
-        train_index = np.load(
-            "/scratch/mmahaut/data/abide/ae_gyrification/train_index.npy"
-        )
-        test_index = np.load(
-            "/scratch/mmahaut/data/abide/ae_gyrification/test_index.npy"
-        )
+        train_index = np.load("{}/train_index.npy".format(base_path))
+        test_index = np.load("{}/test_index.npy".format(base_path))
+
     elif data_orig == "interTVA":
-        sub_list_files = "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list.json"
+        ref_subject = "sub-04"
+        orig_path = "/scratch/mmahaut/data/intertva/"
         ae_type = "ae" if data_type == "tfMRI" else "ae_gyrification"
+        base_path = "/scratch/mmahaut/data/intertva/{}".format(ae_type)
+        sub_list_files = "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list.json"
+
         np.save(
-            "/scratch/mmahaut/data/intertva/{}/train_index.npy".format(ae_type),
-            train_index,
+            "{}/train_index.npy".format(base_path), train_index,
         )
         np.save(
-            "/scratch/mmahaut/data/intertva/{}/test_index.npy".format(ae_type),
-            test_index,
+            "{}/test_index.npy".format(base_path), test_index,
         )
     else:
         print(
@@ -175,6 +179,14 @@ if __name__ == "__main__":
 
     dim = sys.argv[2]
     fold = sys.argv[3]
+
+    dim_directory = "{}/{}".format(base_path, dim)
+    fold_directory = "{}/fold_{}".format(dim_directory, fold)
+
+    if not os.path.exists(dim_directory):
+        os.makedirs(dim_directory)
+    if not os.path.exists(fold_directory):
+        os.makedirs(fold_directory)
 
     index_subjects = np.arange(0, len(sub_list))
 
@@ -221,10 +233,6 @@ if __name__ == "__main__":
     std_rmse_rsfmri_train = []
     std_rmse_rsfmri_test = []
 
-    directory = "{}".format(dim)
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-
     # Past prints, do not work anymore
     # print(kf.get_n_splits(index_subjects))
     # print("number of splits:", kf)
@@ -246,9 +254,7 @@ if __name__ == "__main__":
     # create directory
     # os.system("sbatch /scratch/mmahaut/scripts/slurm/mdae_step.sh dim")
     # create directory
-    directory = "{}/fold_{}".format(dim, fold)
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+
     print(f"Fold #{fold}")
     print(
         "TRAIN:", index_subjects[train_index], "TEST:", index_subjects[test_index],
@@ -256,17 +262,14 @@ if __name__ == "__main__":
     # load training and testing data
     print("Load training data...")
 
-    # Adding parameters for different datasets :
-    if data_orig == "ABIDE":
-        orig_path = "/scratch/mmahaut/data/abide/"
-        ref_subject = "USM_0050475"
-    elif data_orig == "interTVA":
-        orig_path = "/scratch/mmahaut/data/intertva/"
-        ref_subject = "sub-04"
-
     train_gyr_data = np.concatenate(
         [
-            load_data(sub_index, 4, ref_subject, orig_path)
+            load_data(
+                sub_index,
+                4 if data_type == "gyrification" else 1,
+                ref_subject,
+                orig_path,
+            )
             for sub_index in index_subjects[train_index]
         ]
     )
@@ -280,7 +283,12 @@ if __name__ == "__main__":
     print("Load testdata...")
     test_gyr_data = np.concatenate(
         [
-            load_data(sub_index, 4, ref_subject, orig_path)
+            load_data(
+                sub_index,
+                4 if data_type == "gyrification" else 1,
+                ref_subject,
+                orig_path,
+            )
             for sub_index in index_subjects[test_index]
         ]
     )
@@ -316,7 +324,8 @@ if __name__ == "__main__":
     )  # Layer 1, View 2
     encoded_rsfmri = Dense(dim, activation=hidden_layer)(encoded_rsfmri)
     print("encoded rsfmri shape", encoded_rsfmri.shape)
-    # Shared representation with concatenation
+
+    # Shared representation with concatenation !! SO here is where we change the amount of each representation
     shared_layer = concatenate(
         [encoded_gyr, encoded_rsfmri]
     )  # Layer 3: Bottelneck layer
@@ -397,12 +406,10 @@ if __name__ == "__main__":
     # create the decoder model
     # decoder_rsfmri = Model(encoded_input, decoder_rsfmri_layer3(decoder_rsfmri_layer2(decoder_rsfmri_layer1(encoded_input))))
     # decoder_rsfmri.summary()
-    multimodal_autoencoder.save(
-        "{}/fold_{}/multimodal_autoencoder.h5".format(dim, fold)
-    )
-    encoder_shared_layer.save("{}/fold_{}/encoder_shared_layer.h5".format(dim, fold))
-    encoder_gyr.save("{}/fold_{}/encoder_gyr.h5".format(dim, fold))
-    encoder_rsfmri.save("{}/fold_{}/encoder_rsfmri.h5".format(dim, fold))
+    multimodal_autoencoder.save("{}/multimodal_autoencoder.h5".format(fold_directory))
+    encoder_shared_layer.save("{}/encoder_shared_layer.h5".format(fold_directory))
+    encoder_gyr.save("{}/encoder_gyr.h5".format(fold_directory))
+    encoder_rsfmri.save("{}/encoder_rsfmri.h5".format(fold_directory))
     # decoder_gyr.save('{}/fold_{}/decoder_gyr.h5'.format(dim, fold))
     # decoder_rsfmri.save('{}/fold_{}/decoder_rsfmri.h5'.format(dim, fold))
     # plot our loss
@@ -413,8 +420,8 @@ if __name__ == "__main__":
     plt.ylabel("loss")
     plt.xlabel("epoch")
     plt.legend()
-    plt.savefig("{}/fold_{}/loss.png".format(dim, fold))
-    plt.savefig("{}/fold_{}/loss.pdf".format(dim, fold))
+    plt.savefig("{}/loss.png".format(fold_directory))
+    plt.savefig("{}}/loss.pdf".format(fold_directory))
     plt.close()
 
     # Reconstruction of training data
@@ -563,13 +570,13 @@ if __name__ == "__main__":
     )
     print(cvscores_mse_rsfmri_train)
     np.save(
-        "{}/cvscores_mse_rsfmri_train.npy".format(dim),
+        "{}/cvscores_mse_rsfmri_train.npy".format(fold_directory),
         np.array([cvscores_mse_rsfmri_train]),
     )
     print("shape of  mse vector(test):", np.array([cvscores_mse_rsfmri_test]).shape)
     print(cvscores_mse_rsfmri_test)
     np.save(
-        "{}/cvscores_mse_rsfmri_test.npy".format(dim),
+        "{}/cvscores_mse_rsfmri_test.npy".format(fold_directory),
         np.array([cvscores_mse_rsfmri_test]),
     )
     print(
@@ -577,7 +584,7 @@ if __name__ == "__main__":
     )
     print(cvscores_rmse_rsfmri_train)
     np.save(
-        "{}/cvscores_rmse_rsfmri_train.npy".format(dim),
+        "{}/cvscores_rmse_rsfmri_train.npy".format(fold_directory),
         np.array([cvscores_rmse_rsfmri_test]),
     )
     print(
@@ -586,7 +593,7 @@ if __name__ == "__main__":
     )
     print(cvscores_rmse_rsfmri_test)
     np.save(
-        "{}/cvscores_rmse_rsfmri_test.npy".format(dim),
+        "{}/cvscores_rmse_rsfmri_test.npy".format(fold_directory),
         np.array([cvscores_rmse_rsfmri_test]),
     )
     mse_rsfmri_train.append(np.mean(cvscores_mse_rsfmri_train))
@@ -597,46 +604,47 @@ if __name__ == "__main__":
     std_rmse_rsfmri_train.append(np.std(cvscores_rmse_rsfmri_train))
     rmse_rsfmri_test.append(np.mean(cvscores_rmse_rsfmri_test))
     std_rmse_rsfmri_test.append(np.std(cvscores_rmse_rsfmri_test))
-
+    ######################## From here on it is all at root, and not even at dim level
     # save MSE, RMSE, and STD vectors for training and test sets
-    np.save("mse_train_mean.npy", np.array([mse_train]))
-    np.save("rmse_train_mean.npy", np.array([rmse_train]))
-    np.save("std_mse_train_mean.npy", np.array([std_mse_train]))
-    np.save("std_rmse_train_mean.npy", np.array([std_rmse_train]))
-    np.save("mse_test_mean.npy", np.array([mse_test]))
-    np.save("rmse_test_mean.npy", np.array([rmse_test]))
-    np.save("std_mse_test_mean.npy", np.array([std_mse_test]))
-    np.save("std_rmse_test_mean.npy", np.array([std_rmse_test]))
+    np.save("{}/mse_train_mean.npy".format(fold_directory), np.array([mse_train]))
+    np.save("{}/rmse_train_mean.npy".format(fold_directory), np.array([rmse_train]))
+    np.save(
+        "{}/std_mse_train_mean.npy".format(fold_directory), np.array([std_mse_train])
+    )
+    np.save(
+        "{}/std_rmse_train_mean.npy".format(fold_directory), np.array([std_rmse_train])
+    )
+    np.save("{}/mse_test_mean.npy".format(fold_directory), np.array([mse_test]))
+    np.save("{}/rmse_test_mean.npy".format(fold_directory), np.array([rmse_test]))
+    np.save("{}/std_mse_test_mean.npy".format(fold_directory), np.array([std_mse_test]))
+    np.save(
+        "{}/std_rmse_test_mean.npy".format(fold_directory), np.array([std_rmse_test])
+    )
 
     # save MSE, RMSE, and STD vectors for training and test sets (rsfmri)
 
-    np.save("mse_test_mean_rsfmri.npy", np.array([mse_rsfmri_test]))
-    np.save("rmse_test_mean_rsfmri.npy", np.array([rmse_rsfmri_test]))
-    np.save("mse_train_mean_rsfmri.npy", np.array([mse_rsfmri_train]))
-    np.save("rmse_train_mean_rsfmri.npy", np.array([rmse_rsfmri_train]))
-    np.save("std_mse_mean_rsfmri.npy", np.array([std_mse_rsfmri_test]))
-    np.save("std_rmse_mean_rsfmri.npy", np.array([std_rmse_rsfmri_test]))
+    np.save(
+        "{}/mse_test_mean_rsfmri.npy".format(fold_directory),
+        np.array([mse_rsfmri_test]),
+    )
+    np.save(
+        "{}/rmse_test_mean_rsfmri.npy".format(fold_directory),
+        np.array([rmse_rsfmri_test]),
+    )
+    np.save(
+        "{}/mse_train_mean_rsfmri.npy".format(fold_directory),
+        np.array([mse_rsfmri_train]),
+    )
+    np.save(
+        "{}/rmse_train_mean_rsfmri.npy".format(fold_directory),
+        np.array([rmse_rsfmri_train]),
+    )
+    np.save(
+        "{}/std_mse_mean_rsfmri.npy".format(fold_directory),
+        np.array([std_mse_rsfmri_test]),
+    )
+    np.save(
+        "{}/std_rmse_mean_rsfmri.npy".format(fold_directory),
+        np.array([std_rmse_rsfmri_test]),
+    )
 
-    # plotting the mse train
-    # setting x and y axis range
-    # plotting the mse train
-    plt.plot(dimensions, mse_train, label="mse_train")
-    plt.plot(dimensions, mse_test, label="mse_test")
-    plt.xlabel("Encoding dimension")
-    plt.ylabel("Reconstruction error (MSE)")
-    # showing legend
-    plt.legend()
-    plt.savefig("reconstruction_error_mse.pdf")
-    plt.savefig("reconstruction_error_mse.png")
-    plt.close()
-    # plotting the rmse train
-    # setting x and y axis range
-    plt.plot(dimensions, rmse_train, label="rmse_train")
-    plt.plot(dimensions, rmse_test, label="rmse_test")
-    plt.xlabel("Encoding dimension")
-    plt.ylabel("Reconstruction error (RMSE)")
-    # showing legend
-    plt.legend()
-    plt.savefig("reconstruction_error_rmse.pdf")
-    plt.savefig("reconstruction_error_rmse.png")
-    plt.close()
