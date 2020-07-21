@@ -174,8 +174,8 @@ if __name__ == "__main__":
     sub_list_file = open(sub_list_files)
     sub_list = json.load(sub_list_file)
 
-    dim = sys.argv[3]
-    fold = sys.argv[4]
+    dim = int(sys.argv[3])
+    fold = int(sys.argv[4])
 
     dim_directory = "{}/{}".format(base_path, str(dim))
     fold_directory = "{}/fold_{}".format(dim_directory, fold)
