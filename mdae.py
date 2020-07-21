@@ -50,7 +50,7 @@ def run_slurm_job_mdae(
         fh.writelines("#SBATCH --job-name={}\n".format(job_name))
         fh.writelines("#SBATCH -o {}/{}_%j.out\n".format(logs_dir, job_name))
         fh.writelines("#SBATCH -e {}/{}_%j.err\n".format(logs_dir, job_name))
-        fh.writelines("#SBATCH --time=24:00:00\n")
+        fh.writelines("#SBATCH --time=3:00:00\n")
         fh.writelines("#SBATCH --account=b125\n")
         fh.writelines("#SBATCH --partition=volta\n")
         fh.writelines("#SBATCH --gres-flags=enforce-binding\n")
