@@ -27,8 +27,8 @@ def load_data(
         classified_file = open(sub_file)
         classified_dict = json.load(classified_file)
         # no normalisation step (which kind of seems legit for classification)
-        for key, value in classified_dict:
-            Y.append([1] if value == "asd" else [0])
+        for key in classified_dict:
+            Y.append([1] if classified_dict[key] == "asd" else [0])
     elif params["data_source"] == "interTVA":
         # Hardcoding this array is probably not the most reusable solution...
         Y = [
@@ -406,7 +406,6 @@ if __name__ == "__main__":
             np.save(file, r2_score(YT, results[idx[test_index]]))
             mse.append([mean_squared_error(YT, results[idx[test_index]])])
             rsquared.append([r2_score(YT, results[idx[test_index]])])
-
 
         print("mean mse {}".format(np.mean([mse])))
         file = "mean_mse.npy"

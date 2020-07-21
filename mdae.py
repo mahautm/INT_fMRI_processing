@@ -121,8 +121,8 @@ if __name__ == "__main__":
         classified_file = open(sub_file)
         classified_dict = json.load(classified_file)
         # no normalisation step (which kind of seems legit for classification)
-        for key, value in classified_dict:
-            Y.append([1] if value == "asd" else [0])
+        for key in classified_dict:
+            Y.append([1] if classified_dict[key] == "asd" else [0])
 
         kf = StratifiedKFold(n_splits=10)
 
