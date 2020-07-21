@@ -25,6 +25,7 @@ from sklearn.model_selection import KFold, StratifiedKFold
 
 def run_slurm_job_mdae(
     data_orig,
+    data_type,
     dimension,
     fold,
     email="mmahaut@ensc.fr",
@@ -71,8 +72,14 @@ def run_slurm_job_mdae(
             + "module load userspace/all\n"
             + "module load cuda/9.1\n"
             + "conda activate tf_gpu\n"
-            + "{} {}/{} {} {} {}".format(
-                python_path, code_dir, script_name, data_orig, dimension, fold
+            + "{} {}/{} {} {} {} {}".format(
+                python_path,
+                code_dir,
+                script_name,
+                data_orig,
+                data_type,
+                dimension,
+                fold,
             )
         )
         fh.writelines(batch_cmd)
@@ -142,7 +149,7 @@ if __name__ == "__main__":
                     "/scratch/mmahaut/data/abide/ae_gyrification/test_index.npy",
                     test_index,
                 )
-                run_slurm_job_mdae(data_orig, dim, fold)
+                run_slurm_job_mdae(data_orig, data_type, dim, fold)
 
     elif data_orig == "interTVA":
         kf = KFold(n_splits=10)
