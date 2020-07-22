@@ -20,6 +20,22 @@ from keras.callbacks import ModelCheckpoint
 from keras.models import load_model
 import keras.backend as K
 
+# This function is duplicated in regression, against all good coding practices, someday I'll do something about it
+def load_intertva_rsfmri(subject, path):
+    # missing file creation if it is missing
+    full_path = os.path.join(
+        path, "correlation_matrix_fsaverage5_{}.npy".format(subject)
+    )
+    if not os.path.exists(full_path):
+
+        cmd = "rsync mahaut.m@frioul.int.univ-amu.fr:/hpc/banco/sellami.a/InterTVA/rsfmri/{}/glm/noisefiltering/correlation_matrix_fsaverage5.npy {}".format(
+            subject, full_path
+        )
+        print(cmd)
+        os.system(cmd)
+    rsfmri_data = np.load(full_path)
+    return rsfmri_data
+
 
 def load_data(
     data_orig,
@@ -54,16 +70,10 @@ def load_data(
 
     TODO: we are dependant on global variables, sub_list and data_orig. This should be made into function or object parameters in a later version
     """
-    # Import anatomical gyrification data
     if view == 1:
 
-        data_path = os.path.join(
-            orig_path,
-            "past_data/{}_eig_vec_fsaverage5_onref_{}.npy".format(
-                sub_list[sub_index], ref_sub
-            ),
-        )
-        view_gyr = np.load(data_path)
+        data_path = os.path.join(orig_path, "features_rsfMRI")
+        view_tfmri = load_intertva_rsfmri(sub_list[sub_index], data_path)
         return view_gyr
 
     # Import Resting-State fMRI data
