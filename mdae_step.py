@@ -74,7 +74,7 @@ def load_data(
 
         data_path = os.path.join(orig_path, "features_rsfMRI")
         view_tfmri = load_intertva_rsfmri(sub_list[sub_index], data_path)
-        return view_gyr
+        return view_tfmri
 
     # Import Resting-State fMRI data
     elif view == 2:

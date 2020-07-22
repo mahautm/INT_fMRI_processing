@@ -310,59 +310,59 @@ def cross_validation_error(X, Y, params, nbfolds=5):
 # RUN
 ######
 
-mse = []
-rsquared = []
-# Calcul du Laplacien du graphe
-graph = load_graph()
-degree = np.array(graph.sum(axis=0))
-laplacian = ssp.diags(degree, offsets=[0]) - graph
 
-# Les paramètres
-params = {}
-
-params["data_source"] = "interTVA"
-params["modality"] = "gyrification"
-
-params["iterations"] = 1000
-params["mu"] = 0.1
-params["mu_min"] = 1e-7
-# params["soft_thresh"] = 10e-3
-params["soft_thresh"] = 0.0
-params["delta"] = 0.0
-params["graph"] = laplacian
-
-sub_file_path = (
-    "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list_asd.json"
-)
-sub_file = open(sub_file_path)
-subjects = json.load(sub_file)
-
-dimensions = [
-    1,
-    3,
-    5,
-    8,
-    10,
-    13,
-    15,
-    18,
-    20,
-    23,
-    25,
-    28,
-    30,
-    33,
-    35,
-    38,
-    40,
-    42,
-    45,
-    48,
-    50,
-]
-
-batch_1 = dimensions[0:6]
 if __name__ == "__main__":
+
+    mse = []
+    rsquared = []
+    # Calcul du Laplacien du graphe
+    graph = load_graph()
+    degree = np.array(graph.sum(axis=0))
+    laplacian = ssp.diags(degree, offsets=[0]) - graph
+
+    # Les paramètres
+    params = {}
+
+    params["data_source"] = sys.argv[1]
+    params["modality"] = sys.argv[2]
+    params["mu_min"] = 1e-7
+    # params["soft_thresh"] = 10e-3
+    params["soft_thresh"] = 0.0
+    params["delta"] = 0.0
+    params["graph"] = laplacian
+    params["iterations"] = 1000
+    params["mu"] = 0.1
+    sub_file_path = (
+        "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list.json"
+    )
+    sub_file = open(sub_file_path)
+    subjects = json.load(sub_file)
+
+    dimensions = [
+        1,
+        3,
+        5,
+        8,
+        10,
+        13,
+        15,
+        18,
+        20,
+        23,
+        25,
+        28,
+        30,
+        33,
+        35,
+        38,
+        40,
+        42,
+        45,
+        48,
+        50,
+    ]
+
+    batch_1 = [20]
 
     for dim in batch_1:
         # 10-fold validation
