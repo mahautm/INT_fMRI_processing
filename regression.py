@@ -112,7 +112,7 @@ def build_x_data(
     fold,
     subject,
     model_file_path="/scratch/mmahaut/data/intertva/ae",
-    rsfmri_data_file_path="/scratch/mmahaut/data/intertva/features_rsfmri",
+    rsfmri_data_file_path="/scratch/mmahaut/data/intertva/features_rsfMRI",
     modality_data_file_path="/scratch/mmahaut/data/intertva/past_data/tfmri",
     out_file="",
     gyrification_suffix="_eig_vec_fsaverage5_onref_sub-04.npy",
@@ -161,7 +161,7 @@ def load_intertva_rsfmri(subject, path):
     )
     if not os.path.exists(full_path):
 
-        cmd = "scp mahaut.m@frioul.int.univ-amu.fr:/hpc/banco/sellami.a/InterTVA/rsfmri/{}/glm/noisefiltering/correlation_matrix_fsaverage5.npy {}".format(
+        cmd = "rsync mahaut.m@frioul.int.univ-amu.fr:/hpc/banco/sellami.a/InterTVA/rsfmri/{}/glm/noisefiltering/correlation_matrix_fsaverage5.npy {}".format(
             subject, full_path
         )
         print(cmd)
