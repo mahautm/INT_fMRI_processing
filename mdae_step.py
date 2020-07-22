@@ -270,6 +270,7 @@ if __name__ == "__main__":
     data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
     dim = int(sys.argv[3])
     fold = int(sys.argv[4])
+
     (
         train_index,
         test_index,
@@ -279,6 +280,9 @@ if __name__ == "__main__":
         index_subjects,
         sub_list,
     ) = build_path_and_vars(data_orig, data_type, dim, fold)
+    fold_path = os.paths.join(base_path, dim, fold)
+    if not os.path.exists(fold_path):
+        os.makedirs(fold_path)
 
     # activation functions
     hidden_layer = "linear"
