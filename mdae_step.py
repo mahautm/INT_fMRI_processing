@@ -280,7 +280,7 @@ if __name__ == "__main__":
         index_subjects,
         sub_list,
     ) = build_path_and_vars(data_orig, data_type, dim, fold)
-    fold_path = os.path.join(base_path, dim, fold)
+    fold_path = os.path.join(base_path, str(dim), str(fold))
     if not os.path.exists(fold_path):
         os.makedirs(fold_path)
 
