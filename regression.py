@@ -8,8 +8,10 @@ from sklearn.metrics import r2_score
 
 import tensorflow as tf
 import os
+import sys
 import numpy as np
 import json
+from mdae_step import build_path_and_vars, load_intertva_rsfmri
 
 
 def load_data(
@@ -98,7 +100,9 @@ def get_x_data(
             "/X_{}.npy".format(subject),
         )
         if not os.path.exists(x_sub_data_path):
-            build_x_data(dimension, fold, subject, out_file=input_file_path)
+            build_x_data(
+                dimension, fold, subject, params, out_file=input_file_path,
+            )
 
         x_sub_data = np.load(x_sub_data_path)
         X.append(x_sub_data)
@@ -108,31 +112,28 @@ def get_x_data(
 
 
 def build_x_data(
-    dimension,
-    fold,
-    subject,
-    model_file_path="/scratch/mmahaut/data/intertva/ae",
-    rsfmri_data_file_path="/scratch/mmahaut/data/intertva/features_rsfMRI",
-    modality_data_file_path="/scratch/mmahaut/data/intertva/past_data/tfmri",
-    out_file="",
-    gyrification_suffix="_eig_vec_fsaverage5_onref_sub-04.npy",
-    rsfmri_suffix="",
+    dimension, fold, subject, params, out_file="",
 ):
 
     # encoder_rsfmri = tf.keras.models.load_model(os.path.join(model_file_path,"/{}/fold_{}/encoder_rsfmri.h5").format(dimension,fold))
     # encoder_tfmri = tf.keras.models.load_model(os.path.join(model_file_path,"/{}/fold_{}/encoder_tfmri.h5").format(dimension,fold))
     model = tf.keras.models.load_model(
         "{}/{}/fold_{}/encoder_shared_layer.h5".format(
-            model_file_path, dimension, fold
+            params["base_path"], dimension, fold
         ),
     )
 
-    # rsfmri data was not built with the feature extraction script, and therefore might need to be fetched on frioul
+    # rsfmri data was not built with the feature extraction script, and therefore this function can fetch it from frioul
     rsfmri_data = load_intertva_rsfmri(subject, rsfmri_data_file_path)
+
     if params["modality"] == "gyrification":
         gyr_data = np.load(
             os.path.join(
-                modality_data_file_path, "/{}{}".format(subject, gyrification_suffix),
+                params["orig_path"],
+                "features_gyrification",
+                "{}_eig_vec_{}_onref_{}.npy".format(
+                    subject, params["template"], params["ref_subject"]
+                ),
             )
         )
         prediction = model.predict([gyr_data, rsfmri_data])
@@ -142,7 +143,7 @@ def build_x_data(
         simplified_sub_name = subject[5:] if subject[4] == "0" else subject[4:]
         gyr_data = np.load(
             os.path.join(
-                modality_data_file_path,
+                "/scratch/mmahaut/data/intertva/past_data/tfmri",
                 "{}/gii_matrix_fsaverage5.npy".format(simplified_sub_name),
             )
         )
@@ -152,22 +153,6 @@ def build_x_data(
         out_file, str(dimension), "fold_{}".format(fold), "/X_{}.npy".format(subject),
     )
     np.save(prediction, x_sub_data_path)
-
-
-def load_intertva_rsfmri(subject, path):
-    # missing file creation if it is missing
-    full_path = os.path.join(
-        path, "correlation_matrix_fsaverage5_{}.npy".format(subject)
-    )
-    if not os.path.exists(full_path):
-
-        cmd = "rsync mahaut.m@frioul.int.univ-amu.fr:/hpc/banco/sellami.a/InterTVA/rsfmri/{}/glm/noisefiltering/correlation_matrix_fsaverage5.npy {}".format(
-            subject, full_path
-        )
-        print(cmd)
-        os.system(cmd)
-    rsfmri_data = np.load(full_path)
-    return rsfmri_data
 
 
 ########################
@@ -325,6 +310,8 @@ if __name__ == "__main__":
 
     params["data_source"] = sys.argv[1]
     params["modality"] = sys.argv[2]
+    params["template"] = "fsaverage5"
+
     params["mu_min"] = 1e-7
     # params["soft_thresh"] = 10e-3
     params["soft_thresh"] = 0.0
@@ -332,11 +319,6 @@ if __name__ == "__main__":
     params["graph"] = laplacian
     params["iterations"] = 1000
     params["mu"] = 0.1
-    sub_file_path = (
-        "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list.json"
-    )
-    sub_file = open(sub_file_path)
-    subjects = json.load(sub_file)
 
     dimensions = [
         1,
@@ -366,15 +348,26 @@ if __name__ == "__main__":
 
     for dim in batch_1:
         # 10-fold validation
-        idx = np.arange(len(subjects))
 
         # idx = np.arange(39)
-        kf = KFold(n_splits=10)
-        fold = 0
+        # kf = KFold(n_splits=10)
+        # fold = 0
         results = np.zeros(39)
 
-        for train_index, test_index in kf.split(idx):
-            fold += 1
+        # for train_index, test_index in kf.split(idx):
+        # fold += 1
+        for fold in range(1, 11):  # 10-fold validation
+            (
+                train_index,
+                test_index,
+                params["ref_subject"],
+                params["orig_path"],
+                params["base_path"],
+                idx,
+                sub_list,
+            ) = build_path_and_vars(
+                params["data_source"], params["modality"], dim, fold
+            )
             print("Fold #{}".format(fold))
             # Chargement des données
             X, Y = load_data(params, dim, fold)

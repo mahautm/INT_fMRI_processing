@@ -221,6 +221,7 @@ def build_normalised_data(
     )
 
 
+# This is one I'm always using and that should really go in a function holder
 def build_path_and_vars(data_orig, data_type, dim, fold):
 
     # Warning from previous script : That might be too many different paths. To solve that, one way would be to use os more,
@@ -258,7 +259,7 @@ def build_path_and_vars(data_orig, data_type, dim, fold):
         ref_subject,
         orig_path,
         base_path,
-        index_subjects,
+        index_subjects,  # This one's presence just adds a variable to return where it's not always needed, and should later be removed
         sub_list,
     )
 
