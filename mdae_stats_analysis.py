@@ -59,4 +59,5 @@ if __name__ == "__main__":
     ]
     for orig_path in paths_to_analyse:
         table = build_stat_table(dimensions, orig_path, stat_files)
-        table.savefig(os.path.join(orig_path, "mse_summary.png"))
+        plt.title("mse_summary")
+        plt.savefig(os.path.join(orig_path, "mse_summary.png"))
