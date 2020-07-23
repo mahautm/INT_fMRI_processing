@@ -38,8 +38,8 @@ def build_stat_table(dimensions, orig_path, stat_files):
 if __name__ == "__main__":
     # The dimensions are used accross 3 scripts, there should be a parameter file that is loaded, probably in json format
     dimensions = [20]
-    data_orig = sys.argv[1]
-    data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
+    # data_orig = sys.argv[1]
+    # data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
     paths_to_analyse = [
         "/scratch/mmahaut/data/intertva/ae",
         "/scratch/mmahaut/data/intertva/ae_gyrification",
