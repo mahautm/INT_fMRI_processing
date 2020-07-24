@@ -65,7 +65,7 @@ def load_intertva_tfmri(subject, path):
         os.system(cmd)
         lh_tfmri = np.load(os.path.join(path, "gii_matrix_fsaverage5_lh.npy"))
         rh_tfmri = np.load(os.path.join(path, "gii_matrix_fsaverage5_rh.npy"))
-        tfmri_data = np.concatenate(lh_tfmri, rh_tfmri)
+        tfmri_data = np.concatenate((lh_tfmri, rh_tfmri))
         np.save(full_path, tfmri_data)
 
     else:
