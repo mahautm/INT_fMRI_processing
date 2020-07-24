@@ -11,7 +11,7 @@ import os
 import sys
 import numpy as np
 import json
-from mdae_step import build_path_and_vars, load_intertva_rsfmri
+from mdae_step import build_path_and_vars, load_intertva_rsfmri, load_intertva_tfmri
 
 
 def load_data(
@@ -138,18 +138,13 @@ def build_x_data(
                 ),
             )
         )
-        prediction = model.predict([rsfmri_data, gyr_data])
+        prediction = model.predict([gyr_data, rsfmri_data])
 
     elif params["modality"] == "tfMRI":
-        # !! This is not properly taken in the expected frioul environment, but from data given by Stéphane
-        simplified_sub_name = subject[5:] if subject[4] == "0" else subject[4:]
-        tfmri_data = np.load(
-            os.path.join(
-                "/scratch/mmahaut/data/intertva/past_data/tfmri",
-                "{}/gii_matrix_fsaverage5.npy".format(simplified_sub_name),
-            )
+        tfmri_data = load_intertva_tfmri(
+            subject, os.path.join(params["orig_path"], "features_tfMRI")
         )
-        prediction = model.predict([rsfmri_data, tfmri_data])
+        prediction = model.predict([tfmri_data, rsfmri_data])
 
     x_sub_data_path = os.path.join(
         out_file, str(dimension), "fold_{}".format(fold), "/X_{}.npy".format(subject),

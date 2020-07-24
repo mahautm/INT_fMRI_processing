@@ -20,14 +20,15 @@ from keras.callbacks import ModelCheckpoint
 from keras.models import load_model
 import keras.backend as K
 
-# This function is duplicated in regression, against all good coding practices, someday I'll do something about it
+
 def load_intertva_rsfmri(subject, path):
     # missing file creation if it is missing
     full_path = os.path.join(
         path, "correlation_matrix_fsaverage5_{}.npy".format(subject)
     )
     if not os.path.exists(full_path):
-
+        if not os.path.exists(path):
+            os.makedirs(path)
         cmd = "rsync mahaut.m@frioul.int.univ-amu.fr:/hpc/banco/sellami.a/InterTVA/rsfmri/{}/glm/noisefiltering/correlation_matrix_fsaverage5.npy {}".format(
             subject, full_path
         )
@@ -35,6 +36,27 @@ def load_intertva_rsfmri(subject, path):
         os.system(cmd)
     rsfmri_data = np.load(full_path)
     return rsfmri_data
+
+
+def load_intertva_tfmri(subject, path):
+    # missing file creation if it is missing
+    full_path = os.path.join(path, "gii_matrix_fsaverage5_{}.npy".format(subject))
+    if not os.path.exists(full_path):
+        if not os.path.exists(path):
+            os.makedirs(path)
+        cmd = "rsync mahaut.m@frioul.int.univ-amu.fr:/hpc/banco/sellami.a/InterTVA/tfmri/{0}/u{0}_task-localizer_model-singletrial_denoised/gii_matrix_fsaverage5_lh.npy {1} & rsync mahaut.m@frioul.int.univ-amu.fr:/hpc/banco/sellami.a/InterTVA/tfmri/{0}/u{0}_task-localizer_model-singletrial_denoised/gii_matrix_fsaverage5_rh.npy {1}".format(
+            subject, path
+        )
+        print(cmd)
+        os.system(cmd)
+        lh_tfmri = np.load(os.path.join(path, "gii_matrix_fsaverage5_lh.npy"))
+        rh_tfmri = np.load(os.path.join(path, "gii_matrix_fsaverage5_rh.npy"))
+        tfmri_data = np.concatenate(lh_tfmri, rh_tfmri)
+        np.save(full_path, tfmri_data)
+
+    else:
+        tfmri_data = np.load(full_path)
+    return tfmri_data
 
 
 def load_data(
@@ -57,26 +79,27 @@ def load_data(
     view: int {1,2,3,4,5}
         View 1: task fMRI
         View 2: resting-state fMRI
-        View 3: concatenated views (task-fMRI + rest-fMRI)    
+        View 3: concatenated views (task-fMRI + rest-fMRI)  --UNUSED
         View 4: gyrification anatomical MRI modality
-        View 5: concatenated views (gyr-MRI + rest-fMRI)
+        View 5: concatenated views (gyr-MRI + rest-fMRI)    --UNUSED
 
     ref_sub: default "USM_0050475"
         the subject the gyrification matrices were based on during the sign homogeneity phase
     
     orig_path: default "/scratch/mmahaut/data/abide/"
-        where we can find the fata to load
+        where we can find the data to load
 
 
     TODO: we are dependant on global variables, sub_list and data_orig. This should be made into function or object parameters in a later version
     """
+    # Import task fMRI data
     if view == 1:
 
-        data_path = os.path.join(orig_path, "features_rsfMRI")
-        view_tfmri = load_intertva_rsfmri(sub_list[sub_index], data_path)
+        data_path = os.path.join(orig_path, "features_tfMRI")
+        view_tfmri = load_intertva_tfmri(sub_list[sub_index], data_path)
         return view_tfmri
 
-    # Import Resting-State fMRI data
+    # Import resting-state fMRI data
     elif view == 2:
         if data_orig == "ABIDE":
             view_rsfmri = np.load(
@@ -89,42 +112,29 @@ def load_data(
             )
 
         elif data_orig == "interTVA":
-            # in the past_data directory, for interTVA, subjects are solely identified by their number,
-            #  we therefore remove the 'sub-' prefix at the begining of the names, as well as the 0 in single digit cases
-            simplified_sub_name = (
-                sub_list[sub_index][5:]
-                if sub_list[sub_index][4] == "0"
-                else sub_list[sub_index][4:]
-            )
-            view_rsfmri = np.load(
-                os.path.join(
-                    orig_path,
-                    "past_data/rsfmri/{}/correlation_matrix_fsaverage5.npy".format(
-                        simplified_sub_name
-                    ),
-                )
-            )
+            data_path = os.path.join(orig_path, "features_rsfMRI")
+            view_rsfmri = load_intertva_rsfmri(sub_list[sub_index], data_path)
         return view_rsfmri
 
-    # Import concatenated fMRI data
-    elif view == 3:
-        data_path = os.path.join(
-            orig_path,
-            "features_gyr/{}_eig_vec_fsaverage5_onref_{}.npy".format(
-                sub_list[sub_index], ref_sub
-            ),
-        )
-        view_gyr = np.load(data_path)
-        view_rsfmri = np.load(
-            os.path.join(
-                orig_path,
-                "features_rsfMRI/correlation_matrix_fsaverage5_{}.npy".format(
-                    sub_index
-                ),
-            )
-        )
-        fmri_data = np.concatenate([view_gyr, view_rsfmri], axis=1)
-        return fmri_data
+    # Import concatenated fMRI data -- UNUSED
+    # elif view == 3:
+    #     data_path = os.path.join(
+    #         orig_path,
+    #         "features_gyrification/{}_eig_vec_fsaverage5_onref_{}.npy".format(
+    #             sub_list[sub_index], ref_sub
+    #         ),
+    #     )
+    #     view_gyr = np.load(data_path)
+    #     view_rsfmri = np.load(
+    #         os.path.join(
+    #             orig_path,
+    #             "features_rsfMRI/correlation_matrix_fsaverage5_{}.npy".format(
+    #                 sub_index
+    #             ),
+    #         )
+    #     )
+    #     fmri_data = np.concatenate([view_gyr, view_rsfmri], axis=1)
+    #     return fmri_data
 
     elif view == 4:
         data_path = os.path.join(
@@ -136,24 +146,25 @@ def load_data(
         view_gyr = np.load(data_path)
         return view_gyr
 
-    elif view == 5:
-        data_path = os.path.join(
-            orig_path,
-            "features_gyrification/{}_eig_vec_fsaverage5_onref_{}.npy".format(
-                sub_list[sub_index], ref_sub
-            ),
-        )
-        view_gyr = np.load(data_path)
-        view_rsfmri = np.load(
-            os.path.join(
-                orig_path,
-                "features_rsfMRI/correlation_matrix_fsaverage5_{}.npy".format(
-                    sub_list[sub_index]
-                ),
-            )
-        )
-        fmri_data = np.concatenate([view_gyr, view_rsfmri], axis=1)
-        return fmri_data
+    # -- UNUSED
+    # elif view == 5:
+    #     data_path = os.path.join(
+    #         orig_path,
+    #         "features_gyrification/{}_eig_vec_fsaverage5_onref_{}.npy".format(
+    #             sub_list[sub_index], ref_sub
+    #         ),
+    #     )
+    #     view_gyr = np.load(data_path)
+    #     view_rsfmri = np.load(
+    #         os.path.join(
+    #             orig_path,
+    #             "features_rsfMRI/correlation_matrix_fsaverage5_{}.npy".format(
+    #                 sub_list[sub_index]
+    #             ),
+    #         )
+    #     )
+    #     fmri_data = np.concatenate([view_gyr, view_rsfmri], axis=1)
+    #     return fmri_data
 
 
 def build_normalised_data(
