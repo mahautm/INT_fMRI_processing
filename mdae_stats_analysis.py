@@ -33,7 +33,8 @@ def build_stat_table(dimensions, orig_path, stat_files):
         loc="top",
         bbox=[0, -0.3, 1, 0.275],
     )
-
+    the_table.auto_set_font_size(False)
+    the_table.set_fontsize(12)
     fig.tight_layout()
     return the_table
 
