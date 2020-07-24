@@ -26,7 +26,13 @@ def build_stat_table(dimensions, orig_path, stat_files):
                 filename[: len(filename) - 5]
             )  # enlever le .npy à la fin des noms de fichier
         cell_text.append(row_cell_text)
-    the_table = plt.table(cellText=cell_text, rowLabels=rows, colLabels=columns,)
+    the_table = plt.table(
+        cellText=cell_text,
+        rowLabels=rows,
+        colLabels=columns,
+        loc="top",
+        bbox=[0, -0.3, 1, 0.275],
+    )
 
     fig.tight_layout()
     return the_table
