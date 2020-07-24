@@ -124,7 +124,7 @@ def build_x_data(
     )
 
     # rsfmri data was not built with the feature extraction script, and therefore this function can fetch it from frioul
-    rsfmri_data = load_intertva_rsfmri(subject, rsfmri_data_file_path)
+    rsfmri_data = load_intertva_rsfmri(subject, os.path.join(params["orig_path"],"features_rsfMRI")
 
     if params["modality"] == "gyrification":
         gyr_data = np.load(
