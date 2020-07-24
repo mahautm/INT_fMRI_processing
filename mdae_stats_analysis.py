@@ -31,8 +31,7 @@ def build_stat_table(dimensions, orig_path, stat_files, title=""):
     )
     the_table.scale(4, 2.5)
     plt.draw()
-    plt.title = title
-    plt.title("mse_summary")
+    plt.title(title)
     plt.savefig(
         os.path.join(orig_path, "mse_summary.png"),
         dpi=fig.dpi,
