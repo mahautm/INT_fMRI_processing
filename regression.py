@@ -149,7 +149,7 @@ def build_x_data(
     x_sub_data_path = os.path.join(
         out_file, str(dimension), "fold_{}".format(fold), "/X_{}.npy".format(subject),
     )
-    np.save(prediction, x_sub_data_path)
+    np.save(x_sub_data_path, prediction)
 
 
 ########################
