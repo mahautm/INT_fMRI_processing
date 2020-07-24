@@ -1,26 +1,21 @@
-# import matplotlib.pyplot as plt
-
-# plt.switch_backend("agg")
 import sys
-
 import os
-
-# import json
-
-# # from sklearn.preprocessing import StandardScaler, MinMaxScaler
-# from sklearn.metrics import mean_squared_error
-
-# from math import sqrt
 import numpy as np
-
-# import tensorflow as tf
 import matplotlib.pyplot as plt
 
-# import mdae_step as mds
+import pandas as pd
+
+
 def build_stat_table(dimensions, orig_path, stat_files):
+    fig, ax = plt.subplots()
+    fig.patch.set_visible(False)
+    ax.axis("off")
+    ax.axis("tight")
+
     cell_text = []
     rows = []
     columns = []
+
     for dim_index in range(len(dimensions)):
         rows.append("{} dim encoding".format(dimensions[dim_index]))
         row_cell_text = []
@@ -32,6 +27,8 @@ def build_stat_table(dimensions, orig_path, stat_files):
             )  # enlever le .npy à la fin des noms de fichier
         cell_text.append(row_cell_text)
     the_table = plt.table(cellText=cell_text, rowLabels=rows, colLabels=columns,)
+
+    fig.tight_layout()
     return the_table
 
 
