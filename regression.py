@@ -138,18 +138,18 @@ def build_x_data(
                 ),
             )
         )
-        prediction = model.predict([gyr_data, rsfmri_data])
+        prediction = model.predict([rsfmri_data, gyr_data])
 
     elif params["modality"] == "tfMRI":
         # !! This is not properly taken in the expected frioul environment, but from data given by Stéphane
         simplified_sub_name = subject[5:] if subject[4] == "0" else subject[4:]
-        gyr_data = np.load(
+        tfmri_data = np.load(
             os.path.join(
                 "/scratch/mmahaut/data/intertva/past_data/tfmri",
                 "{}/gii_matrix_fsaverage5.npy".format(simplified_sub_name),
             )
         )
-        prediction = model.predict([gyr_data, rsfmri_data])
+        prediction = model.predict([rsfmri_data, tfmri_data])
 
     x_sub_data_path = os.path.join(
         out_file, str(dimension), "fold_{}".format(fold), "/X_{}.npy".format(subject),

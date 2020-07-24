@@ -23,7 +23,7 @@ def build_stat_table(dimensions, orig_path, stat_files, title=""):
             stat = np.load(os.path.join(orig_path, filename))[0]
             row_cell_text.append(stat[dim_index])
             columns.append(
-                filename[: len(filename) - 5]
+                filename[: len(filename) - 4]
             )  # enlever le .npy à la fin des noms de fichier
         cell_text.append(row_cell_text)
     the_table = plt.table(
