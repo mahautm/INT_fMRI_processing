@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 
-def build_stat_table(dimensions, orig_path, stat_files):
+def build_stat_table(dimensions, orig_path, stat_files, title=""):
     fig, ax = plt.subplots()
     fig.patch.set_visible(False)
     ax.axis("off")
@@ -20,22 +20,25 @@ def build_stat_table(dimensions, orig_path, stat_files):
         rows.append("{} dim encoding".format(dimensions[dim_index]))
         row_cell_text = []
         for filename in stat_files:
-            stat = np.load(os.path.join(orig_path, filename))
+            stat = np.load(os.path.join(orig_path, filename))[0]
             row_cell_text.append(stat[dim_index])
             columns.append(
                 filename[: len(filename) - 5]
             )  # enlever le .npy à la fin des noms de fichier
         cell_text.append(row_cell_text)
     the_table = plt.table(
-        cellText=cell_text,
-        rowLabels=rows,
-        colLabels=columns,
-        loc="top",
-        bbox=[0, -0.3, 1, 0.275],
+        cellText=cell_text, rowLabels=rows, colLabels=columns, loc="center",
     )
-    the_table.auto_set_font_size(False)
-    the_table.set_fontsize(12)
-    fig.tight_layout()
+    the_table.scale(4, 2.5)
+    plt.draw()
+    plt.title = title
+    plt.title("mse_summary")
+    plt.savefig(
+        os.path.join(orig_path, "mse_summary.png"),
+        dpi=fig.dpi,
+        bbox_inches="tight",
+        pad_inches=0.5,
+    )
     return the_table
 
 
@@ -49,6 +52,11 @@ if __name__ == "__main__":
         "/scratch/mmahaut/data/intertva/ae_gyrification",
         "/scratch/mmahaut/data/abide/ae_gyrification",
     ]
+    titles = [
+        "interTVA tfMRI MSE",
+        "interTVA gyrification MSE",
+        "ABIDE gyrification MSE",
+    ]
     stat_files = [
         "rmse_test_mean.npy",
         "rmse_test_mean_rsfmri.npy",
@@ -61,7 +69,6 @@ if __name__ == "__main__":
         "std_rmse_test_mean.npy",
         "std_rmse_train_mean.npy",
     ]
-    for orig_path in paths_to_analyse:
-        table = build_stat_table(dimensions, orig_path, stat_files)
-        plt.title("mse_summary")
-        plt.savefig(os.path.join(orig_path, "mse_summary.png"))
+    for i in range(len(paths_to_analyse)):
+        table = build_stat_table(dimensions, paths_to_analyse[i], stat_files, titles[i])
+
