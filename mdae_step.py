@@ -36,10 +36,9 @@ def load_intertva_rsfmri(subject, path):
                 if exc.errno != errno.EEXIST:
                     raise
                 pass
-        cmd = "rsync mahaut.m@frioul.int.univ-amu.fr:/hpc/banco/sellami.a/InterTVA/rsfmri/{}/glm/noisefiltering/correlation_matrix_fsaverage5.npy {}".format(
+        cmd = "scp mahaut.m@frioul.int.univ-amu.fr:/hpc/banco/sellami.a/InterTVA/rsfmri/{}/glm/noisefiltering/correlation_matrix_fsaverage5.npy {}".format(
             subject, full_path
         )
-        print(cmd)
         os.system(cmd)
     rsfmri_data = np.load(full_path)
     return rsfmri_data
@@ -61,10 +60,9 @@ def load_intertva_tfmri(subject, path):
         lh_path = os.path.join(path, "gii_matrix_fsaverage5_lh_{}.npy".format(subject))
         rh_path = os.path.join(path, "gii_matrix_fsaverage5_rh_{}.npy".format(subject))
         # an exception here would maybe come in handy, in case rsync doesn't work
-        cmd = "rsync mahaut.m@frioul.int.univ-amu.fr:/hpc/banco/sellami.a/InterTVA/tfmri/{0}/u{0}_task-localizer_model-singletrial_denoised/gii_matrix_fsaverage5_lh.npy {1} & rsync mahaut.m@frioul.int.univ-amu.fr:/hpc/banco/sellami.a/InterTVA/tfmri/{0}/u{0}_task-localizer_model-singletrial_denoised/gii_matrix_fsaverage5_rh.npy {2}".format(
+        cmd = "scp mahaut.m@frioul.int.univ-amu.fr:/hpc/banco/sellami.a/InterTVA/tfmri/{0}/u{0}_task-localizer_model-singletrial_denoised/gii_matrix_fsaverage5_lh.npy {1} & rsync mahaut.m@frioul.int.univ-amu.fr:/hpc/banco/sellami.a/InterTVA/tfmri/{0}/u{0}_task-localizer_model-singletrial_denoised/gii_matrix_fsaverage5_rh.npy {2}".format(
             subject, lh_path, rh_path,
         )
-        print(cmd)
         os.system(cmd)
         lh_tfmri = np.load(lh_path)
         rh_tfmri = np.load(rh_path)
