@@ -57,14 +57,21 @@ def load_intertva_tfmri(subject, path):
                 if exc.errno != errno.EEXIST:
                     raise
                 pass
+
+        lh_path = os.path.join(path, "gii_matrix_fsaverage5_lh_{}.npy".format(subject))
+        rh_path = os.path.join(path, "gii_matrix_fsaverage5_rh_{}.npy".format(subject))
         # an exception here would maybe come in handy, in case rsync doesn't work
-        cmd = "rsync mahaut.m@frioul.int.univ-amu.fr:/hpc/banco/sellami.a/InterTVA/tfmri/{0}/u{0}_task-localizer_model-singletrial_denoised/gii_matrix_fsaverage5_lh.npy {1} & rsync mahaut.m@frioul.int.univ-amu.fr:/hpc/banco/sellami.a/InterTVA/tfmri/{0}/u{0}_task-localizer_model-singletrial_denoised/gii_matrix_fsaverage5_rh.npy {1}".format(
-            subject, path
+        cmd = "rsync mahaut.m@frioul.int.univ-amu.fr:/hpc/banco/sellami.a/InterTVA/tfmri/{0}/u{0}_task-localizer_model-singletrial_denoised/gii_matrix_fsaverage5_lh.npy {1} & rsync mahaut.m@frioul.int.univ-amu.fr:/hpc/banco/sellami.a/InterTVA/tfmri/{0}/u{0}_task-localizer_model-singletrial_denoised/gii_matrix_fsaverage5_rh.npy {2}".format(
+            subject, lh_path, rh_path,
         )
         print(cmd)
         os.system(cmd)
-        lh_tfmri = np.load(os.path.join(path, "gii_matrix_fsaverage5_lh.npy"))
-        rh_tfmri = np.load(os.path.join(path, "gii_matrix_fsaverage5_rh.npy"))
+        lh_tfmri = np.load(lh_path)
+        rh_tfmri = np.load(rh_path)
+        # seperate frioul files can be deleted now they have been saved as a unique combined file
+        cmd_deletion = "rm {} & rm {}".format(lh_path, rh_path)
+        os.system(cmd_deletion)
+
         tfmri_data = np.concatenate((lh_tfmri, rh_tfmri))
         np.save(full_path, tfmri_data)
 
