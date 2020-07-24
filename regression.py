@@ -9,6 +9,7 @@ from sklearn.metrics import r2_score
 import tensorflow as tf
 import os
 import sys
+import errno
 import numpy as np
 import json
 from mdae_step import build_path_and_vars, load_intertva_rsfmri, load_intertva_tfmri
@@ -100,11 +101,11 @@ def get_x_data(
             "/X_{}.npy".format(subject),
         )
         if not os.path.exists(x_sub_data_path):
-            build_x_data(
+            x_sub_data = build_x_data(
                 dimension, fold, subject, params, out_file=input_file_path,
             )
-
-        x_sub_data = np.load(x_sub_data_path)
+        else:
+            x_sub_data = np.load(x_sub_data_path)
         X.append(x_sub_data)
 
     return X
@@ -146,10 +147,19 @@ def build_x_data(
         )
         prediction = model.predict([tfmri_data, rsfmri_data])
 
-    x_sub_data_path = os.path.join(
-        out_file, str(dimension), "fold_{}".format(fold), "X_{}.npy".format(subject),
-    )
+    path = os.path.join(out_file, str(dimension), "fold_{}".format(fold))
+    if not os.path.exists(path):
+        # As we are working with parallel scripts, this will allow the script to keep working despite another one having built the directory
+        try:
+            os.makedirs(path)
+        except OSError as exc:
+            if exc.errno != errno.EEXIST:
+                raise
+            pass
+
+    x_sub_data_path = os.path.join(os.path.join(path, "X_{}.npy".format(subject)))
     np.save(x_sub_data_path, prediction)
+    return prediction
 
 
 ########################
