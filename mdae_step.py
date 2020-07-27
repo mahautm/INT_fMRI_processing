@@ -313,7 +313,12 @@ if __name__ == "__main__":
     ) = build_path_and_vars(data_orig, data_type, dim, fold)
     fold_path = os.path.join(base_path, str(dim), "fold_{}".format(str(fold)))
     if not os.path.exists(fold_path):
-        os.makedirs(fold_path)
+        try:
+            os.makedirs(fold_path)
+        except OSError as exc:
+            if exc.errno != errno.EEXIST:
+                raise
+            pass
 
     # activation functions
     hidden_layer = "linear"
