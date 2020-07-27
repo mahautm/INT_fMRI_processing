@@ -320,8 +320,8 @@ if __name__ == "__main__":
                 raise
             pass
 
-    # activation functions
-    hidden_layer = "linear"
+    # activation functions, relu / linear gives best results according to paper
+    hidden_layer = "relu"
     output_layer = "linear"
     # create directory
     # os.system("sbatch /scratch/mmahaut/scripts/slurm/mdae_step.sh dim")
