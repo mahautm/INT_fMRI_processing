@@ -263,7 +263,8 @@ def estimate_beta(X, Y, params):
     (res, mu) = cvm.monotone_fista_support(
         objective,
         gradient,
-        X[4] * 0.0,
+        X[4]
+        * 0.0,  # Pourquoi 4 ? est-ce une valeur arbitraire, pour avoir la forme (shape) ?
         params["mu"],
         params["mu_min"],
         params["iterations"],
@@ -386,7 +387,9 @@ if __name__ == "__main__":
             XT = X[idx[test_index], :, :]
             YT = Y[idx[test_index]]
             beta = estimate_beta(XE, YE, params)
-            file = "fold_{}/beta.npy".format(fold)
+            file = "{}/regression_output/fold_{}/beta.npy".format(
+                params["base_path"], fold
+            )
             np.save(file, beta)
             # Estimate the results
             results[idx[test_index]] = np.trace(
