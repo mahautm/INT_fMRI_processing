@@ -262,13 +262,6 @@ def build_path_and_vars(data_orig, data_type, dim, fold):
         base_path = "/scratch/mmahaut/data/abide/ae_gyrification"
         sub_list_files = "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list_asd.json"
 
-        train_index = np.load(
-            "{}/{}/fold_{}/train_index.npy".format(base_path, dim, fold)
-        )
-        test_index = np.load(
-            "{}/{}/fold_{}/test_index.npy".format(base_path, dim, fold)
-        )
-
     elif data_orig == "interTVA":
         ref_subject = "sub-04"
         orig_path = "/scratch/mmahaut/data/intertva/"
@@ -276,12 +269,14 @@ def build_path_and_vars(data_orig, data_type, dim, fold):
         base_path = "/scratch/mmahaut/data/intertva/{}".format(ae_type)
         sub_list_files = "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list.json"
 
-        train_index = np.load("{}/train_index.npy".format(base_path))
-        test_index = np.load("{}/test_index.npy".format(base_path))
     else:
         print(
             "Warning !! : Please provide data origin as parameter when calling script: either 'ABIDE' or 'interTVA' "
         )
+
+    train_index = np.load("{}/{}/fold_{}/train_index.npy".format(base_path, dim, fold))
+    test_index = np.load("{}/{}/fold_{}/test_index.npy".format(base_path, dim, fold))
+
     sub_list_file = open(sub_list_files)
     sub_list = json.load(sub_list_file)
 
