@@ -86,7 +86,7 @@ def get_x_data(
     """
     X = []
     input_file_path = os.path.join(
-        params["orig_path"], "ae_output_{}".format_map(params["modality"])
+        params["orig_path"], "ae_output_{}".format(params["modality"])
     )
 
     for subject in subject_list:
@@ -109,7 +109,7 @@ def get_x_data(
 
 
 def build_x_data(
-    dimension, fold, subject, params, out_file="",
+    dimension, fold, subject, params, out_file,
 ):
 
     # encoder_rsfmri = tf.keras.models.load_model(os.path.join(model_file_path,"/{}/fold_{}/encoder_rsfmri.h5").format(dimension,fold))
