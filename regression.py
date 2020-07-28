@@ -16,13 +16,10 @@ from mdae_step import build_path_and_vars, load_intertva_rsfmri, load_intertva_t
 
 
 def load_data(
-    params,
-    dimension,
-    fold,
-    sub_file="/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list_asd_classified.json",
+    params, dimension, fold, sub_file,
 ):
     # Hasn't been tested yet,
-    X = get_x_data(params, dimension, fold)
+    X = get_x_data(params, dimension, fold, subject_list=sub_file)
     XZ = np.array(X)
 
     Y = []
@@ -81,18 +78,17 @@ def load_data(
 
 
 def get_x_data(
-    params,
-    dimension,
-    fold,
-    input_file_path="/scratch/mmahaut/data/intertva/ae_output_tfmri",
-    subject_list_path="/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list.json",
+    params, dimension, fold, subject_list,
 ):
     """
     lazybuilder for regression input data. If data has already been calculated, it is simply loaded.
     Otherwise we get the model and run it once more
     """
-    subject_list = json.load(open(subject_list_path))
     X = []
+    input_file_path = os.path.join(
+        params["orig_path"], "ae_output_{}".format_map(params["modality"])
+    )
+
     for subject in subject_list:
         x_sub_data_path = os.path.join(
             input_file_path,
@@ -130,14 +126,12 @@ def build_x_data(
     )
 
     if params["modality"] == "gyrification":
-        gyr_data = np.load(
-            os.path.join(
-                params["orig_path"],
-                "features_gyrification",
-                "{}_eig_vec_{}_onref_{}.npy".format(
-                    subject, params["template"], params["ref_subject"]
-                ),
-            )
+        gyr_data = os.path.join(
+            params["orig_path"],
+            "features_gyrification",
+            "{}_eig_vec_{}_onref_{}.npy".format(
+                subject, params["template"], params["ref_subject"]
+            ),
         )
         prediction = model.predict([gyr_data, rsfmri_data])
 
@@ -378,7 +372,7 @@ if __name__ == "__main__":
             )
             print("Fold #{}".format(fold))
             # Chargement des données
-            X, Y = load_data(params, dim, fold)
+            X, Y = load_data(params, dim, fold, sub_list)
             print("TRAIN:", idx[train_index], "TEST:", idx[test_index])
             # Ensemble d'entrainement
             XE = X[idx[train_index], :, :]
@@ -392,9 +386,19 @@ if __name__ == "__main__":
             )
             np.save(file, beta)
             # Estimate the results
-            results[idx[test_index]] = np.trace(
-                np.transpose(XT, axes=(0, 2, 1)) @ beta, axis1=1, axis2=2
-            )
+            if params["data_source"] == "ABIDE":
+                results[idx[test_index]] = (
+                    0
+                    if np.trace(
+                        np.transpose(XT, axes=(0, 2, 1)) @ beta, axis1=1, axis2=2
+                    )
+                    < 0.5
+                    else 1
+                )
+            elif params["data_source"] == "interTVA":
+                results[idx[test_index]] = np.trace(
+                    np.transpose(XT, axes=(0, 2, 1)) @ beta, axis1=1, axis2=2
+                )
             print(results[idx[test_index]])
             print(
                 "MSE, fold_{}".format(fold),
