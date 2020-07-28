@@ -138,14 +138,13 @@ if __name__ == "__main__":
             fold = 0
             for train_index, test_index in kf.split(index_subjects, Y):
                 fold += 1
-                np.save(
-                    "/scratch/mmahaut/data/abide/ae_gyrification/train_index.npy",
-                    train_index,
+                fold_path = "/scratch/mmahaut/data/abide/ae_gyrification/{}/fold_{}".format(
+                    dim, fold
                 )
-                np.save(
-                    "/scratch/mmahaut/data/abide/ae_gyrification/test_index.npy",
-                    test_index,
-                )
+                if not os.path.exists(fold_path):
+                    os.makedirs(fold_path)
+                np.save(os.path.join(fold_path, "train_index.npy"), train_index)
+                np.save(os.path.join(fold_path, "test_index.npy"), test_index)
                 run_slurm_job_mdae(data_orig, data_type, dim, fold)
 
     elif data_orig == "interTVA":
@@ -158,17 +157,17 @@ if __name__ == "__main__":
         index_subjects = np.arange(0, len(sub_list))
         for dim in dimensions:
             fold = 0
+
             for train_index, test_index in kf.split(index_subjects):
                 fold += 1
                 ae_type = "ae" if data_type == "tfMRI" else "ae_gyrification"
-                np.save(
-                    "/scratch/mmahaut/data/intertva/{}/train_index.npy".format(ae_type),
-                    train_index,
+                fold_path = "/scratch/mmahaut/data/intertva/{}/{}/fold_{}".format(
+                    ae_type, dim, fold
                 )
-                np.save(
-                    "/scratch/mmahaut/data/intertva/{}/test_index.npy".format(ae_type),
-                    test_index,
-                )
+                if not os.path.exists(fold_path):
+                    os.makedirs(fold_path)
+                np.save(os.path.join(fold_path, "train_index.npy"), train_index)
+                np.save(os.path.join(fold_path, "test_index.npy"), test_index)
                 run_slurm_job_mdae(data_orig, data_type, dim, fold)
     else:
         print(

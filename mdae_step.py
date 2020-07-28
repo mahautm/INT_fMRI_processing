@@ -262,8 +262,12 @@ def build_path_and_vars(data_orig, data_type, dim, fold):
         base_path = "/scratch/mmahaut/data/abide/ae_gyrification"
         sub_list_files = "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list_asd.json"
 
-        train_index = np.load("{}/train_index.npy".format(base_path))
-        test_index = np.load("{}/test_index.npy".format(base_path))
+        train_index = np.load(
+            "{}/{}/fold_{}/train_index.npy".format(base_path, dim, fold)
+        )
+        test_index = np.load(
+            "{}/{}/fold_{}/test_index.npy".format(base_path, dim, fold)
+        )
 
     elif data_orig == "interTVA":
         ref_subject = "sub-04"
@@ -320,7 +324,7 @@ if __name__ == "__main__":
                 raise
             pass
 
-    # activation functions, relu / linear gives best results according to paper
+    # activation functions, relu / linear gives best results according to IJCNN paper
     hidden_layer = "relu"
     output_layer = "linear"
     # create directory
