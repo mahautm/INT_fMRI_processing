@@ -126,12 +126,14 @@ def build_x_data(
     )
 
     if params["modality"] == "gyrification":
-        gyr_data = os.path.join(
-            params["orig_path"],
-            "features_gyrification",
-            "{}_eig_vec_{}_onref_{}.npy".format(
-                subject, params["template"], params["ref_subject"]
-            ),
+        gyr_data = np.load(
+            os.path.join(
+                params["orig_path"],
+                "features_gyrification",
+                "{}_eig_vec_{}_onref_{}.npy".format(
+                    subject, params["template"], params["ref_subject"]
+                ),
+            )
         )
         prediction = model.predict([gyr_data, rsfmri_data])
 
