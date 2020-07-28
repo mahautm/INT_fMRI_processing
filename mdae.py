@@ -9,6 +9,7 @@ plt.switch_backend("agg")
 import sys
 import os
 import json
+import errno
 
 # from sklearn.preprocessing import StandardScaler, MinMaxScaler
 # from sklearn.decomposition import PCA
@@ -142,7 +143,12 @@ if __name__ == "__main__":
                     dim, fold
                 )
                 if not os.path.exists(fold_path):
-                    os.makedirs(fold_path)
+                    try:
+                        os.makedirs(fold_path)
+                    except OSError as exc:
+                        if exc.errno != errno.EEXIST:
+                            raise
+                        pass
                 np.save(os.path.join(fold_path, "train_index.npy"), train_index)
                 np.save(os.path.join(fold_path, "test_index.npy"), test_index)
                 run_slurm_job_mdae(data_orig, data_type, dim, fold)
@@ -165,7 +171,12 @@ if __name__ == "__main__":
                     ae_type, dim, fold
                 )
                 if not os.path.exists(fold_path):
-                    os.makedirs(fold_path)
+                    try:
+                        os.makedirs(fold_path)
+                    except OSError as exc:
+                        if exc.errno != errno.EEXIST:
+                            raise
+                        pass
                 np.save(os.path.join(fold_path, "train_index.npy"), train_index)
                 np.save(os.path.join(fold_path, "test_index.npy"), test_index)
                 run_slurm_job_mdae(data_orig, data_type, dim, fold)

@@ -251,7 +251,8 @@ def build_normalised_data(
     )
 
 
-# This is one I'm always using and that should really go in a function holder
+# This is one I'm always using and that should really go in a function holder,
+# might also need to be used in the mdae.py script instead of doing the writing part
 def build_path_and_vars(data_orig, data_type, dim, fold):
 
     # Warning from previous script : That might be too many different paths. To solve that, one way would be to use os more,
@@ -311,20 +312,19 @@ if __name__ == "__main__":
         sub_list,
     ) = build_path_and_vars(data_orig, data_type, dim, fold)
     fold_path = os.path.join(base_path, str(dim), "fold_{}".format(str(fold)))
-    if not os.path.exists(fold_path):
-        try:
-            os.makedirs(fold_path)
-        except OSError as exc:
-            if exc.errno != errno.EEXIST:
-                raise
-            pass
+
+    # Should not be needed anymore, as paths are built in the mdae.py script now, waiting for an opportunity to test before removing
+    # if not os.path.exists(fold_path):
+    #     try:
+    #         os.makedirs(fold_path)
+    #     except OSError as exc:
+    #         if exc.errno != errno.EEXIST:
+    #             raise
+    #         pass
 
     # activation functions, relu / linear gives best results according to IJCNN paper
     hidden_layer = "relu"
     output_layer = "linear"
-    # create directory
-    # os.system("sbatch /scratch/mmahaut/scripts/slurm/mdae_step.sh dim")
-    # create directory
 
     print(f"Fold #{fold}")
     print(

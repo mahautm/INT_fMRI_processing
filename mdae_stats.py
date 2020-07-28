@@ -80,7 +80,7 @@ def get_model_stats(data_orig, data_type, number_folds="10"):
 
     # Training
     for dim in dimensions:
-        for fold in range(1, number_folds+1):
+        for fold in range(1, number_folds + 1):
             (
                 train_index,
                 test_index,
@@ -202,7 +202,7 @@ def get_model_stats(data_orig, data_type, number_folds="10"):
             # Attempt to prevent memory leak on skylake machine, legacy from when this was a loop
             # K.clear_session()
 
-        # Save MSE, RMSE (gyr +rsfmr)
+        # Save MSE, RMSE (gyr + rsfmr)
         print("shape of vector mse train", np.array([cvscores_mse_train]).shape)
         print(cvscores_mse_train)
         np.save(
