@@ -383,10 +383,11 @@ if __name__ == "__main__":
             XT = X[idx[test_index], :, :]
             YT = Y[idx[test_index]]
             beta = estimate_beta(XE, YE, params)
-            file = "{}/regression_output/fold_{}/beta.npy".format(
-                params["base_path"], fold
-            )
-            np.save(file, beta)
+            file_path = "{}/regression_output/fold_{}".format(params["base_path"], fold)
+            if not os.path.exists(file_path):
+                os.makedirs(file_path)
+            np.save(os.path.join(file_path, "beta.npy"), beta)
+
             # Estimate the results
             if params["data_source"] == "ABIDE":
                 results[idx[test_index]] = (
@@ -409,24 +410,29 @@ if __name__ == "__main__":
             print(
                 "R2 score, fold_{}".format(fold), r2_score(YT, results[idx[test_index]])
             )
-            file = "fold_{}/mse.npy".format(fold)
-            np.save(file, mean_squared_error(YT, results[idx[test_index]]))
-            file = "fold_{}/r_squared.npy".format(fold)
-            np.save(file, r2_score(YT, results[idx[test_index]]))
+            np.save(
+                os.path.join(file_path, "mse.npy"),
+                mean_squared_error(YT, results[idx[test_index]]),
+            )
+            np.save(
+                os.path.join(file_path, "/r_squared.npy"),
+                r2_score(YT, results[idx[test_index]]),
+            )
             mse.append([mean_squared_error(YT, results[idx[test_index]])])
             rsquared.append([r2_score(YT, results[idx[test_index]])])
 
         print("mean mse {}".format(np.mean([mse])))
+        file_path = "{}/regression_output/".format(params["base_path"])
         file = "mean_mse.npy"
-        np.save(file, np.mean([mse]))
+        np.save(os.path.join(file, file_path), np.mean([mse]))
         print("mean r squared {}".format(np.mean([rsquared])))
         file = "mean_rsquared.npy"
-        np.save(file, np.mean([rsquared]))
+        np.save(os.path.join(file, file_path), np.mean([rsquared]))
         print(results)
         print("Mean Error = {}".format(np.linalg.norm(results - Y) ** 0.2 / Y.shape[0]))
         print("MSE = {}".format(mean_squared_error(Y, results)))
         file = "mse.npy"
-        np.save(file, mean_squared_error(Y, results))
+        np.save(os.path.join(file, file_path), mean_squared_error(Y, results))
         file = "r2_score.npy"
-        np.save(file, r2_score(Y, results))
+        np.save(os.path.join(file, file_path), r2_score(Y, results))
 
