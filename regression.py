@@ -415,7 +415,7 @@ if __name__ == "__main__":
                 mean_squared_error(YT, results[idx[test_index]]),
             )
             np.save(
-                os.path.join(file_path, "/r_squared.npy"),
+                os.path.join(file_path, "r_squared.npy"),
                 r2_score(YT, results[idx[test_index]]),
             )
             mse.append([mean_squared_error(YT, results[idx[test_index]])])
