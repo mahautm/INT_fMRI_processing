@@ -251,6 +251,62 @@ def build_normalised_data(
     )
 
 
+def build_model(dim, input_shape_1, input_shape_2, hidden_layer, output_layer):
+    # Apply linear autoencoder
+    # Inputs Shape
+    input_view_gyr = Input(shape=(input_shape_1))
+    input_view_rsfmri = Input(shape=(input_shape_2))
+
+    # input_train_data = Input(shape=(normalized_train_data[0].shape))
+    # Encoder Model
+    # First view
+    encoded_gyr = Dense(100, activation=hidden_layer)(input_view_gyr)  # Layer 1, View 1
+    encoded_gyr = Dense(dim, activation=hidden_layer)(encoded_gyr)
+    print("encoded gyr shape", encoded_gyr.shape)
+    # Second view
+    encoded_rsfmri = Dense(100, activation=hidden_layer)(
+        input_view_rsfmri
+    )  # Layer 1, View 2
+    encoded_rsfmri = Dense(dim, activation=hidden_layer)(encoded_rsfmri)
+    print("encoded rsfmri shape", encoded_rsfmri.shape)
+
+    # Shared representation with concatenation !! SO here is where we change the amount of each representation
+    shared_layer = concatenate(
+        [encoded_gyr, encoded_rsfmri]
+    )  # Layer 3: Bottelneck layer
+    print("Shared Layer", shared_layer.shape)
+    # output_shared_layer=Dense(dim, activation=hidden_layer)(shared_layer)
+    # print("Output Shared Layer", output_shared_layer.shape)
+
+    # Decoder Model
+
+    decoded_gyr = Dense(dim, activation=hidden_layer)(shared_layer)
+    decoded_gyr = Dense(100, activation=hidden_layer)(decoded_gyr)
+    decoded_gyr = Dense(
+        normalized_train_gyr_data[0].shape[0], activation=output_layer, name="dec_gyr",
+    )(decoded_gyr)
+    print("decoded_gyr", decoded_gyr.shape)
+    # Second view
+    decoded_rsfmri = Dense(dim, activation=hidden_layer)(shared_layer)
+    decoded_rsfmri = Dense(100, activation=hidden_layer)(decoded_rsfmri)
+    decoded_rsfmri = Dense(
+        normalized_train_rsfmri_data[0].shape[0],
+        activation=output_layer,
+        name="dec_rsfmri",
+    )(decoded_rsfmri)
+    print("decoded_rsfmri", decoded_rsfmri.shape)
+
+    # This model maps an input to its reconstruction
+    multimodal_autoencoder = Model(
+        inputs=[input_view_gyr, input_view_rsfmri],
+        outputs=[decoded_gyr, decoded_rsfmri],
+    )
+    adam = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, amsgrad=False)
+    multimodal_autoencoder.compile(optimizer=adam, loss="mse")
+    print(multimodal_autoencoder.summary())
+    return multimodal_autoencoder
+
+
 # This is one I'm always using and that should really go in a function holder,
 # might also need to be used in the mdae.py script instead of doing the writing part
 def build_path_and_vars(data_orig, data_type, dim, fold):
@@ -322,7 +378,7 @@ if __name__ == "__main__":
     #             raise
     #         pass
 
-    # activation functions, relu / linear gives best results according to IJCNN paper
+    # activation functions, relu / linear gives best results according to IJCNN paper, my test on dim 20 doesn't seem to change much
     hidden_layer = "relu"
     output_layer = "linear"
 
@@ -348,59 +404,13 @@ if __name__ == "__main__":
         train_index,
         test_index,
     )
-
-    # Apply linear autoencoder
-    # Inputs Shape
-    input_view_gyr = Input(shape=(normalized_train_gyr_data[0].shape))
-    input_view_rsfmri = Input(shape=(normalized_train_rsfmri_data[0].shape))
-
-    # input_train_data = Input(shape=(normalized_train_data[0].shape))
-    # Encoder Model
-    # First view
-    encoded_gyr = Dense(100, activation=hidden_layer)(input_view_gyr)  # Layer 1, View 1
-    encoded_gyr = Dense(dim, activation=hidden_layer)(encoded_gyr)
-    print("encoded gyr shape", encoded_gyr.shape)
-    # Second view
-    encoded_rsfmri = Dense(100, activation=hidden_layer)(
-        input_view_rsfmri
-    )  # Layer 1, View 2
-    encoded_rsfmri = Dense(dim, activation=hidden_layer)(encoded_rsfmri)
-    print("encoded rsfmri shape", encoded_rsfmri.shape)
-
-    # Shared representation with concatenation !! SO here is where we change the amount of each representation
-    shared_layer = concatenate(
-        [encoded_gyr, encoded_rsfmri]
-    )  # Layer 3: Bottelneck layer
-    print("Shared Layer", shared_layer.shape)
-    # output_shared_layer=Dense(dim, activation=hidden_layer)(shared_layer)
-    # print("Output Shared Layer", output_shared_layer.shape)
-
-    # Decoder Model
-
-    decoded_gyr = Dense(dim, activation=hidden_layer)(shared_layer)
-    decoded_gyr = Dense(100, activation=hidden_layer)(decoded_gyr)
-    decoded_gyr = Dense(
-        normalized_train_gyr_data[0].shape[0], activation=output_layer, name="dec_gyr",
-    )(decoded_gyr)
-    print("decoded_gyr", decoded_gyr.shape)
-    # Second view
-    decoded_rsfmri = Dense(dim, activation=hidden_layer)(shared_layer)
-    decoded_rsfmri = Dense(100, activation=hidden_layer)(decoded_rsfmri)
-    decoded_rsfmri = Dense(
-        normalized_train_rsfmri_data[0].shape[0],
-        activation=output_layer,
-        name="dec_rsfmri",
-    )(decoded_rsfmri)
-    print("decoded_rsfmri", decoded_rsfmri.shape)
-
-    # This model maps an input to its reconstruction
-    multimodal_autoencoder = Model(
-        inputs=[input_view_gyr, input_view_rsfmri],
-        outputs=[decoded_gyr, decoded_rsfmri],
+    multimodal_autoencoder = build_model(
+        dim,
+        normalized_train_gyr_data[0].shape,
+        normalized_train_rsfmri_data[0].shape,
+        hidden_layer,
+        output_layer,
     )
-    adam = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, amsgrad=False)
-    multimodal_autoencoder.compile(optimizer=adam, loss="mse")
-    print(multimodal_autoencoder.summary())
     # fit Autoencoder on training set
     history = multimodal_autoencoder.fit(
         [normalized_train_gyr_data, normalized_train_rsfmri_data],

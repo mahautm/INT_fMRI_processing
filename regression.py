@@ -15,8 +15,68 @@ import json
 from mdae_step import build_path_and_vars, load_intertva_rsfmri, load_intertva_tfmri
 
 
+def load_raw_data(params, dimension, fold, sub_file):
+    X = get_x_data(params, dimension, fold, subject_list=sub_file)
+    XZ = np.array(X)
+
+    Y = []
+    if params["data_source"] == "ABIDE":
+        classified_file = open(
+            "/scratch/mmahaut/scripts/INT_fMRI_processing/url_preparation/subs_list_asd_classified.json"
+        )  # Hardwriten non-modifiable paths in script is bad practice. modify later !
+        classified_dict = json.load(classified_file)
+        # no normalisation step (which kind of seems legit for classification)
+        for key in classified_dict:
+            Y.append([1] if classified_dict[key] == "asd" else [0])
+    elif params["data_source"] == "interTVA":
+        # Hardcoding this array is probably not the most reusable solution...
+        Y = [
+            81.25,
+            81.25,
+            93.75,
+            93.75,
+            93.75,
+            62.5,
+            81.25,
+            100,
+            100,
+            87.5,
+            87.5,
+            68.75,
+            68.75,
+            87.5,
+            93.75,
+            100,
+            62.5,
+            87.5,
+            93.75,
+            87.5,
+            81.25,
+            81.25,
+            81.25,
+            93.75,
+            50,
+            62.5,
+            93.75,
+            81.25,
+            81.25,
+            87.5,
+            68.75,
+            81.25,
+            87.5,
+            87.5,
+            87.5,
+            75,
+            93.75,
+            93.75,
+            93.75,
+        ]
+
+    YZ = np.array(Y)
+    return XZ, YZ
+
+
 def load_data(params, dimension, fold, sub_file):
-    # Hasn't been tested yet,
     X = get_x_data(params, dimension, fold, subject_list=sub_file)
     XZ = np.array(X)
 
