@@ -69,8 +69,8 @@ if __name__ == "__main__":
 
         cell_text.append(
             [
-                "%.3f%% (+/- %.5f%%)" % (np.mean(mse), np.std(mse)),
-                "%.3f%% (+/- %.5f%%)" % (np.mean(r_squared), np.std(r_squared)),
+                "%.3f (+/- %.5f)" % (np.mean(mse), np.std(mse)),
+                "%.3f (+/- %.5f)" % (np.mean(r_squared), np.std(r_squared)),
             ]
         )
     the_table = plt.table(
