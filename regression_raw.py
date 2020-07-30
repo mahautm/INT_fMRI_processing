@@ -13,7 +13,7 @@ import numpy as np
 import json
 from mdae_step import build_path_and_vars, load_intertva_rsfmri, load_intertva_tfmri
 
-from regression import estimate_beta
+from regression import estimate_beta, load_graph
 
 
 def load_data(params, dimension, fold, sub_file):
