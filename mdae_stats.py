@@ -147,12 +147,14 @@ def get_model_stats(data_orig, data_type, number_folds="10"):
             val_rmse_rsfmri = sqrt(val_mse_train_rsfmri)
             print("Reconstruction RMSE of rsfmri : ", val_rmse_rsfmri)
             cvscores_rmse_rsfmri_train.append(val_rmse_rsfmri)
+
             # sum of MSE (gyr + rsfmri)
             cvscores_mse_train.append(np.sum([val_mse_train_gyr, val_mse_train_rsfmri]))
             # sum of RMSE (gyr + rsfmri)
             cvscores_rmse_train.append(
                 sqrt(np.sum([val_mse_train_gyr, val_mse_train_rsfmri]))
             )
+            # mean of MSE (gyr + rsfmri)/2
 
             # Reconstruction of test data
             print("Reconstruction of test data... ")
