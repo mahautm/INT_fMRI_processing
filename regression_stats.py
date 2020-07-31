@@ -53,11 +53,11 @@ if __name__ == "__main__":
     ax.axis("tight")
 
     cell_text = []
-    rows = ["tfMRI + rsfMRI", "Anat + rsfMRI", "raw_Anat + raw_rsfMRI"]
+    rows = ["tfMRI + rsfMRI", "Anat + rsfMRI"]
     columns = ["Average MSE", "Average R²"]
     title = "InterTVA trace-regression quantitative evaluation from relu/linear 20 dimensional multimodal auto-encoder"
     for dim in dimensions:
-        for modality in ["tfMRI", "gyrification", "raw_input/gyrification"]:
+        for modality in ["tfMRI", "gyrification"]:
             mse = []
             r_squared = []
             for fold in range(1, fold_number + 1):
