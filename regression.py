@@ -74,7 +74,8 @@ def load_data(params, dimension, fold, sub_file):
             93.75,
         ]
 
-    YZ = np.array(Y)
+    x = np.array(Y)
+    YZ = (x - min(x)) / (max(x) - min(x))
     return XZ, YZ
 
 
