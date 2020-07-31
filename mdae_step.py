@@ -360,8 +360,8 @@ if __name__ == "__main__":
     data_orig = sys.argv[1]
     data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
     dim_1 = int(sys.argv[3])  # 15 according to paper works best
-    dim_2 = int(sys.argv[3])  # 5 according to paper works best
-    fold = int(sys.argv[4])
+    dim_2 = int(sys.argv[4])  # 5 according to paper works best
+    fold = int(sys.argv[5])
 
     (
         train_index,
