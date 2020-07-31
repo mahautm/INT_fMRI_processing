@@ -165,25 +165,26 @@ if __name__ == "__main__":
         sub_list = json.load(sub_list_file)
 
         index_subjects = np.arange(0, len(sub_list))
-        for dim in dimensions:
-            fold = 0
+        for dim_1 in dimensions_1:
+            for dim_2 in dimensions_2:
+                fold = 0
 
-            for train_index, test_index in kf.split(index_subjects):
-                fold += 1
-                ae_type = "ae" if data_type == "tfMRI" else "ae_gyrification"
-                fold_path = "/scratch/mmahaut/data/intertva/{}/{}/fold_{}".format(
-                    ae_type, dim, fold
-                )
-                if not os.path.exists(fold_path):
-                    try:
-                        os.makedirs(fold_path)
-                    except OSError as exc:
-                        if exc.errno != errno.EEXIST:
-                            raise
-                        pass
-                np.save(os.path.join(fold_path, "train_index.npy"), train_index)
-                np.save(os.path.join(fold_path, "test_index.npy"), test_index)
-                run_slurm_job_mdae(data_orig, data_type, dim, fold)
+                for train_index, test_index in kf.split(index_subjects):
+                    fold += 1
+                    ae_type = "ae" if data_type == "tfMRI" else "ae_gyrification"
+                    fold_path = "/scratch/mmahaut/data/intertva/{}/{}/fold_{}".format(
+                        ae_type, dim, fold
+                    )
+                    if not os.path.exists(fold_path):
+                        try:
+                            os.makedirs(fold_path)
+                        except OSError as exc:
+                            if exc.errno != errno.EEXIST:
+                                raise
+                            pass
+                    np.save(os.path.join(fold_path, "train_index.npy"), train_index)
+                    np.save(os.path.join(fold_path, "test_index.npy"), test_index)
+                    run_slurm_job_mdae(data_orig, data_type, dim_1, dim_2, fold)
     else:
         print(
             "Warning !! : Please provide data origin as parameter when calling script: either 'ABIDE' or 'interTVA' "
