@@ -172,8 +172,8 @@ if __name__ == "__main__":
                 for train_index, test_index in kf.split(index_subjects):
                     fold += 1
                     ae_type = "ae" if data_type == "tfMRI" else "ae_gyrification"
-                    fold_path = "/scratch/mmahaut/data/intertva/{}/{}/fold_{}".format(
-                        ae_type, dim, fold
+                    fold_path = "/scratch/mmahaut/data/intertva/{}-{}/{}/fold_{}".format(
+                        ae_type, dim_1, dim_2, fold
                     )
                     if not os.path.exists(fold_path):
                         try:
