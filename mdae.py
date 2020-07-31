@@ -27,7 +27,8 @@ from sklearn.model_selection import KFold, StratifiedKFold
 def run_slurm_job_mdae(
     data_orig,
     data_type,
-    dimension,
+    dimension_1,
+    dimension_2,
     fold,
     email="mmahaut@ensc.fr",
     logs_dir="/scratch/mmahaut/scripts/logs",
@@ -69,13 +70,14 @@ def run_slurm_job_mdae(
         batch_cmd = (
             'eval "$(/scratch/mmahaut/tools/Anaconda3/bin/conda shell.bash hook)"\n'
             + "conda activate tf_gpu\n"
-            + "{} {}/{} {} {} {} {}".format(
+            + "{} {}/{} {} {} {} {} {}".format(
                 python_path,
                 code_dir,
                 script_name,
                 data_orig,
                 data_type,
-                dimension,
+                dimension_1,
+                dimension_2,
                 fold,
             )
         )
@@ -87,8 +89,7 @@ def run_slurm_job_mdae(
 if __name__ == "__main__":
 
     data_orig = sys.argv[1]
-    # sys.argv[2] Default is gyrification, tfMRI must be written otherwise !!check what happens when empty
-    data_type = sys.argv[2]
+    data_type = sys.argv[2]  # tfMRI or gyrification
 
     # dimensions = [
     #     1,
@@ -116,7 +117,9 @@ if __name__ == "__main__":
 
     # IJCNN paper points to 20 being the best dimension, with 5 to rsfMRI and 15 to tfMRI
 
-    dimensions = [20]
+    # dimensions = [20] # Legacy... it used to give equal importance to both
+    dimensions_1 = [15]
+    dimensions_2 = [5]
 
     # In the ABIDE case, we need to get the Y data to ensure proper repartition of asd and non-asd subjects
     Y = []
@@ -135,23 +138,24 @@ if __name__ == "__main__":
         sub_list = json.load(sub_list_file)
 
         index_subjects = np.arange(0, len(sub_list))
-        for dim in dimensions:
-            fold = 0
-            for train_index, test_index in kf.split(index_subjects, Y):
-                fold += 1
-                fold_path = "/scratch/mmahaut/data/abide/ae_gyrification/{}/fold_{}".format(
-                    dim, fold
-                )
-                if not os.path.exists(fold_path):
-                    try:
-                        os.makedirs(fold_path)
-                    except OSError as exc:
-                        if exc.errno != errno.EEXIST:
-                            raise
-                        pass
-                np.save(os.path.join(fold_path, "train_index.npy"), train_index)
-                np.save(os.path.join(fold_path, "test_index.npy"), test_index)
-                run_slurm_job_mdae(data_orig, data_type, dim, fold)
+        for dim_1 in dimensions_1:
+            for dim_2 in dimensions_2:
+                fold = 0
+                for train_index, test_index in kf.split(index_subjects, Y):
+                    fold += 1
+                    fold_path = "/scratch/mmahaut/data/abide/ae_gyrification/{}-{}/fold_{}".format(
+                        dim_1, dim_2, fold
+                    )
+                    if not os.path.exists(fold_path):
+                        try:
+                            os.makedirs(fold_path)
+                        except OSError as exc:
+                            if exc.errno != errno.EEXIST:
+                                raise
+                            pass
+                    np.save(os.path.join(fold_path, "train_index.npy"), train_index)
+                    np.save(os.path.join(fold_path, "test_index.npy"), test_index)
+                    run_slurm_job_mdae(data_orig, data_type, dim_1, dim_2, fold)
 
     elif data_orig == "interTVA":
         kf = KFold(n_splits=10)

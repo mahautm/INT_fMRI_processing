@@ -309,7 +309,7 @@ def build_model(dim_1, dim_2, input_shape_1, input_shape_2, hidden_layer, output
 
 # This is one I'm always using and that should really go in a function holder,
 # might also need to be used in the mdae.py script instead of doing the writing part
-def build_path_and_vars(data_orig, data_type, dim, fold):
+def build_path_and_vars(data_orig, data_type, dim_1, dim_2, fold):
 
     # Warning from previous script : That might be too many different paths. To solve that, one way would be to use os more,
     # Another would be to build a parameter object to drag everywhere, in between ? At least it is all in one place...
@@ -331,8 +331,12 @@ def build_path_and_vars(data_orig, data_type, dim, fold):
             "Warning !! : Please provide data origin as parameter when calling script: either 'ABIDE' or 'interTVA' "
         )
 
-    train_index = np.load("{}/{}/fold_{}/train_index.npy".format(base_path, dim, fold))
-    test_index = np.load("{}/{}/fold_{}/test_index.npy".format(base_path, dim, fold))
+    train_index = np.load(
+        "{}/{}-{}/fold_{}/train_index.npy".format(base_path, dim_1, dim_2, fold)
+    )
+    test_index = np.load(
+        "{}/{}-{}/fold_{}/test_index.npy".format(base_path, dim_1, dim_2, fold)
+    )
 
     sub_list_file = open(sub_list_files)
     sub_list = json.load(sub_list_file)
@@ -355,7 +359,8 @@ if __name__ == "__main__":
 
     data_orig = sys.argv[1]
     data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
-    dim = int(sys.argv[3])
+    dim_1 = int(sys.argv[3])  # 15 according to paper works best
+    dim_2 = int(sys.argv[3])  # 5 according to paper works best
     fold = int(sys.argv[4])
 
     (
@@ -366,8 +371,10 @@ if __name__ == "__main__":
         base_path,
         index_subjects,
         sub_list,
-    ) = build_path_and_vars(data_orig, data_type, dim, fold)
-    fold_path = os.path.join(base_path, str(dim), "fold_{}".format(str(fold)))
+    ) = build_path_and_vars(data_orig, data_type, dim_1, dim_2, fold)
+    fold_path = os.path.join(
+        base_path, "{}-{}".format(dim_1, dim_2), "fold_{}".format(str(fold))
+    )
 
     # Should not be needed anymore, as paths are built in the mdae.py script now, waiting for an opportunity to test before removing
     # if not os.path.exists(fold_path):
@@ -406,8 +413,8 @@ if __name__ == "__main__":
     )
     # Getting rid of dir here ...
     multimodal_autoencoder = build_model(
-        15,
-        5,
+        dim_1,  # 15 according to paper works best
+        dim_2,  # 5 according to paper works best
         normalized_train_gyr_data[0].shape,
         normalized_train_rsfmri_data[0].shape,
         hidden_layer,
@@ -444,7 +451,7 @@ if __name__ == "__main__":
     encoder_shared_layer.summary()
     # Separate Decoder model
     # create a placeholder for an encoded (32-dimensional) input
-    encoded_input = Input(shape=(dim,))
+    # encoded_input = Input(shape=(dim,)) # !! Attempting removal, it seems not to have a use
     # retrieve the layers of the autoencoder model
     # First view
     # decoder_gyr_layer1 = multimodal_autoencoder.layers[-6]  # Index of the first layer (after bottelneck layer)
@@ -461,13 +468,19 @@ if __name__ == "__main__":
     # decoder_rsfmri = Model(encoded_input, decoder_rsfmri_layer3(decoder_rsfmri_layer2(decoder_rsfmri_layer1(encoded_input))))
     # decoder_rsfmri.summary()
     multimodal_autoencoder.save(
-        "{}/{}/fold_{}/multimodal_autoencoder.h5".format(base_path, dim, fold)
+        "{}/{}-{}/fold_{}/multimodal_autoencoder.h5".format(
+            base_path, dim_1, dim_2, fold
+        )
     )
     encoder_shared_layer.save(
-        "{}/{}/fold_{}/encoder_shared_layer.h5".format(base_path, dim, fold)
+        "{}/{}-{}/fold_{}/encoder_shared_layer.h5".format(base_path, dim_1, dim_2, fold)
     )
-    encoder_gyr.save("{}/{}/fold_{}/encoder_gyr.h5".format(base_path, dim, fold))
-    encoder_rsfmri.save("{}/{}/fold_{}/encoder_rsfmri.h5".format(base_path, dim, fold))
+    encoder_gyr.save(
+        "{}/{}-{}/fold_{}/encoder_gyr.h5".format(base_path, dim_1, dim_2, fold)
+    )
+    encoder_rsfmri.save(
+        "{}/{}-{}/fold_{}/encoder_rsfmri.h5".format(base_path, dim_1, dim_2, fold)
+    )
     # decoder_gyr.save('{}/fold_{}/decoder_gyr.h5'.format(dim, fold))
     # decoder_rsfmri.save('{}/fold_{}/decoder_rsfmri.h5'.format(dim, fold))
     # plot our loss
@@ -478,7 +491,7 @@ if __name__ == "__main__":
     plt.ylabel("loss")
     plt.xlabel("epoch")
     plt.legend()
-    plt.savefig("{}/{}/fold_{}/loss.png".format(base_path, dim, fold))
-    plt.savefig("{}/{}/fold_{}/loss.pdf".format(base_path, dim, fold))
+    plt.savefig("{}/{}-{}/fold_{}/loss.png".format(base_path, dim_1, dim_2, fold))
+    plt.savefig("{}/{}-{}/fold_{}/loss.pdf".format(base_path, dim_1, dim_2, fold))
     plt.close()
 
