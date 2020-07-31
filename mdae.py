@@ -1,8 +1,3 @@
-# import keras
-# from keras.layers import Input, Dense, concatenate
-# from keras.models import Model
-# from keras.layers import Dropout
-# from keras.callbacks import EarlyStopping
 import matplotlib.pyplot as plt
 
 plt.switch_backend("agg")
@@ -11,17 +6,8 @@ import os
 import json
 import errno
 
-# from sklearn.preprocessing import StandardScaler, MinMaxScaler
-# from sklearn.decomposition import PCA
-# from sklearn.metrics import mean_squared_error
-# from math import sqrt
-# from keras.optimizers import SGD, Adadelta, Adam
 import numpy as np
 from sklearn.model_selection import KFold, StratifiedKFold
-
-# from keras.callbacks import ModelCheckpoint
-# from keras.models import load_model
-# import keras.backend as K
 
 
 def run_slurm_job_mdae(
@@ -37,11 +23,49 @@ def run_slurm_job_mdae(
     code_dir="/scratch/mmahaut/scripts/INT_fMRI_processing",
     script_name="mdae_step.py",
 ):
+    """
+    This will write a .sh file to train a multi-modal auto-encoder on a specific set of subjects with SLURM, and then execute it.
 
-    # subs_list_file = open(subs_list_file_path)
-    # subject_list = json.load(subs_list_file)
-    # # An arbitrary reference subject has to be chosen. Here we just take the first.
-    # ref_subject = subject_list[0]
+    Parameters
+    ----------
+    data_orig : {"ABIDE","interTVA"}
+        indicates which data set is used. ABIDE is a dataset with subjects on the autism spectrum and control subjects,
+        InterTVA is a dataset where non-pathological subjects are given sound recognition tasks. 
+
+    data_type : {"tfMRI","gyrification"}
+        The multi-modal auto-encoder uses two modalities to build it's representations. One is resting-state fMRI, and the other
+        is either task fMRI (tfMRI) or an anatomical modality which represents the folds in the subject's brain, (gyrification)
+
+    dimension_1 : int
+        The number of encoding layer dimensions for the first modality,
+        According to IJCNN 2020 published paper, for tfMRI 15 is the best value
+
+    dimension_2 : int
+        The number of encoding layer dimensions for the first modality,
+        According to IJCNN 2020 published paper, for rsfMRI 5 is the best value
+
+    fold : int
+        For cross-validation, subjects are separated in a train and a test group. Those groups must be saved in the corresponding folder
+        the number corresponding to each fold will here be used to load the proper group in the mdae-step.py script
+
+    email : string, email address, default "mmahaut@ensc.fr"
+        email to which notifications will be sent at the end of the execution of the script for the first fold of a given dimension
+
+    logs_dir : string, path, default "/scratch/mmahaut/scripts/logs"
+        path to where both the output and the error logs will be saved.
+
+    python_path : string, path, default "python"
+        path to where the python version used to run the mdae_step.py script is found. 3.7 & 3.8 work.
+    
+    slurm_dir : string, path, default "/scratch/mmahaut/scripts/slurm"
+        path to where the .sh script used to enter the slurm queue will be saved before being executed
+
+    code_dir : string, path, default "/scratch/mmahaut/scripts/INT_fMRI_processing"
+        path to where the script can be found
+
+    script_name : string, path, default "mdae_step.py"
+        script file name
+    """
 
     job_name = "{}_dim{}-{}_fold{}_mdae".format(
         data_orig, dimension_1, dimension_2, fold
@@ -174,7 +198,7 @@ if __name__ == "__main__":
                 for train_index, test_index in kf.split(index_subjects):
                     fold += 1
                     ae_type = "ae" if data_type == "tfMRI" else "ae_gyrification"
-                    fold_path = "/scratch/mmahaut/data/intertva/{}-{}/{}/fold_{}".format(
+                    fold_path = "/scratch/mmahaut/data/intertva/{}/{}-{}/fold_{}".format(
                         ae_type, dim_1, dim_2, fold
                     )
                     if not os.path.exists(fold_path):
