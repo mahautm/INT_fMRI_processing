@@ -43,7 +43,9 @@ def run_slurm_job_mdae(
     # # An arbitrary reference subject has to be chosen. Here we just take the first.
     # ref_subject = subject_list[0]
 
-    job_name = "{}_dim{}_fold{}_mdae".format(data_orig, dimension, fold)
+    job_name = "{}_dim{}-{}_fold{}_mdae".format(
+        data_orig, dimension_1, dimension_2, fold
+    )
     slurmjob_path = os.path.join(slurm_dir, "{}.sh".format(job_name))
     create_slurmjob_cmd = "touch {}".format(slurmjob_path)
     os.system(create_slurmjob_cmd)
