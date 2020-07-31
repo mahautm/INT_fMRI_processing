@@ -110,7 +110,7 @@ def get_raw_x_data(
             tfmri_data = load_intertva_tfmri(
                 subject, os.path.join(params["orig_path"], "features_tfMRI")
             )
-            x_sub_data = np.concatenate([gyr_data, tfmri_data], axis=1)
+            x_sub_data = np.concatenate([tfmri_data, rsfmri_data], axis=1)
         X.append(x_sub_data)
 
     return X
