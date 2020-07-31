@@ -251,7 +251,7 @@ def build_normalised_data(
     )
 
 
-def build_model(dim, input_shape_1, input_shape_2, hidden_layer, output_layer):
+def build_model(dim_1, dim_2, input_shape_1, input_shape_2, hidden_layer, output_layer):
     # Apply linear autoencoder
     # Inputs Shape
     input_view_gyr = Input(shape=(input_shape_1))
@@ -261,13 +261,13 @@ def build_model(dim, input_shape_1, input_shape_2, hidden_layer, output_layer):
     # Encoder Model
     # First view
     encoded_gyr = Dense(100, activation=hidden_layer)(input_view_gyr)  # Layer 1, View 1
-    encoded_gyr = Dense(dim, activation=hidden_layer)(encoded_gyr)
+    encoded_gyr = Dense(dim_1, activation=hidden_layer)(encoded_gyr)
     print("encoded gyr shape", encoded_gyr.shape)
     # Second view
     encoded_rsfmri = Dense(100, activation=hidden_layer)(
         input_view_rsfmri
     )  # Layer 1, View 2
-    encoded_rsfmri = Dense(dim, activation=hidden_layer)(encoded_rsfmri)
+    encoded_rsfmri = Dense(dim_2, activation=hidden_layer)(encoded_rsfmri)
     print("encoded rsfmri shape", encoded_rsfmri.shape)
 
     # Shared representation with concatenation !! SO here is where we change the amount of each representation
@@ -280,14 +280,14 @@ def build_model(dim, input_shape_1, input_shape_2, hidden_layer, output_layer):
 
     # Decoder Model
 
-    decoded_gyr = Dense(dim, activation=hidden_layer)(shared_layer)
+    decoded_gyr = Dense(dim_1, activation=hidden_layer)(shared_layer)
     decoded_gyr = Dense(100, activation=hidden_layer)(decoded_gyr)
     decoded_gyr = Dense(
         normalized_train_gyr_data[0].shape[0], activation=output_layer, name="dec_gyr",
     )(decoded_gyr)
     print("decoded_gyr", decoded_gyr.shape)
     # Second view
-    decoded_rsfmri = Dense(dim, activation=hidden_layer)(shared_layer)
+    decoded_rsfmri = Dense(dim_2, activation=hidden_layer)(shared_layer)
     decoded_rsfmri = Dense(100, activation=hidden_layer)(decoded_rsfmri)
     decoded_rsfmri = Dense(
         normalized_train_rsfmri_data[0].shape[0],
@@ -404,8 +404,10 @@ if __name__ == "__main__":
         train_index,
         test_index,
     )
+    # Getting rid of dir here ...
     multimodal_autoencoder = build_model(
-        dim,
+        15,
+        5,
         normalized_train_gyr_data[0].shape,
         normalized_train_rsfmri_data[0].shape,
         hidden_layer,

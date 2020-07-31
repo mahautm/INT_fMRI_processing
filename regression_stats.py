@@ -45,7 +45,7 @@ if __name__ == "__main__":
     # The dimensions are used accross 3 scripts, there should be a parameter file that is loaded, probably in json format
     dimensions = [20]
     fold_number = 10
-    path = "/scratch/mmahaut/data/intertva/"
+    path = "/scratch/mmahaut/data/intertva/regression_output"
 
     fig, ax = plt.subplots()
     fig.patch.set_visible(False)
@@ -53,26 +53,26 @@ if __name__ == "__main__":
     ax.axis("tight")
 
     cell_text = []
-    rows = ["tfMRI + rsfMRI", "Anat + rsfMRI"]
+    rows = ["tfMRI + rsfMRI", "Anat + rsfMRI", "raw_Anat + raw_rsfMRI"]
     columns = ["Average MSE", "Average R²"]
     title = "InterTVA trace-regression quantitative evaluation from relu/linear 20 dimensional multimodal auto-encoder"
+    for dim in dimensions:
+        for modality in ["tfMRI", "gyrification", "raw_input/gyrification"]:
+            mse = []
+            r_squared = []
+            for fold in range(1, fold_number + 1):
+                full_path = os.path.join(
+                    path, modality, str(dim), "fold_{}".format(fold)
+                )
+                mse.append(np.load(os.path.join(full_path, "mse.npy")))
+                r_squared.append(np.load(os.path.join(full_path, "r_squared.npy")))
 
-    for modality in ["ae", "ae_gyrification"]:
-        mse = []
-        r_squared = []
-        for fold in range(1, fold_number + 1):
-            full_path = os.path.join(
-                path, modality, "regression_output/fold_{}".format(fold)
+            cell_text.append(
+                [
+                    "%.3f (+/- %.5f)" % (np.mean(mse), np.std(mse)),
+                    "%.3f (+/- %.5f)" % (np.mean(r_squared), np.std(r_squared)),
+                ]
             )
-            mse.append(np.load(os.path.join(full_path, "mse.npy")))
-            r_squared.append(np.load(os.path.join(full_path, "r_squared.npy")))
-
-        cell_text.append(
-            [
-                "%.3f (+/- %.5f)" % (np.mean(mse), np.std(mse)),
-                "%.3f (+/- %.5f)" % (np.mean(r_squared), np.std(r_squared)),
-            ]
-        )
     the_table = plt.table(
         cellText=cell_text, rowLabels=rows, colLabels=columns, loc="center",
     )
