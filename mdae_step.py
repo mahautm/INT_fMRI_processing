@@ -22,7 +22,29 @@ from keras.models import load_model
 import keras.backend as K
 
 
-def load_intertva_rsfmri(subject, path):
+def load_intertva_rsfmri(subject, path, username="mahaut.m"):
+    """
+    lazy-loader for interTVA rsfmri data. It will either load the data directly, if it is available on the drive,
+    or copy it from the frioul drive and then load it if not.
+    copying from frioul only works if an ssh key has been setup that corresponds to the username, without password activation.
+
+    Parameters
+    ----------
+
+    subject : string
+        subject whose data is being collected it is always the prefix "sub-" followed by a double digit number between 03 and 42
+        (excluding 36)
+
+    path : string, path
+        path to the directory where the rsfmri data file is either found, or copied to
+
+    username : string
+        your frioul username and password, corresponding to the ssh key setup on the machine.
+
+    output
+    ------
+        rsfmri_data : a numpy array with the correlation matrix of each vertex activation to each region of interest.
+    """
     # missing file creation if it is missing
     full_path = os.path.join(
         path, "correlation_matrix_fsaverage5_{}.npy".format(subject)
@@ -36,8 +58,8 @@ def load_intertva_rsfmri(subject, path):
                 if exc.errno != errno.EEXIST:
                     raise
                 pass
-        cmd = "scp mahaut.m@frioul.int.univ-amu.fr:/hpc/banco/sellami.a/InterTVA/rsfmri/{}/glm/noisefiltering/correlation_matrix_fsaverage5.npy {}".format(
-            subject, full_path
+        cmd = "scp {}@frioul.int.univ-amu.fr:/hpc/banco/sellami.a/InterTVA/rsfmri/{}/glm/noisefiltering/correlation_matrix_fsaverage5.npy {}".format(
+            username, subject, full_path
         )
         os.system(cmd)
     rsfmri_data = np.load(full_path)
@@ -45,6 +67,28 @@ def load_intertva_rsfmri(subject, path):
 
 
 def load_intertva_tfmri(subject, path):
+    """
+    lazy-loader for interTVA tfMRI data. It will either load the data directly, if it is available on the drive,
+    or copy it from the frioul drive and then load it if not.
+    copying from frioul only works if an ssh key has been setup that corresponds to the username, without password activation.
+
+    Parameters
+    ----------
+
+    subject : string
+        subject whose data is being collected it is always the prefix "sub-" followed by a double digit number between 03 and 42
+        (excluding 36)
+
+    path : string, path
+        path to the directory where the tfMRI data file is either found, or copied to
+
+    username : string
+        your frioul username and password, corresponding to the ssh key setup on the machine.
+
+    output
+    ------
+        tfmri_data : a numpy array with the gii matrix of each vertex activation for the subject.
+    """
     # missing file creation if it is missing
     full_path = os.path.join(path, "gii_matrix_fsaverage5_{}.npy".format(subject))
     if not os.path.exists(full_path):
@@ -79,12 +123,7 @@ def load_intertva_tfmri(subject, path):
 
 
 def load_data(
-    data_orig,
-    sub_index,
-    view,
-    sub_list,
-    ref_sub="sub-04",
-    orig_path="/scratch/mmahaut/data/intertva/",
+    data_orig, sub_index, view, sub_list, ref_sub, orig_path,
 ):
     """
     The first three view are copies of Akrem's loader, but adapted to the file architecture
@@ -94,22 +133,27 @@ def load_data(
 
     Parameters
     ----------
-    sub:
+    data_orig : {"ABIDE","interTVA"}
+        indicates which data set is used. ABIDE is a dataset with subjects on the autism spectrum and control subjects,
+        InterTVA is a dataset where non-pathological subjects are given sound recognition tasks. 
+
+    sub_index:
+
     view: int {1,2,3,4,5}
         View 1: task fMRI
         View 2: resting-state fMRI
-        View 3: concatenated views (task-fMRI + rest-fMRI)  --UNUSED
+        View 3: concatenated views (task-fMRI + rest-fMRI)  --UNUSED, commented
         View 4: gyrification anatomical MRI modality
-        View 5: concatenated views (gyr-MRI + rest-fMRI)    --UNUSED
+        View 5: concatenated views (gyr-MRI + rest-fMRI)    --UNUSED, commented
 
-    ref_sub: default "USM_0050475"
+    ref_sub: string
         the subject the gyrification matrices were based on during the sign homogeneity phase
     
-    orig_path: default "/scratch/mmahaut/data/abide/"
+    sub_list :
+    
+    orig_path: string, path
         where we can find the data to load
 
-
-    TODO: we are dependant on global variables, sub_list and data_orig. This should be made into function or object parameters in a later version
     """
     # Import task fMRI data
     if view == 1:
@@ -304,7 +348,25 @@ def build_model(dim_1, dim_2, input_shape_1, input_shape_2, hidden_layer, output
     adam = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, amsgrad=False)
     multimodal_autoencoder.compile(optimizer=adam, loss="mse")
     print(multimodal_autoencoder.summary())
-    return multimodal_autoencoder
+
+    # This model maps an inputs to its encoded representation
+    # First view
+    encoder_gyr = Model(input_view_gyr, encoded_gyr)
+    encoder_gyr.summary()
+    # Second view
+    encoder_rsfmri = Model(input_view_rsfmri, encoded_rsfmri)
+    encoder_rsfmri.summary()
+    # This model maps a two inputs to its bottelneck layer (shared layer)
+    encoder_shared_layer = Model(
+        inputs=[input_view_gyr, input_view_rsfmri], outputs=shared_layer
+    )
+    encoder_shared_layer.summary()
+
+    return multimodal_autoencoder, encoder_rsfmri, encoder_shared_layer
+
+
+def build_trimodal_model():
+    pass
 
 
 # This is one I'm always using and that should really go in a function holder,
@@ -355,13 +417,12 @@ def build_path_and_vars(data_orig, data_type, dim_1, dim_2, fold):
 
 
 if __name__ == "__main__":
-    # Expects 3 arguements, {"ABIDE", "interTVA"}, dimension of encoding layer, fold
 
-    data_orig = sys.argv[1]
+    data_orig = sys.argv[1]  # {"ABIDE", "interTVA"}
     data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
     dim_1 = int(sys.argv[3])  # 15 according to paper works best
     dim_2 = int(sys.argv[4])  # 5 according to paper works best
-    fold = int(sys.argv[5])
+    fold = int(sys.argv[5])  # int belonging to [1,10]
 
     (
         train_index,
@@ -375,15 +436,6 @@ if __name__ == "__main__":
     fold_path = os.path.join(
         base_path, "{}-{}".format(dim_1, dim_2), "fold_{}".format(str(fold))
     )
-
-    # Should not be needed anymore, as paths are built in the mdae.py script now, waiting for an opportunity to test before removing
-    # if not os.path.exists(fold_path):
-    #     try:
-    #         os.makedirs(fold_path)
-    #     except OSError as exc:
-    #         if exc.errno != errno.EEXIST:
-    #             raise
-    #         pass
 
     # activation functions, relu / linear gives best results according to IJCNN paper, my test on dim 20 doesn't seem to change much
     hidden_layer = "relu"
@@ -412,7 +464,7 @@ if __name__ == "__main__":
         test_index,
     )
     # Getting rid of dir here ...
-    multimodal_autoencoder = build_model(
+    multimodal_autoencoder, encoder_rsfmri, encoder_shared_layer = build_model(
         dim_1,  # 15 according to paper works best
         dim_2,  # 5 according to paper works best
         normalized_train_gyr_data[0].shape,
@@ -437,36 +489,6 @@ if __name__ == "__main__":
     # save models
     # Save the results weights
 
-    # This model maps an inputs to its encoded representation
-    # First view
-    encoder_gyr = Model(input_view_gyr, encoded_gyr)
-    encoder_gyr.summary()
-    # Second view
-    encoder_rsfmri = Model(input_view_rsfmri, encoded_rsfmri)
-    encoder_rsfmri.summary()
-    # This model maps a two inputs to its bottelneck layer (shared layer)
-    encoder_shared_layer = Model(
-        inputs=[input_view_gyr, input_view_rsfmri], outputs=shared_layer
-    )
-    encoder_shared_layer.summary()
-    # Separate Decoder model
-    # create a placeholder for an encoded (32-dimensional) input
-    # encoded_input = Input(shape=(dim,)) # !! Attempting removal, it seems not to have a use
-    # retrieve the layers of the autoencoder model
-    # First view
-    # decoder_gyr_layer1 = multimodal_autoencoder.layers[-6]  # Index of the first layer (after bottelneck layer)
-    # decoder_gyr_layer2 = multimodal_autoencoder.layers[-4]
-    # decoder_gyr_layer3 = multimodal_autoencoder.layers[-2]
-    # # create the decoder model
-    # decoder_gyr = Model(encoded_input, decoder_gyr_layer3(decoder_gyr_layer2(decoder_gyr_layer1(encoded_input))))
-    # decoder_gyr.summary()
-    # # Second view
-    # decoder_rsfmri_layer1 = multimodal_autoencoder.layers[-5]
-    # decoder_rsfmri_layer2 = multimodal_autoencoder.layers[-3]
-    # decoder_rsfmri_layer3 = multimodal_autoencoder.layers[-1]
-    # create the decoder model
-    # decoder_rsfmri = Model(encoded_input, decoder_rsfmri_layer3(decoder_rsfmri_layer2(decoder_rsfmri_layer1(encoded_input))))
-    # decoder_rsfmri.summary()
     multimodal_autoencoder.save(
         "{}/{}-{}/fold_{}/multimodal_autoencoder.h5".format(
             base_path, dim_1, dim_2, fold
@@ -481,9 +503,7 @@ if __name__ == "__main__":
     encoder_rsfmri.save(
         "{}/{}-{}/fold_{}/encoder_rsfmri.h5".format(base_path, dim_1, dim_2, fold)
     )
-    # decoder_gyr.save('{}/fold_{}/decoder_gyr.h5'.format(dim, fold))
-    # decoder_rsfmri.save('{}/fold_{}/decoder_rsfmri.h5'.format(dim, fold))
-    # plot our loss
+
     plt.plot(history.history["loss"], label="loss_fold_{}".format(fold))
     plt.plot(history.history["val_loss"], label="val_loss_fold_{}".format(fold))
     print("vector of val_loss", history.history["val_loss"])
