@@ -1,8 +1,8 @@
 import keras
-from keras.layers import Input, Dense, concatenate
 from keras.models import Model
-from keras.layers import Dropout
-from keras.callbacks import EarlyStopping
+
+# from keras.layers import Dropout
+# from keras.callbacks import EarlyStopping
 import matplotlib.pyplot as plt
 
 plt.switch_backend("agg")
@@ -10,16 +10,16 @@ import sys
 import os
 import json
 import errno
-from sklearn.preprocessing import StandardScaler, MinMaxScaler
-from sklearn.decomposition import PCA
-from sklearn.metrics import mean_squared_error
-from math import sqrt
-from keras.optimizers import SGD, Adadelta, Adam
+from sklearn.preprocessing import MinMaxScaler
+from keras.optimizers import Adam
 import numpy as np
 from sklearn.model_selection import KFold, StratifiedKFold
-from keras.callbacks import ModelCheckpoint
+
+# from keras.callbacks import ModelCheckpoint
 from keras.models import load_model
 import keras.backend as K
+
+from mdae_models import build_convolutional_model, build_trimodal_model, build_model
 
 
 def load_intertva_rsfmri(subject, path, username="mahaut.m"):
@@ -293,80 +293,6 @@ def build_normalised_data(
         normalized_train_rsfmri_data,
         normalized_test_rsfmri_data,
     )
-
-
-def build_model(dim_1, dim_2, input_shape_1, input_shape_2, hidden_layer, output_layer):
-    # Apply linear autoencoder
-    # Inputs Shape
-    input_view_gyr = Input(shape=(input_shape_1))
-    input_view_rsfmri = Input(shape=(input_shape_2))
-
-    # input_train_data = Input(shape=(normalized_train_data[0].shape))
-    # Encoder Model
-    # First view
-    encoded_gyr = Dense(100, activation=hidden_layer)(input_view_gyr)  # Layer 1, View 1
-    encoded_gyr = Dense(dim_1, activation=hidden_layer)(encoded_gyr)
-    print("encoded gyr shape", encoded_gyr.shape)
-    # Second view
-    encoded_rsfmri = Dense(100, activation=hidden_layer)(
-        input_view_rsfmri
-    )  # Layer 1, View 2
-    encoded_rsfmri = Dense(dim_2, activation=hidden_layer)(encoded_rsfmri)
-    print("encoded rsfmri shape", encoded_rsfmri.shape)
-
-    # Shared representation with concatenation !! SO here is where we change the amount of each representation
-    shared_layer = concatenate(
-        [encoded_gyr, encoded_rsfmri]
-    )  # Layer 3: Bottelneck layer
-    print("Shared Layer", shared_layer.shape)
-    # output_shared_layer=Dense(dim, activation=hidden_layer)(shared_layer)
-    # print("Output Shared Layer", output_shared_layer.shape)
-
-    # Decoder Model
-
-    decoded_gyr = Dense(dim_1, activation=hidden_layer)(shared_layer)
-    decoded_gyr = Dense(100, activation=hidden_layer)(decoded_gyr)
-    decoded_gyr = Dense(
-        normalized_train_gyr_data[0].shape[0], activation=output_layer, name="dec_gyr",
-    )(decoded_gyr)
-    print("decoded_gyr", decoded_gyr.shape)
-    # Second view
-    decoded_rsfmri = Dense(dim_2, activation=hidden_layer)(shared_layer)
-    decoded_rsfmri = Dense(100, activation=hidden_layer)(decoded_rsfmri)
-    decoded_rsfmri = Dense(
-        normalized_train_rsfmri_data[0].shape[0],
-        activation=output_layer,
-        name="dec_rsfmri",
-    )(decoded_rsfmri)
-    print("decoded_rsfmri", decoded_rsfmri.shape)
-
-    # This model maps an input to its reconstruction
-    multimodal_autoencoder = Model(
-        inputs=[input_view_gyr, input_view_rsfmri],
-        outputs=[decoded_gyr, decoded_rsfmri],
-    )
-    adam = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, amsgrad=False)
-    multimodal_autoencoder.compile(optimizer=adam, loss="mse")
-    print(multimodal_autoencoder.summary())
-
-    # This model maps an inputs to its encoded representation
-    # First view
-    encoder_gyr = Model(input_view_gyr, encoded_gyr)
-    encoder_gyr.summary()
-    # Second view
-    encoder_rsfmri = Model(input_view_rsfmri, encoded_rsfmri)
-    encoder_rsfmri.summary()
-    # This model maps a two inputs to its bottelneck layer (shared layer)
-    encoder_shared_layer = Model(
-        inputs=[input_view_gyr, input_view_rsfmri], outputs=shared_layer
-    )
-    encoder_shared_layer.summary()
-
-    return multimodal_autoencoder, encoder_rsfmri, encoder_shared_layer, encoder_gyr
-
-
-def build_trimodal_model():
-    pass
 
 
 # This is one I'm always using and that should really go in a function holder,

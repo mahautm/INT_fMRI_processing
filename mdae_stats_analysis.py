@@ -43,7 +43,7 @@ def build_stat_table(dimensions, orig_path, stat_files, title=""):
 
 if __name__ == "__main__":
     # The dimensions are used accross 3 scripts, there should be a parameter file that is loaded, probably in json format
-    dimensions = [20]
+    dimensions = ["15-5"]
     # data_orig = sys.argv[1]
     # data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
     paths_to_analyse = [
