@@ -15,7 +15,7 @@ import tensorflow as tf
 import mdae_step as mds
 
 
-def get_model_stats(data_orig, data_type, number_folds="10"):
+def get_model_stats(data_orig, data_type,dimensions_1, dimensions_2, number_folds="10"):
 
     # multimodal_autoencoder = tf.keras.models.load_model(
     #     "{}/{}/fold_{}/multimodal_autoencoder.h5".format(base_path,dim,fold)
@@ -79,7 +79,8 @@ def get_model_stats(data_orig, data_type, number_folds="10"):
     cvscores_rmse_rsfmri_test = []
 
     # Training
-    for dim in dimensions:
+    for dim_1 in dimensions_1:
+        for dim_2 in dimensions_2:
         for fold in range(1, number_folds + 1):
             (
                 train_index,
@@ -89,7 +90,7 @@ def get_model_stats(data_orig, data_type, number_folds="10"):
                 base_path,
                 index_subjects,
                 sub_list,
-            ) = mds.build_path_and_vars(data_orig, data_type, dim, fold)
+            ) = mds.build_path_and_vars(data_orig, data_type, dim_1, dim_2, fold)
             (
                 normalized_train_gyr_data,
                 normalized_test_gyr_data,
@@ -107,7 +108,7 @@ def get_model_stats(data_orig, data_type, number_folds="10"):
             )
 
             multimodal_autoencoder = tf.keras.models.load_model(
-                "{}/{}/fold_{}/multimodal_autoencoder.h5".format(base_path, dim, fold)
+                "{}/{}-{}/fold_{}/multimodal_autoencoder.h5".format(base_path, dim_1,dim_2, fold)
             )
 
             print("Reconstruction of training data... ")
@@ -208,25 +209,25 @@ def get_model_stats(data_orig, data_type, number_folds="10"):
         print("shape of vector mse train", np.array([cvscores_mse_train]).shape)
         print(cvscores_mse_train)
         np.save(
-            "{}/{}/cvscores_mse_train.npy".format(base_path, dim),
+            "{}/{}/cvscores_mse_train.npy".format(base_path, dim_1 ,dim_2),
             np.array([cvscores_mse_train]),
         )
         print("shape of  mse vector(test):", np.array([cvscores_mse_test]).shape)
         print(cvscores_mse_test)
         np.save(
-            "{}/{}/cvscores_mse_test.npy".format(base_path, dim),
+            "{}/{}/cvscores_mse_test.npy".format(base_path, dim_1 ,dim_2),
             np.array([cvscores_mse_test]),
         )
         print("shape of rmse vector (train):", np.array([cvscores_rmse_train]).shape)
         print(cvscores_rmse_train)
         np.save(
-            "{}/{}/cvscores_rmse_train.npy".format(base_path, dim),
+            "{}/{}/cvscores_rmse_train.npy".format(base_path, dim_1 ,dim_2),
             np.array([cvscores_rmse_train]),
         )
         print("shape of rmse vector (test):", np.array([cvscores_rmse_test]).shape)
         print(cvscores_rmse_test)
         np.save(
-            "{}/{}/cvscores_rmse_test.npy".format(base_path, dim),
+            "{}/{}/cvscores_rmse_test.npy".format(base_path, dim_1 ,dim_2),
             np.array([cvscores_rmse_test]),
         )
         print(
@@ -248,13 +249,13 @@ def get_model_stats(data_orig, data_type, number_folds="10"):
         )
         print(cvscores_mse_gyr_train)
         np.save(
-            "{}/{}/cvscores_mse_gyr_train.npy".format(base_path, dim),
+            "{}/{}/cvscores_mse_gyr_train.npy".format(base_path, dim_1 ,dim_2),
             np.array([cvscores_mse_gyr_train]),
         )
         print("shape of  mse vector(test):", np.array([cvscores_mse_gyr_test]).shape)
         print(cvscores_mse_gyr_test)
         np.save(
-            "{}/{}/cvscores_mse_gyr_test.npy".format(base_path, dim),
+            "{}/{}/cvscores_mse_gyr_test.npy".format(base_path, dim_1 ,dim_2),
             np.array([cvscores_mse_gyr_test]),
         )
         print(
@@ -262,7 +263,7 @@ def get_model_stats(data_orig, data_type, number_folds="10"):
         )
         print(cvscores_rmse_gyr_train)
         np.save(
-            "{}/{}/cvscores_rmse_gyr_train.npy".format(base_path, dim),
+            "{}/{}/cvscores_rmse_gyr_train.npy".format(base_path, dim_1 ,dim_2),
             np.array([cvscores_rmse_gyr_test]),
         )
         print(
@@ -270,7 +271,7 @@ def get_model_stats(data_orig, data_type, number_folds="10"):
         )
         print(cvscores_rmse_gyr_test)
         np.save(
-            "{}/{}/cvscores_rmse_gyr_test.npy".format(base_path, dim),
+            "{}/{}/cvscores_rmse_gyr_test.npy".format(base_path, dim_1 ,dim_2),
             np.array([cvscores_rmse_gyr_test]),
         )
         mse_gyr_train.append(np.mean(cvscores_mse_gyr_train))
@@ -289,13 +290,13 @@ def get_model_stats(data_orig, data_type, number_folds="10"):
         )
         print(cvscores_mse_rsfmri_train)
         np.save(
-            "{}/{}/cvscores_mse_rsfmri_train.npy".format(base_path, dim),
+            "{}/{}/cvscores_mse_rsfmri_train.npy".format(base_path, dim_1 ,dim_2),
             np.array([cvscores_mse_rsfmri_train]),
         )
         print("shape of  mse vector(test):", np.array([cvscores_mse_rsfmri_test]).shape)
         print(cvscores_mse_rsfmri_test)
         np.save(
-            "{}/{}/cvscores_mse_rsfmri_test.npy".format(base_path, dim),
+            "{}/{}/cvscores_mse_rsfmri_test.npy".format(base_path, dim_1 ,dim_2),
             np.array([cvscores_mse_rsfmri_test]),
         )
         print(
@@ -304,7 +305,7 @@ def get_model_stats(data_orig, data_type, number_folds="10"):
         )
         print(cvscores_rmse_rsfmri_train)
         np.save(
-            "{}/{}/cvscores_rmse_rsfmri_train.npy".format(base_path, dim),
+            "{}/{}/cvscores_rmse_rsfmri_train.npy".format(base_path, dim_1 ,dim_2),
             np.array([cvscores_rmse_rsfmri_test]),
         )
         print(
@@ -313,7 +314,7 @@ def get_model_stats(data_orig, data_type, number_folds="10"):
         )
         print(cvscores_rmse_rsfmri_test)
         np.save(
-            "{}/{}/cvscores_rmse_rsfmri_test.npy".format(base_path, dim),
+            "{}/{}/cvscores_rmse_rsfmri_test.npy".format(base_path, dim_1 ,dim_2),
             np.array([cvscores_rmse_rsfmri_test]),
         )
         mse_rsfmri_train.append(np.mean(cvscores_mse_rsfmri_train))
@@ -361,8 +362,10 @@ def get_model_stats(data_orig, data_type, number_folds="10"):
     # plotting the mse train
     # setting x and y axis range
     # plotting the mse train
-    plt.plot(dimensions, mse_train, label="mse_train")
-    plt.plot(dimensions, mse_test, label="mse_test")
+
+    #Here what we really want is all the combinations between dimensions_1 and 2, and not just dimensions_1
+    plt.plot(dimensions_1, mse_train, label="mse_train")
+    plt.plot(dimensions_1, mse_test, label="mse_test")
     plt.xlabel("Encoding dimension")
     plt.ylabel("Reconstruction error (MSE)")
     # showing legend
@@ -372,8 +375,8 @@ def get_model_stats(data_orig, data_type, number_folds="10"):
     plt.close()
     # plotting the rmse train
     # setting x and y axis range
-    plt.plot(dimensions, rmse_train, label="rmse_train")
-    plt.plot(dimensions, rmse_test, label="rmse_test")
+    plt.plot(dimensions_1, rmse_train, label="rmse_train")
+    plt.plot(dimensions_1, rmse_test, label="rmse_test")
     plt.xlabel("Encoding dimension")
     plt.ylabel("Reconstruction error (RMSE)")
     # showing legend
@@ -385,7 +388,9 @@ def get_model_stats(data_orig, data_type, number_folds="10"):
 
 if __name__ == "__main__":
     # The dimensions are used accross 3 scripts, there should be a parameter file that is loaded, probably in json format
-    dimensions = [20]
+    dimensions_1 = [15]
+    dimensions_2 = [5]
+
     data_orig = sys.argv[1]
     data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
-    get_model_stats(data_orig, data_type, 10)
+    get_model_stats(data_orig, data_type, dimensions_1, dimensions_2, 10)
