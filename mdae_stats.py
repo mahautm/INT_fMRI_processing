@@ -225,25 +225,25 @@ def get_model_stats(
         print("shape of vector mse train", np.array([cvscores_mse_train]).shape)
         print(cvscores_mse_train)
         np.save(
-            "{}/{}/cvscores_mse_train.npy".format(base_path, dim_1, dim_2),
+            "{}/{}-{}/cvscores_mse_train.npy".format(base_path, dim_1, dim_2),
             np.array([cvscores_mse_train]),
         )
         print("shape of  mse vector(test):", np.array([cvscores_mse_test]).shape)
         print(cvscores_mse_test)
         np.save(
-            "{}/{}/cvscores_mse_test.npy".format(base_path, dim_1, dim_2),
+            "{}/{}-{}/cvscores_mse_test.npy".format(base_path, dim_1, dim_2),
             np.array([cvscores_mse_test]),
         )
         print("shape of rmse vector (train):", np.array([cvscores_rmse_train]).shape)
         print(cvscores_rmse_train)
         np.save(
-            "{}/{}/cvscores_rmse_train.npy".format(base_path, dim_1, dim_2),
+            "{}/{}-{}/cvscores_rmse_train.npy".format(base_path, dim_1, dim_2),
             np.array([cvscores_rmse_train]),
         )
         print("shape of rmse vector (test):", np.array([cvscores_rmse_test]).shape)
         print(cvscores_rmse_test)
         np.save(
-            "{}/{}/cvscores_rmse_test.npy".format(base_path, dim_1, dim_2),
+            "{}/{}-{}/cvscores_rmse_test.npy".format(base_path, dim_1, dim_2),
             np.array([cvscores_rmse_test]),
         )
         print(
@@ -265,13 +265,13 @@ def get_model_stats(
         )
         print(cvscores_mse_gyr_train)
         np.save(
-            "{}/{}/cvscores_mse_gyr_train.npy".format(base_path, dim_1, dim_2),
+            "{}/{}-{}/cvscores_mse_gyr_train.npy".format(base_path, dim_1, dim_2),
             np.array([cvscores_mse_gyr_train]),
         )
         print("shape of  mse vector(test):", np.array([cvscores_mse_gyr_test]).shape)
         print(cvscores_mse_gyr_test)
         np.save(
-            "{}/{}/cvscores_mse_gyr_test.npy".format(base_path, dim_1, dim_2),
+            "{}/{}-{}/cvscores_mse_gyr_test.npy".format(base_path, dim_1, dim_2),
             np.array([cvscores_mse_gyr_test]),
         )
         print(
@@ -279,7 +279,7 @@ def get_model_stats(
         )
         print(cvscores_rmse_gyr_train)
         np.save(
-            "{}/{}/cvscores_rmse_gyr_train.npy".format(base_path, dim_1, dim_2),
+            "{}/{}-{}/cvscores_rmse_gyr_train.npy".format(base_path, dim_1, dim_2),
             np.array([cvscores_rmse_gyr_test]),
         )
         print(
@@ -287,7 +287,7 @@ def get_model_stats(
         )
         print(cvscores_rmse_gyr_test)
         np.save(
-            "{}/{}/cvscores_rmse_gyr_test.npy".format(base_path, dim_1, dim_2),
+            "{}/{}-{}/cvscores_rmse_gyr_test.npy".format(base_path, dim_1, dim_2),
             np.array([cvscores_rmse_gyr_test]),
         )
         mse_gyr_train.append(np.mean(cvscores_mse_gyr_train))
@@ -306,13 +306,13 @@ def get_model_stats(
         )
         print(cvscores_mse_rsfmri_train)
         np.save(
-            "{}/{}/cvscores_mse_rsfmri_train.npy".format(base_path, dim_1, dim_2),
+            "{}/{}-{}/cvscores_mse_rsfmri_train.npy".format(base_path, dim_1, dim_2),
             np.array([cvscores_mse_rsfmri_train]),
         )
         print("shape of  mse vector(test):", np.array([cvscores_mse_rsfmri_test]).shape)
         print(cvscores_mse_rsfmri_test)
         np.save(
-            "{}/{}/cvscores_mse_rsfmri_test.npy".format(base_path, dim_1, dim_2),
+            "{}/{}-{}/cvscores_mse_rsfmri_test.npy".format(base_path, dim_1, dim_2),
             np.array([cvscores_mse_rsfmri_test]),
         )
         print(
@@ -321,7 +321,7 @@ def get_model_stats(
         )
         print(cvscores_rmse_rsfmri_train)
         np.save(
-            "{}/{}/cvscores_rmse_rsfmri_train.npy".format(base_path, dim_1, dim_2),
+            "{}/{}-{}/cvscores_rmse_rsfmri_train.npy".format(base_path, dim_1, dim_2),
             np.array([cvscores_rmse_rsfmri_test]),
         )
         print(
@@ -330,7 +330,7 @@ def get_model_stats(
         )
         print(cvscores_rmse_rsfmri_test)
         np.save(
-            "{}/{}/cvscores_rmse_rsfmri_test.npy".format(base_path, dim_1, dim_2),
+            "{}/{}-{}/cvscores_rmse_rsfmri_test.npy".format(base_path, dim_1, dim_2),
             np.array([cvscores_rmse_rsfmri_test]),
         )
         mse_rsfmri_train.append(np.mean(cvscores_mse_rsfmri_train))
