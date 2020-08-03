@@ -16,8 +16,8 @@ from mdae_step import build_path_and_vars, load_intertva_rsfmri, load_intertva_t
 from regression import estimate_beta, load_graph
 
 
-def load_data(params, dimension, fold, sub_file):
-    X = get_raw_x_data(params, dimension, fold, subject_list=sub_file)
+def load_data(params, fold, sub_file):
+    X = get_raw_x_data(params, fold, subject_list=sub_file)
     XZ = np.array(X)
 
     Y = []
@@ -82,7 +82,7 @@ def load_data(params, dimension, fold, sub_file):
 
 
 def get_raw_x_data(
-    params, dimension, fold, subject_list,
+    params, fold, subject_list,
 ):
     """
     Train everything on resting state rsfmri,
@@ -173,79 +173,82 @@ if __name__ == "__main__":
     ]
 
     batch_1 = [20]
+    batch_2 = [20]
 
-    for dim in batch_1:
-        # 10-fold validation
+    for dim_1 in batch_1:
+        for dim_2 in batch_2:
+            # 10-fold validation
 
-        # idx = np.arange(39)
-        # kf = KFold(n_splits=10)
-        # fold = 0
-        results = np.zeros(39)
+            # idx = np.arange(39)
+            # kf = KFold(n_splits=10)
+            # fold = 0
+            results = np.zeros(39)
 
-        # for train_index, test_index in kf.split(idx):
-        # fold += 1
-        for fold in range(1, 11):  # 10-fold validation
-            (
-                train_index,
-                test_index,
-                params["ref_subject"],
-                params["orig_path"],
-                params["base_path"],
-                idx,
-                sub_list,
-            ) = build_path_and_vars(
-                params["data_source"], params["modality"], dim, fold
-            )
-            print("Fold #{}".format(fold))
-            # Chargement des données
-            X, Y = load_data(params, dim, fold, sub_list)
-            print("TRAIN:", idx[train_index], "TEST:", idx[test_index])
-            # Ensemble d'entrainement
-            XE = X[idx[train_index], :, :]
-            YE = Y[idx[train_index]]
-            # Ensemble de test
-            XT = X[idx[test_index], :, :]
-            YT = Y[idx[test_index]]
-            beta = estimate_beta(XE, YE, params)
-            file_path = "{}/regression_output/raw_input/{}/{}/fold_{}".format(
-                params["orig_path"], params["modality"], dim, fold
-            )
-            if not os.path.exists(file_path):
-                os.makedirs(file_path)
-            np.save(os.path.join(file_path, "beta.npy"), beta)
+            # for train_index, test_index in kf.split(idx):
+            # fold += 1
+            for fold in range(1, 11):  # 10-fold validation
+                (
+                    train_index,
+                    test_index,
+                    params["ref_subject"],
+                    params["orig_path"],
+                    params["base_path"],
+                    idx,
+                    sub_list,
+                ) = build_path_and_vars(
+                    params["data_source"], params["modality"], dim_1, dim_2, fold
+                )
+                print("Fold #{}".format(fold))
+                # Chargement des données
+                X, Y = load_data(params, fold, sub_list)
+                print("TRAIN:", idx[train_index], "TEST:", idx[test_index])
+                # Ensemble d'entrainement
+                XE = X[idx[train_index], :, :]
+                YE = Y[idx[train_index]]
+                # Ensemble de test
+                XT = X[idx[test_index], :, :]
+                YT = Y[idx[test_index]]
+                beta = estimate_beta(XE, YE, params)
+                file_path = "{}/regression_output/raw_input/{}/{}-{}/fold_{}".format(
+                    params["orig_path"], params["modality"], dim_1, dim_2, fold
+                )
+                if not os.path.exists(file_path):
+                    os.makedirs(file_path)
+                np.save(os.path.join(file_path, "beta.npy"), beta)
 
-            # Estimate the results
-            if params["data_source"] == "ABIDE":
-                results[idx[test_index]] = (
-                    0
-                    if np.trace(
+                # Estimate the results
+                if params["data_source"] == "ABIDE":
+                    results[idx[test_index]] = (
+                        0
+                        if np.trace(
+                            np.transpose(XT, axes=(0, 2, 1)) @ beta, axis1=1, axis2=2
+                        )
+                        < 0.5
+                        else 1
+                    )
+                elif params["data_source"] == "interTVA":
+                    results[idx[test_index]] = np.trace(
                         np.transpose(XT, axes=(0, 2, 1)) @ beta, axis1=1, axis2=2
                     )
-                    < 0.5
-                    else 1
+                print(results[idx[test_index]])
+                print(
+                    "MSE, fold_{}".format(fold),
+                    mean_squared_error(YT, results[idx[test_index]]),
                 )
-            elif params["data_source"] == "interTVA":
-                results[idx[test_index]] = np.trace(
-                    np.transpose(XT, axes=(0, 2, 1)) @ beta, axis1=1, axis2=2
+                print(
+                    "R2 score, fold_{}".format(fold),
+                    r2_score(YT, results[idx[test_index]]),
                 )
-            print(results[idx[test_index]])
-            print(
-                "MSE, fold_{}".format(fold),
-                mean_squared_error(YT, results[idx[test_index]]),
-            )
-            print(
-                "R2 score, fold_{}".format(fold), r2_score(YT, results[idx[test_index]])
-            )
-            np.save(
-                os.path.join(file_path, "mse.npy"),
-                mean_squared_error(YT, results[idx[test_index]]),
-            )
-            np.save(
-                os.path.join(file_path, "r_squared.npy"),
-                r2_score(YT, results[idx[test_index]]),
-            )
-            mse.append([mean_squared_error(YT, results[idx[test_index]])])
-            rsquared.append([r2_score(YT, results[idx[test_index]])])
+                np.save(
+                    os.path.join(file_path, "mse.npy"),
+                    mean_squared_error(YT, results[idx[test_index]]),
+                )
+                np.save(
+                    os.path.join(file_path, "r_squared.npy"),
+                    r2_score(YT, results[idx[test_index]]),
+                )
+                mse.append([mean_squared_error(YT, results[idx[test_index]])])
+                rsquared.append([r2_score(YT, results[idx[test_index]])])
 
         print("mean mse {}".format(np.mean([mse])))
         file_path = "{}/regression_output/".format(params["base_path"])
