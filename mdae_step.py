@@ -362,7 +362,7 @@ def build_model(dim_1, dim_2, input_shape_1, input_shape_2, hidden_layer, output
     )
     encoder_shared_layer.summary()
 
-    return multimodal_autoencoder, encoder_rsfmri, encoder_shared_layer
+    return multimodal_autoencoder, encoder_rsfmri, encoder_shared_layer, encoder_gyr
 
 
 def build_trimodal_model():
@@ -464,7 +464,12 @@ if __name__ == "__main__":
         test_index,
     )
     # Getting rid of dir here ...
-    multimodal_autoencoder, encoder_rsfmri, encoder_shared_layer = build_model(
+    (
+        multimodal_autoencoder,
+        encoder_rsfmri,
+        encoder_shared_layer,
+        encoder_gyr,
+    ) = build_model(
         dim_1,  # 15 according to paper works best
         dim_2,  # 5 according to paper works best
         normalized_train_gyr_data[0].shape,
