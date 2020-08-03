@@ -172,8 +172,8 @@ if __name__ == "__main__":
         50,
     ]
 
-    batch_1 = [20]
-    batch_2 = [20]
+    batch_1 = [15]
+    batch_2 = [5]
 
     for dim_1 in batch_1:
         for dim_2 in batch_2:
