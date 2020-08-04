@@ -251,7 +251,7 @@ if __name__ == "__main__":
                 rsquared.append([r2_score(YT, results[idx[test_index]])])
 
         print("mean mse {}".format(np.mean([mse])))
-        file_path = "{}/regression_output/".format(params["base_path"])
+        file_path = "{}/regression_output".format(params["orig_path"])
         file = "mean_mse.npy"
         np.save(os.path.join(file, file_path), np.mean([mse]))
         print("mean r squared {}".format(np.mean([rsquared])))
