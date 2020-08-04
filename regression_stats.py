@@ -76,7 +76,9 @@ if __name__ == "__main__":
                 )
                 mse.append(np.load(os.path.join(full_path, "mse.npy")))
                 r_squared.append(np.load(os.path.join(full_path, "r_squared.npy")))
-
+                print("MSE : ", mse)
+                print("MSE mean", np.mean(mse))
+                print("[MSE] mean", np.mean([mse]))
             cell_text.append(
                 [
                     "%.3f (+/- %.5f)" % (np.mean(mse), np.std(mse)),
