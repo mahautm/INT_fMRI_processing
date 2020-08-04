@@ -90,7 +90,7 @@ if __name__ == "__main__":
     plt.draw()
     plt.title(title)
     plt.savefig(
-        os.path.join(path, "regression_summary.png"),
+        os.path.join(path, "regression_summary_raw_2.png"),
         dpi=fig.dpi,
         bbox_inches="tight",
         pad_inches=0.5,
