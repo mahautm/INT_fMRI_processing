@@ -74,11 +74,12 @@ if __name__ == "__main__":
                 full_path = os.path.join(
                     path, modality, str(dim), "fold_{}".format(fold)
                 )
+                print(full_path)
                 mse.append(np.load(os.path.join(full_path, "mse.npy")))
                 r_squared.append(np.load(os.path.join(full_path, "r_squared.npy")))
                 print("MSE : ", mse)
                 print("MSE mean", np.mean(mse))
-                print("[MSE] mean", np.mean([mse]))
+                # print("[MSE] mean", np.mean([mse])) # <-- same thing as above, just needed to be sure
             cell_text.append(
                 [
                     "%.3f (+/- %.5f)" % (np.mean(mse), np.std(mse)),
