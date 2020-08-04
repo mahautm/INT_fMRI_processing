@@ -54,8 +54,8 @@ if __name__ == "__main__":
 
     cell_text = []
     rows = [
-        "tfMRI + rsfMRI",
-        "Anat + rsfMRI",
+        # "tfMRI + rsfMRI",
+        # "Anat + rsfMRI",
         "raw_tfMRI + raw_rsfMRI",
         "raw_Anat + raw_rsfMRI",
     ]
@@ -63,8 +63,8 @@ if __name__ == "__main__":
     title = "InterTVA trace-regression quantitative evaluation from relu/linear 20 dimensional multimodal auto-encoder"
     for dim in dimensions:
         for modality in [
-            "tfMRI",
-            "gyrification",
+            # "tfMRI",
+            # "gyrification",
             "raw_input/tfMRI",
             "raw_input/gyrification",
         ]:
