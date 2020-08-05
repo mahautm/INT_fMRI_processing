@@ -164,10 +164,14 @@ if __name__ == "__main__":
         sub_list = json.load(sub_list_file)
 
         index_subjects = np.arange(0, len(sub_list))
+        index_vertices = np.arrange(0,20484) # <-- number of vertices for a given subject
+
+        index_subject_vertices = np.meshgrid(index_subjects, index_vertices).T.reshape(-1,2) # <-- all combinations of vertices and subjects
+
         for dim_1 in dimensions_1:
             for dim_2 in dimensions_2:
                 fold = 0
-                for train_index, test_index in kf.split(index_subjects, Y):
+                for train_index, test_index in kf.split(index_subject_vertices, Y):
                     fold += 1
                     fold_path = "/scratch/mmahaut/data/abide/ae_gyrification/{}-{}/fold_{}".format(
                         dim_1, dim_2, fold

@@ -1,8 +1,6 @@
 import keras
 from keras.models import Model
 
-# from keras.layers import Dropout
-# from keras.callbacks import EarlyStopping
 import matplotlib.pyplot as plt
 
 plt.switch_backend("agg")
@@ -10,8 +8,83 @@ import sys
 import os
 import numpy as np
 
-from mdae_models import build_convolutional_model
-from mdae_step import build_normalised_data, build_path_and_vars
+from mdae_models import build_model
+from mdae_step import (
+    build_path_and_vars,
+    load_data,
+)  # build_normalised_data is redefined is this function to be a vertex function
+
+from sklearn.preprocessing import MinMaxScaler
+
+
+def build_normalised_data(
+    data_orig,
+    data_type,
+    ref_subject,
+    orig_path,
+    sub_list,
+    index_subjects_vertices,
+    train_index,
+    test_index,
+):
+    train_gyr_data = np.concatenate(
+        [
+            load_data(
+                data_orig,
+                sub_index,
+                4 if data_type == "gyrification" else 1,
+                sub_list,
+                ref_subject,
+                orig_path,
+            )[
+                1
+            ]  # 1 as the second number in the meshgrid is for the vertex
+            for sub_index in index_subjects_vertices[train_index][
+                0
+            ]  # 0 as the first number in the meshgrid is for the subject
+        ]
+    )
+    train_rsfmri_data = np.concatenate(
+        [
+            load_data(data_orig, sub_index, 2, sub_list, ref_subject, orig_path)[1]
+            for sub_index in index_subjects_vertices[train_index][0]
+        ]
+    )
+    print("Shape of the training data:", train_gyr_data.shape)
+    print("Load testdata...")
+    test_gyr_data = np.concatenate(
+        [
+            load_data(
+                data_orig,
+                sub_index,
+                4 if data_type == "gyrification" else 1,
+                sub_list,
+                ref_subject,
+                orig_path,
+            )[1]
+            for sub_index in index_subjects_vertices[test_index][0]
+        ]
+    )
+    test_rsfmri_data = np.concatenate(
+        [
+            load_data(data_orig, sub_index, 2, sub_list, ref_subject, orig_path)[1]
+            for sub_index in index_subjects_vertices[test_index][0]
+        ]
+    )
+    scaler = MinMaxScaler()
+
+    normalized_train_gyr_data = scaler.fit_transform(train_gyr_data)
+    normalized_test_gyr_data = scaler.fit_transform(test_gyr_data)
+    normalized_train_rsfmri_data = scaler.fit_transform(train_rsfmri_data)
+    normalized_test_rsfmri_data = scaler.fit_transform(test_rsfmri_data)
+
+    return (
+        normalized_train_gyr_data,
+        normalized_test_gyr_data,
+        normalized_train_rsfmri_data,
+        normalized_test_rsfmri_data,
+    )
+
 
 if __name__ == "__main__":
 
@@ -34,9 +107,17 @@ if __name__ == "__main__":
     hidden_layer = "relu"
     output_layer = "linear"
 
+    index_vertices = np.arange(0, 20484)
+    index_subject_vertices = np.meshgrid(index_subjects, index_vertices).T.reshape(
+        -1, 2
+    )
+
     print(f"Fold #{fold}")
     print(
-        "TRAIN:", index_subjects[train_index], "TEST:", index_subjects[test_index],
+        "Format : [subject, vertex] :\n" "TRAIN:",
+        index_subject_vertices[train_index],
+        "\nTEST:",
+        index_subject_vertices[test_index],
     )
     # load training and testing data
     print("Load training data...")
@@ -62,7 +143,9 @@ if __name__ == "__main__":
         encoder_rsfmri,
         encoder_shared_layer,
         encoder_gyr,
-    ) = build_convolutional_model(
+    ) = build_model(
+        15,  # 15 rsfMRI dimensions in latent space as determined most efficient by IJCNN paper
+        5,  # 5 tfMRI dimensions in latent space as determined most efficient in IJCNN paper
         normalized_train_gyr_data[0].shape,
         normalized_train_rsfmri_data[0].shape,
         hidden_layer,

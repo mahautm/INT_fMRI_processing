@@ -79,7 +79,7 @@ if __name__ == "__main__":
             np.save(os.path.join(fold_path, "train_index.npy"), train_index)
             np.save(os.path.join(fold_path, "test_index.npy"), test_index)
             run_slurm_job_mdae(
-                data_orig, data_type, "", "", fold, script_name="mdae_step_conv.py",
+                data_orig, data_type, "", "conv", fold, script_name="mdae_step_conv.py",
             )
     else:
         print(
