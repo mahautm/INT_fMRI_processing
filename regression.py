@@ -388,7 +388,7 @@ if __name__ == "__main__":
         50,
     ]
 
-    batch_1 = [20]
+    batch_1 = ["15-5"]
 
     for dim in batch_1:
         # 10-fold validation
@@ -410,7 +410,11 @@ if __name__ == "__main__":
                 idx,
                 sub_list,
             ) = build_path_and_vars(
-                params["data_source"], params["modality"], dim_1, dim_2, fold
+                params["data_source"],
+                params["modality"],
+                15,
+                5,
+                fold,  # <-- hard coded, a problem is coming here
             )
             print("Fold #{}".format(fold))
             # Chargement des données

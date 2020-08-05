@@ -77,9 +77,9 @@ if __name__ == "__main__":
                 print(full_path)
                 mse.append(np.load(os.path.join(full_path, "mse.npy")))
                 r_squared.append(np.load(os.path.join(full_path, "r_squared.npy")))
-                print("MSE : ", mse)
-                print("MSE mean", np.mean(mse))
-                # print("[MSE] mean", np.mean([mse])) # <-- same thing as above, just needed to be sure
+            print("MSE : ", mse)
+            print("MSE mean", np.mean(mse))
+            # print("[MSE] mean", np.mean([mse])) # <-- same thing as above, just needed to be sure
             cell_text.append(
                 [
                     "%.3f (+/- %.5f)" % (np.mean(mse), np.std(mse)),
@@ -93,7 +93,7 @@ if __name__ == "__main__":
     plt.draw()
     plt.title(title)
     plt.savefig(
-        os.path.join(path, "regression_summary_raw_2.png"),
+        os.path.join(path, "regression_summary.png"),
         dpi=fig.dpi,
         bbox_inches="tight",
         pad_inches=0.5,

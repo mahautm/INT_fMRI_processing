@@ -145,7 +145,9 @@ def build_trimodal_model():
     return multimodal_autoencoder, encoder_rsfmri, encoder_shared_layer, encoder_gyr
 
 
-def build_convolutional_model(input_shape_1, input_shape_2, hidden_layer, output_layer):
+def build_convolutional_model(
+    input_shape_1, input_shape_2, hidden_layer, output_layer
+):  # <- no need as vertexes don't hold spatial information, I need to include a laplatian in all that, to give it back its spatial dimension
     # Apply linear autoencoder
     # Inputs Shape
     input_view_1 = Input(shape=(input_shape_1))

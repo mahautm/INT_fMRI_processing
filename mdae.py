@@ -13,8 +13,7 @@ from sklearn.model_selection import KFold, StratifiedKFold
 def run_slurm_job_mdae(
     data_orig,
     data_type,
-    dimension_1,
-    dimension_2,
+    dimension,
     fold,
     email="mmahaut@ensc.fr",
     logs_dir="/scratch/mmahaut/scripts/logs",
@@ -67,9 +66,7 @@ def run_slurm_job_mdae(
         script file name
     """
 
-    job_name = "{}_dim{}-{}_fold{}_mdae".format(
-        data_orig, dimension_1, dimension_2, fold
-    )
+    job_name = "{}_dim{}_fold{}_mdae".format(data_orig, dimension, fold)
     slurmjob_path = os.path.join(slurm_dir, "{}.sh".format(job_name))
     create_slurmjob_cmd = "touch {}".format(slurmjob_path)
     os.system(create_slurmjob_cmd)
@@ -96,14 +93,13 @@ def run_slurm_job_mdae(
         batch_cmd = (
             'eval "$(/scratch/mmahaut/tools/Anaconda3/bin/conda shell.bash hook)"\n'
             + "conda activate tf\n"
-            + "{} {}/{} {} {} {} {} {}".format(
+            + "{} {}/{} {} {} {} {}".format(
                 python_path,
                 code_dir,
                 script_name,
                 data_orig,
                 data_type,
-                dimension_1,
-                dimension_2,
+                dimension,
                 fold,
             )
         )
