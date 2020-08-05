@@ -168,7 +168,9 @@ if __name__ == "__main__":
             0, 20484
         )  # <-- number of vertices for a given subject
 
-        index_subject_vertices = np.meshgrid(index_subjects, index_vertices).T.reshape(
+        index_subject_vertices = np.array(
+            np.meshgrid(index_subjects, index_vertices)
+        ).T.reshape(
             -1, 2
         )  # <-- all combinations of vertices and subjects
 
