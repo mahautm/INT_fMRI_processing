@@ -138,6 +138,12 @@ if __name__ == "__main__":
         test_index,
     )
     # Getting rid of dir here ...
+
+    print(
+        "INPUT SHAPE : ",
+        normalized_train_gyr_data[0].shape,
+        normalized_train_rsfmri_data[0].shape,
+    )
     (
         multimodal_autoencoder,
         encoder_rsfmri,
