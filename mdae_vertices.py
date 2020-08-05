@@ -183,7 +183,9 @@ if __name__ == "__main__":
         for dim_1 in dimensions_1:
             for dim_2 in dimensions_2:
                 fold = 0
-                for train_index, test_index in kf.split(index_subject_vertices, Y):
+                for train_index, test_index in kf.split(
+                    index_subject_vertices, Y_vertex
+                ):
                     fold += 1
                     fold_path = "/scratch/mmahaut/data/abide/ae_gyrification/{}-{}/fold_{}".format(
                         dim_1, dim_2, fold

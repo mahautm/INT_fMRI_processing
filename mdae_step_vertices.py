@@ -108,9 +108,9 @@ if __name__ == "__main__":
     output_layer = "linear"
 
     index_vertices = np.arange(0, 20484)
-    index_subject_vertices = np.meshgrid(index_subjects, index_vertices).T.reshape(
-        -1, 2
-    )
+    index_subject_vertices = np.array(
+        np.meshgrid(index_subjects, index_vertices)
+    ).T.reshape(-1, 2)
 
     print(f"Fold #{fold}")
     print(
