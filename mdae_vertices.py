@@ -164,7 +164,7 @@ if __name__ == "__main__":
         sub_list = json.load(sub_list_file)
 
         index_subjects = np.arange(0, len(sub_list))
-        index_vertices = np.arrange(
+        index_vertices = np.arange(
             0, 20484
         )  # <-- number of vertices for a given subject
 
