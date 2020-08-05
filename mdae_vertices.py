@@ -21,7 +21,7 @@ def run_slurm_job_mdae(
     python_path="python",
     slurm_dir="/scratch/mmahaut/scripts/slurm",
     code_dir="/scratch/mmahaut/scripts/INT_fMRI_processing",
-    script_name="mdae_step.py",
+    script_name="mdae_step_vertices.py",
 ):
     """
     This will write a .sh file to train a multi-modal auto-encoder on a specific set of subjects with SLURM, and then execute it.
