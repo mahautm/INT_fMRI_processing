@@ -163,9 +163,22 @@ if __name__ == "__main__":
         sub_list_file = open(sub_list_files)
         sub_list = json.load(sub_list_file)
 
-        index_subject_vertices = np.arange(
-            0, len(sub_list) * 20484
-        )  # <-- numbered combinations of vertices (20484) and subjects
+        # VERTICES KFOLD
+
+        index_subjects = np.arange(0, len(sub_list))
+        index_vertices = np.arange(
+            0, 20484
+        )  # <-- number of vertices for a given subject
+
+        index_subject_vertices = np.array(
+            np.meshgrid(index_subjects, index_vertices)
+        ).T.reshape(
+            -1, 2
+        )  # <-- all combinations of vertices and subjects
+
+        Y_vertex = np.concatenate(
+            [[y] * 20484 for y in Y]
+        )  # index_subject_vertex is indexed with subjects first
 
         for dim_1 in dimensions_1:
             for dim_2 in dimensions_2:
