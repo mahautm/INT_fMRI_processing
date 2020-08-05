@@ -164,9 +164,13 @@ if __name__ == "__main__":
         sub_list = json.load(sub_list_file)
 
         index_subjects = np.arange(0, len(sub_list))
-        index_vertices = np.arrange(0,20484) # <-- number of vertices for a given subject
+        index_vertices = np.arrange(
+            0, 20484
+        )  # <-- number of vertices for a given subject
 
-        index_subject_vertices = np.meshgrid(index_subjects, index_vertices).T.reshape(-1,2) # <-- all combinations of vertices and subjects
+        index_subject_vertices = np.meshgrid(index_subjects, index_vertices).T.reshape(
+            -1, 2
+        )  # <-- all combinations of vertices and subjects
 
         for dim_1 in dimensions_1:
             for dim_2 in dimensions_2:
@@ -185,7 +189,7 @@ if __name__ == "__main__":
                             pass
                     np.save(os.path.join(fold_path, "train_index.npy"), train_index)
                     np.save(os.path.join(fold_path, "test_index.npy"), test_index)
-                    run_slurm_job_mdae(data_orig, data_type, dim_1, dim_2, fold)
+                    run_slurm_job_mdae(data_orig, data_type, "", "15-5_vertex", fold)
 
     elif data_orig == "interTVA":
         kf = KFold(n_splits=10)
