@@ -188,7 +188,7 @@ if __name__ == "__main__":
                 ):
                     fold += 1
                     fold_path = "/scratch/mmahaut/data/abide/ae_gyrification/{}-{}/fold_{}".format(
-                        dim_1, dim_2, fold
+                        "", "15-5_vertex", fold
                     )
                     if not os.path.exists(fold_path):
                         try:
@@ -217,7 +217,7 @@ if __name__ == "__main__":
                     fold += 1
                     ae_type = "ae" if data_type == "tfMRI" else "ae_gyrification"
                     fold_path = "/scratch/mmahaut/data/intertva/{}/{}-{}/fold_{}".format(
-                        ae_type, dim_1, dim_2, fold
+                        ae_type, "", "15-5_vertex", fold
                     )
                     if not os.path.exists(fold_path):
                         try:
