@@ -228,7 +228,7 @@ if __name__ == "__main__":
                             pass
                     np.save(os.path.join(fold_path, "train_index.npy"), train_index)
                     np.save(os.path.join(fold_path, "test_index.npy"), test_index)
-                    run_slurm_job_mdae(data_orig, data_type, dim_1, dim_2, fold)
+                    run_slurm_job_mdae(data_orig, data_type, "", "15-5_vertex", fold)
     else:
         print(
             "Warning !! : Please provide data origin as parameter when calling script: either 'ABIDE' or 'interTVA' "
