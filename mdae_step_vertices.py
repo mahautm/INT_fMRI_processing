@@ -32,25 +32,27 @@ def build_normalised_data(
             [
                 load_data(
                     data_orig,
-                    sub_index,
+                    sub_vertex_index[
+                        0
+                    ],  # 0 as the first number in the meshgrid is for the subject
                     4 if data_type == "gyrification" else 1,
                     sub_list,
                     ref_subject,
                     orig_path,
                 )[
-                    1
+                    sub_vertex_index[1]
                 ]  # 1 as the second number in the meshgrid is for the vertex
-                for sub_index in index_subjects_vertices[train_index][
-                    0
-                ]  # 0 as the first number in the meshgrid is for the subject
+                for sub_vertex_index in index_subjects_vertices[train_index]
             ]
         )
     )
     train_rsfmri_data = np.concatenate(
         (
             [
-                load_data(data_orig, sub_index, 2, sub_list, ref_subject, orig_path)[1]
-                for sub_index in index_subjects_vertices[train_index][0]
+                load_data(
+                    data_orig, sub_vertex_index[0], 2, sub_list, ref_subject, orig_path
+                )[sub_vertex_index[1]]
+                for sub_vertex_index in index_subjects_vertices[train_index]
             ]
         )
     )
@@ -61,21 +63,23 @@ def build_normalised_data(
             [
                 load_data(
                     data_orig,
-                    sub_index,
+                    sub_vertex_index[0],
                     4 if data_type == "gyrification" else 1,
                     sub_list,
                     ref_subject,
                     orig_path,
-                )[1]
-                for sub_index in index_subjects_vertices[test_index][0]
+                )[sub_vertex_index[1]]
+                for sub_vertex_index in index_subjects_vertices[test_index]
             ]
         )
     )
     test_rsfmri_data = np.concatenate(
         (
             [
-                load_data(data_orig, sub_index, 2, sub_list, ref_subject, orig_path)[1]
-                for sub_index in index_subjects_vertices[test_index][0]
+                load_data(
+                    data_orig, sub_vertex_index[0], 2, sub_list, ref_subject, orig_path
+                )[sub_vertex_index[1]]
+                for sub_vertex_index in index_subjects_vertices[test_index]
             ]
         )
     )
