@@ -50,10 +50,10 @@ def build_normalised_data(
                 data_orig, sub_vertex_index[0], 2, sub_list, ref_subject, orig_path
             )
         train_gyr_data = np.concatenate(
-            train_gyr_data, subject_gyr_data[sub_vertex_index[1]]
+            (train_gyr_data, subject_gyr_data[sub_vertex_index[1]])
         )
         train_rsfmri_data = np.concatenate(
-            train_rsfmri_data, subject_rs_data[sub_vertex_index[1]]
+            (train_rsfmri_data, subject_rs_data[sub_vertex_index[1]])
         )
         last_index = sub_vertex_index[0]
 
@@ -83,10 +83,10 @@ def build_normalised_data(
                 data_orig, sub_vertex_index[0], 2, sub_list, ref_subject, orig_path
             )
         test_gyr_data = np.concatenate(
-            test_gyr_data, subject_gyr_data[sub_vertex_index[1]]
+            (test_gyr_data, subject_gyr_data[sub_vertex_index[1]])
         )
         test_rsfmri_data = np.concatenate(
-            test_rsfmri_data, subject_rs_data[sub_vertex_index[1]]
+            (test_rsfmri_data, subject_rs_data[sub_vertex_index[1]])
         )
         last_index = sub_vertex_index[0]
     scaler = MinMaxScaler()
