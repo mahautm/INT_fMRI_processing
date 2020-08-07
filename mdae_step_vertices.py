@@ -28,8 +28,8 @@ def build_normalised_data(
     test_index,
 ):
     last_index = -1
-    train_gyr_data = np.array([])
-    train_rsfmri_data = np.array([])
+    train_gyr_data = []
+    train_rsfmri_data = []
 
     subject_gyr_data = np.array([])
     subject_rs_data = np.array([])
@@ -59,8 +59,8 @@ def build_normalised_data(
 
     # Same for Test data
     last_index = -1
-    test_gyr_data = np.array([])
-    test_rsfmri_data = np.array([])
+    test_gyr_data = []
+    test_rsfmri_data = []
 
     subject_gyr_data = np.array([])
     subject_rs_data = np.array([])
