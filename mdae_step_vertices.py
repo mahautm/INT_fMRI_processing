@@ -28,11 +28,11 @@ def build_normalised_data(
     test_index,
 ):
     last_index = -1
-    train_gyr_data = []
-    train_rsfmri_data = []
+    train_gyr_data = np.array([])
+    train_rsfmri_data = np.array([])
 
-    subject_gyr_data = np.array()
-    subject_rs_data = np.array()
+    subject_gyr_data = np.array([])
+    subject_rs_data = np.array([])
 
     for sub_vertex_index in index_subjects_vertices[train_index]:
         if sub_vertex_index[0] != last_index:
@@ -57,13 +57,13 @@ def build_normalised_data(
         )
         last_index = sub_vertex_index[0]
 
-    # Test data still takes to much RAM
+    # Same for Test data
     last_index = -1
-    test_gyr_data = []
-    test_rsfmri_data = []
+    test_gyr_data = np.array([])
+    test_rsfmri_data = np.array([])
 
-    subject_gyr_data = np.array()
-    subject_rs_data = np.array()
+    subject_gyr_data = np.array([])
+    subject_rs_data = np.array([])
     print("Shape of the training data:", train_gyr_data.shape)
     print("Load testdata...")
 
