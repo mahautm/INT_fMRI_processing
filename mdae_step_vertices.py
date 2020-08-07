@@ -58,33 +58,37 @@ def build_normalised_data(
         last_index = sub_vertex_index[0]
 
     # Test data still takes to much RAM
+    last_index = -1
+    test_gyr_data = []
+    test_rsfmri_data = []
+
+    subject_gyr_data = np.array()
+    subject_rs_data = np.array()
     print("Shape of the training data:", train_gyr_data.shape)
     print("Load testdata...")
-    test_gyr_data = np.concatenate(
-        (
-            [
-                load_data(
-                    data_orig,
-                    sub_vertex_index[0],
-                    4 if data_type == "gyrification" else 1,
-                    sub_list,
-                    ref_subject,
-                    orig_path,
-                )[sub_vertex_index[1]]
-                for sub_vertex_index in index_subjects_vertices[test_index]
-            ]
+
+    for sub_vertex_index in index_subjects_vertices[train_index]:
+        if sub_vertex_index[0] != last_index:
+            subject_gyr_data = load_data(
+                data_orig,
+                sub_vertex_index[
+                    0
+                ],  # 0 as the first number in the meshgrid is for the subject
+                4 if data_type == "gyrification" else 1,
+                sub_list,
+                ref_subject,
+                orig_path,
+            )
+            subject_rs_data = load_data(
+                data_orig, sub_vertex_index[0], 2, sub_list, ref_subject, orig_path
+            )
+        test_gyr_data = np.concatenate(
+            test_gyr_data, subject_gyr_data[sub_vertex_index[1]]
         )
-    )
-    test_rsfmri_data = np.concatenate(
-        (
-            [
-                load_data(
-                    data_orig, sub_vertex_index[0], 2, sub_list, ref_subject, orig_path
-                )[sub_vertex_index[1]]
-                for sub_vertex_index in index_subjects_vertices[test_index]
-            ]
+        test_rsfmri_data = np.concatenate(
+            test_rsfmri_data, subject_rs_data[sub_vertex_index[1]]
         )
-    )
+        last_index = sub_vertex_index[0]
     scaler = MinMaxScaler()
 
     normalized_train_gyr_data = scaler.fit_transform(train_gyr_data)
