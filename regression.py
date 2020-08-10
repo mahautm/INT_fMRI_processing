@@ -15,6 +15,10 @@ from mdae_step import build_path_and_vars, load_intertva_rsfmri, load_intertva_t
 
 
 def load_data(params, dimension, fold, sub_file):
+    """
+    Prepares normalised data for input and output of regression
+
+    """
     X = get_x_data(params, dimension, fold, subject_list=sub_file)
     # X = get_raw_x_data(params, dimension, fold, subject_list=sub_file)
     XZ = np.array(X)
@@ -362,7 +366,7 @@ if __name__ == "__main__":
     params["delta"] = 0.0
     params["graph"] = laplacian
     params["iterations"] = 1000
-    params["mu"] = 0.1
+    params["mu"] = 0.1  # <- The initial descent step
 
     dimensions = [
         1,
@@ -441,7 +445,7 @@ if __name__ == "__main__":
                     if np.trace(
                         np.transpose(XT, axes=(0, 2, 1)) @ beta, axis1=1, axis2=2
                     )
-                    < 0.5
+                    < 0.5  # <- threshold for classification
                     else 1
                 )
             elif params["data_source"] == "interTVA":
