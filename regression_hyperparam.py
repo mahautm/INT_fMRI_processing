@@ -107,7 +107,7 @@ if __name__ == "__main__":
     params_grid["modality"] = ["gyrification", "tfMRI"]
     params_grid["data_source"] = ["ABIDE", "interTVA"]
     params_grid["auto_encoded"] = [True, False]
-    params_grid["fold"] = [3]
+    params_grid["fold"] = 3
 
     for fold in range(params_grid["fold"] + 1):
         for data_source in params_grid["data_source"]:
