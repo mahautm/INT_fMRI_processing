@@ -295,7 +295,7 @@ def build_normalised_data(
     )
 
 
-# This is one I'm always using and that should really go in a function holder,
+# This is one I'm always using and that should really go in a function holder, or better : an object
 # might also need to be used in the mdae.py script instead of doing the writing part
 def build_path_and_vars(data_orig, data_type, dim_1, dim_2, fold):
 
@@ -337,7 +337,7 @@ def build_path_and_vars(data_orig, data_type, dim_1, dim_2, fold):
         ref_subject,
         orig_path,
         base_path,
-        index_subjects,  # This one's presence just adds a variable to return where it's not always needed, and should later be removed
+        index_subjects,  # This one's presence just adds a variable to return where it's not always needed, and might later be removed
         sub_list,
     )
 
