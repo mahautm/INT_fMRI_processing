@@ -98,7 +98,7 @@ if __name__ == "__main__":
                             "delta_{}".format(delta),
                             "soft_thres_{}".format(soft_thres),
                         )
-                        print(full_path)
+                        # print(full_path)
                         mse.append(np.load(os.path.join(full_path, "mse.npy")))
                         r_squared.append(
                             np.load(os.path.join(full_path, "r_squared.npy"))
@@ -120,6 +120,11 @@ if __name__ == "__main__":
     the_table.scale(4, 2.5)
     plt.draw()
     plt.title(title)
+
+    print(len(rows))
+    print(len(cell_text))
+    print(len(cell_text_row))
+
     plt.savefig(
         os.path.join(path, "regression_hyperparameters.png"),
         dpi=fig.dpi,
