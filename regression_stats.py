@@ -99,21 +99,20 @@ if __name__ == "__main__":
         pad_inches=0.5,
     )
 
-    mse = []
-    rsquared = []
-    # STATS (for later) (taken from the end of regression, apart from folds)
-    print("mean mse {}".format(np.mean([mse])))
-    file_path = "{}/regression_output/".format(params["orig_path"])
-    file = "mean_mse.npy"
-    np.save(os.path.join(file, file_path), np.mean([mse]))
-    print("mean r squared {}".format(np.mean([rsquared])))
-    file = "mean_rsquared.npy"
-    np.save(os.path.join(file, file_path), np.mean([rsquared]))
-    print(results)
-    print("Mean Error = {}".format(np.linalg.norm(results - Y) ** 0.2 / Y.shape[0]))
-    print("MSE = {}".format(mean_squared_error(Y, results)))
-    file = "mse.npy"
-    np.save(os.path.join(file, file_path), mean_squared_error(Y, results))
-    file = "r2_score.npy"
-    np.save(os.path.join(file, file_path), r2_score(Y, results))
-
+    # mse = []
+    # rsquared = []
+    # # STATS (for later) (taken from the end of regression, apart from folds)
+    # print("mean mse {}".format(np.mean([mse])))
+    # file_path = "{}/regression_output/".format(params["orig_path"])
+    # file = "mean_mse.npy"
+    # np.save(os.path.join(file, file_path), np.mean([mse]))
+    # print("mean r squared {}".format(np.mean([rsquared])))
+    # file = "mean_rsquared.npy"
+    # np.save(os.path.join(file, file_path), np.mean([rsquared]))
+    # print(results)
+    # print("Mean Error = {}".format(np.linalg.norm(results - Y) ** 0.2 / Y.shape[0]))
+    # print("MSE = {}".format(mean_squared_error(Y, results)))
+    # file = "mse.npy"
+    # np.save(os.path.join(file, file_path), mean_squared_error(Y, results))
+    # file = "r2_score.npy"
+    # np.save(os.path.join(file, file_path), r2_score(Y, results))

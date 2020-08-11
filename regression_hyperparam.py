@@ -102,11 +102,11 @@ def run_slurm_job_regression(
 
 if __name__ == "__main__":
     params_grid = {}
-    params_grid["delta"] = [1e-6, 1e-5, 1e-4, 1e-3]
-    params_grid["soft_thresh"] = [1e-5, 1e-4, 1e-3, 1e-2]
+    params_grid["delta"] = [1e-3, 1e-6, 1e-7, 1e-8]
+    params_grid["soft_thresh"] = [1e-5, 1e-6, 1e-7, 1e-8]
     params_grid["modality"] = ["gyrification", "tfMRI"]
-    params_grid["data_source"] = ["ABIDE", "interTVA"]
-    params_grid["auto_encoded"] = [True, False]
+    params_grid["data_source"] = ["interTVA"]  # ["ABIDE", "interTVA"]
+    params_grid["auto_encoded"] = [True]  # [True, False]
     params_grid["fold"] = 3
 
     for fold in range(params_grid["fold"] + 1):

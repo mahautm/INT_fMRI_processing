@@ -72,9 +72,9 @@ if __name__ == "__main__":
     # np.save(os.path.join(file, file_path), r2_score(Y, results))
 
     # Here rows are for soft thres params
-    rows = [1e-5, 1e-4, 1e-3, 1e-2]
+    rows = [1e-5, 1e-6, 1e-7, 1e-8]
     # Here collumns are for delta params
-    columns = [1e-6, 1e-5, 1e-4, 1e-3]
+    columns = [1e-3, 1e-6, 1e-7, 1e-8]
     for dim in dimensions:
         for modality in [
             "tfMRI",
