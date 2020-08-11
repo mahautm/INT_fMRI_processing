@@ -106,9 +106,11 @@ if __name__ == "__main__":
                     print("MSE : ", mse)
                     print("MSE mean", np.mean(mse))
                     cell_text_row.append(
-                        "%.3f (+/- %.5f)" % (np.mean(mse), np.std(mse))
-                        + "// %.3f (+/- %.5f)"
-                        % (np.mean(r_squared), np.std(r_squared)),
+                        str(
+                            "%.3f (+/- %.5f)" % (np.mean(mse), np.std(mse))
+                            + "// %.3f (+/- %.5f)"
+                            % (np.mean(r_squared), np.std(r_squared))
+                        )
                     )
                 cell_text.append(cell_text_row)
 
