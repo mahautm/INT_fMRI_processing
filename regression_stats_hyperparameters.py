@@ -95,8 +95,8 @@ if __name__ == "__main__":
                             modality,
                             str(dim),
                             "fold_{}".format(fold),
-                            "delta_{delta}",
-                            "soft_thres_{soft_thres}",
+                            "delta_{}".format(delta),
+                            "soft_thres_{}".format(soft_thres),
                         )
                         print(full_path)
                         mse.append(np.load(os.path.join(full_path, "mse.npy")))
