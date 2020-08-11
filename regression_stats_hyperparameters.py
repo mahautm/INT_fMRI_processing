@@ -107,7 +107,8 @@ if __name__ == "__main__":
                     print("MSE mean", np.mean(mse))
                     cell_text_row.append(
                         "%.3f (+/- %.5f)" % (np.mean(mse), np.std(mse))
-                        + "%.3f (+/- %.5f)" % (np.mean(r_squared), np.std(r_squared)),
+                        + "// %.3f (+/- %.5f)"
+                        % (np.mean(r_squared), np.std(r_squared)),
                     )
                 cell_text.append(cell_text_row)
 
@@ -118,7 +119,7 @@ if __name__ == "__main__":
     plt.draw()
     plt.title(title)
     plt.savefig(
-        os.path.join(path, "regression_summary.png"),
+        os.path.join(path, "regression_hyperparameters.png"),
         dpi=fig.dpi,
         bbox_inches="tight",
         pad_inches=0.5,
