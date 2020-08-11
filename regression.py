@@ -21,7 +21,6 @@ def load_data(params, dimension, fold, sub_file):
     """
     X = get_x_data(params, dimension, fold, subject_list=sub_file)
     XZ = np.array(X)
-
     Y = []
     if params["data_source"] == "ABIDE":
         classified_file = open(
@@ -30,7 +29,7 @@ def load_data(params, dimension, fold, sub_file):
         classified_dict = json.load(classified_file)
         # no normalisation step (which kind of seems legit for classification)
         for key in classified_dict:
-            Y.append([1] if classified_dict[key] == "asd" else [0])
+            Y.append(1 if classified_dict[key] == "asd" else 0)
     elif params["data_source"] == "interTVA":
         # Hardcoding this array is probably not the most reusable solution...
         # Error 1 found on 30/07/2020 : bad correspondance between subject file and hardcoded Y,
@@ -76,7 +75,6 @@ def load_data(params, dimension, fold, sub_file):
             93.75,
             93.75,
         ]
-
     y = np.array(Y)
     YZ = (y - min(y)) / (max(y) - min(y))
     return XZ, YZ
@@ -164,9 +162,9 @@ def build_x_data(
 
 
 def load_raw_data(params, fold, sub_file):
+    # Some repeated code from load_data : not super smart
     X = get_raw_x_data(params, fold, subject_list=sub_file)
     XZ = np.array(X)
-
     Y = []
     if params["data_source"] == "ABIDE":
         classified_file = open(
@@ -175,7 +173,7 @@ def load_raw_data(params, fold, sub_file):
         classified_dict = json.load(classified_file)
         # no normalisation step (which kind of seems legit for classification)
         for key in classified_dict:
-            Y.append([1] if classified_dict[key] == "asd" else [0])
+            Y.append(1 if classified_dict[key] == "asd" else 0)
     elif params["data_source"] == "interTVA":
         # Hardcoding this array is probably not the most reusable solution...
         # Error 1 found on 30/07/2020 : bad correspondance between subject file and hardcoded Y,
@@ -221,7 +219,6 @@ def load_raw_data(params, fold, sub_file):
             93.75,
             93.75,
         ]
-
     YZ = np.array(Y)
     x = np.array(Y)
     YZ = (x - min(x)) / (max(x) - min(x))
