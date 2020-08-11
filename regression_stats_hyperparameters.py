@@ -76,7 +76,6 @@ if __name__ == "__main__":
     rows = [1e-5, 1e-4, 1e-3, 1e-2]
     # Here collumns are for delta params
     columns = [1e-6, 1e-5, 1e-4, 1e-3]
-    title = "InterTVA trace-regression hyperparameter evaluation"
     for dim in dimensions:
         for modality in [
             "tfMRI",
@@ -113,21 +112,21 @@ if __name__ == "__main__":
                 )
             cell_text.append(cell_text_row)
 
-    print(len(rows))
-    print(len(cell_text))
-    print(len(cell_text_row))
+        print(len(rows))
+        print(len(cell_text))
+        print(len(cell_text_row))
+        title = "{} trace-regression hyperparameter evaluation".format(modality)
+        the_table = plt.table(
+            cellText=cell_text, rowLabels=rows, colLabels=columns, loc="center",
+        )
+        the_table.scale(4, 2.5)
+        plt.draw()
+        plt.title(title)
 
-    the_table = plt.table(
-        cellText=cell_text, rowLabels=rows, colLabels=columns, loc="center",
-    )
-    the_table.scale(4, 2.5)
-    plt.draw()
-    plt.title(title)
-
-    plt.savefig(
-        os.path.join(path, "regression_hyperparameters.png"),
-        dpi=fig.dpi,
-        bbox_inches="tight",
-        pad_inches=0.5,
-    )
+        plt.savefig(
+            os.path.join(path, "regression_hyperparameters_{}.png".format(modality)),
+            dpi=fig.dpi,
+            bbox_inches="tight",
+            pad_inches=0.5,
+        )
 
