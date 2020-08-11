@@ -114,16 +114,16 @@ if __name__ == "__main__":
                     )
                 cell_text.append(cell_text_row)
 
+    print(len(rows))
+    print(len(cell_text))
+    print(len(cell_text_row))
+
     the_table = plt.table(
         cellText=cell_text, rowLabels=rows, colLabels=columns, loc="center",
     )
     the_table.scale(4, 2.5)
     plt.draw()
     plt.title(title)
-
-    print(len(rows))
-    print(len(cell_text))
-    print(len(cell_text_row))
 
     plt.savefig(
         os.path.join(path, "regression_hyperparameters.png"),
