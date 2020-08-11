@@ -83,7 +83,6 @@ if __name__ == "__main__":
             # "raw_input/gyrification",
         ]:
             cell_text = []
-
             for soft_thres in rows:
                 cell_text_row = []
                 for delta in columns:
@@ -116,21 +115,20 @@ if __name__ == "__main__":
 
                 cell_text.append(cell_text_row)
 
-        print(len(rows))
-        print(len(cell_text))
-        print(len(cell_text_row))
-        title = "{} trace-regression hyperparameter evaluation".format(modality)
-        the_table = plt.table(
-            cellText=cell_text, rowLabels=rows, colLabels=columns, loc="center",
-        )
-        the_table.scale(4, 2.5)
-        plt.draw()
-        plt.title(title)
+            title = "{} trace-regression hyperparameter evaluation".format(modality)
+            the_table = plt.table(
+                cellText=cell_text, rowLabels=rows, colLabels=columns, loc="center",
+            )
+            the_table.scale(4, 2.5)
+            plt.draw()
+            plt.title(title)
 
-        plt.savefig(
-            os.path.join(path, "regression_hyperparameters_{}.png".format(modality)),
-            dpi=fig.dpi,
-            bbox_inches="tight",
-            pad_inches=0.5,
-        )
+            plt.savefig(
+                os.path.join(
+                    path, "regression_hyperparameters_{}.png".format(modality)
+                ),
+                dpi=fig.dpi,
+                bbox_inches="tight",
+                pad_inches=0.5,
+            )
 
