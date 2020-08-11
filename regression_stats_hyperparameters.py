@@ -71,7 +71,6 @@ if __name__ == "__main__":
     # file = "r2_score.npy"
     # np.save(os.path.join(file, file_path), r2_score(Y, results))
 
-    cell_text = []
     # Here rows are for soft thres params
     rows = [1e-5, 1e-4, 1e-3, 1e-2]
     # Here collumns are for delta params
@@ -83,8 +82,10 @@ if __name__ == "__main__":
             # "raw_input/tfMRI",
             # "raw_input/gyrification",
         ]:
-            cell_text_row = []
+            cell_text = []
+
             for soft_thres in rows:
+                cell_text_row = []
                 for delta in columns:
                     mse = []
                     r_squared = []
