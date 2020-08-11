@@ -109,7 +109,7 @@ if __name__ == "__main__":
     params_grid["auto_encoded"] = [True]  # [True, False]
     params_grid["fold"] = 3
 
-    for fold in range(params_grid["fold"] + 1):
+    for fold in range(1, params_grid["fold"] + 1):
         for data_source in params_grid["data_source"]:
             for delta in params_grid["delta"]:
                 for soft_thresh in params_grid["soft_thresh"]:
