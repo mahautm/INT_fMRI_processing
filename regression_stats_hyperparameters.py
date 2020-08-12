@@ -88,7 +88,7 @@ if __name__ == "__main__":
             "raw_input/tfMRI",
             "raw_input/gyrification",
         ]:
-            i += 1
+
             cell_text = []
             for soft_thres in rows:
                 cell_text_row = []
@@ -138,4 +138,5 @@ if __name__ == "__main__":
                 bbox_inches="tight",
                 pad_inches=0.5,
             )
+            i += 1  # GNAGNAGNA
 
