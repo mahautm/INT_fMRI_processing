@@ -70,7 +70,13 @@ if __name__ == "__main__":
     # np.save(os.path.join(file, file_path), mean_squared_error(Y, results))
     # file = "r2_score.npy"
     # np.save(os.path.join(file, file_path), r2_score(Y, results))
-
+    titles = [
+        "tfMRI",
+        "gyrification",
+        "raw_input_tfMRI",
+        "raw_input_gyrification",
+    ]
+    i = 0
     # Here rows are for soft thres params
     rows = [1e-5, 1e-6, 1e-7, 1e-8]
     # Here collumns are for delta params
@@ -82,6 +88,7 @@ if __name__ == "__main__":
             "raw_input/tfMRI",
             "raw_input/gyrification",
         ]:
+            i += 1
             cell_text = []
             for soft_thres in rows:
                 cell_text_row = []
@@ -125,7 +132,7 @@ if __name__ == "__main__":
 
             plt.savefig(
                 os.path.join(
-                    path, "regression_hyperparameters_{}.png".format(modality)
+                    path, "regression_hyperparameters_{}.png".format(titles[i])
                 ),
                 dpi=fig.dpi,
                 bbox_inches="tight",
