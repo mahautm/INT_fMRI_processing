@@ -36,11 +36,11 @@ if __name__ == "__main__":
     params["data_source"] = sys.argv[1]  # ABIDE or interTVA
     params["modality"] = sys.argv[2]  # gyrification or tfMRI
     # delta is the size of Laplacian, we seek similar values in a given local brain area
-    params["delta"] = sys.argv[3]
+    params["delta"] = float(sys.argv[3])
     # soft_tresh -- low firing neurones (below threshold) are ignored
-    params["soft_thresh"] = sys.argv[4]
+    params["soft_thresh"] = float(sys.argv[4])
     # each fold is trained on a different node, that way calculations can be done faster
-    params["fold"] = sys.argv[5]
+    params["fold"] = int(sys.argv[5])
     # According to IJCNN paper, 15 is the best number of dimensions for tfMRI
     params["dim_1"] = 15
     # According to IJCNN paper, 5 is the best number of dimensions for rsfMRI
