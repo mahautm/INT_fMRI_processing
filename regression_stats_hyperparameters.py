@@ -79,8 +79,8 @@ if __name__ == "__main__":
         for modality in [
             "tfMRI",
             "gyrification",
-            # "raw_input/tfMRI",
-            # "raw_input/gyrification",
+            "raw_input/tfMRI",
+            "raw_input/gyrification",
         ]:
             cell_text = []
             for soft_thres in rows:
