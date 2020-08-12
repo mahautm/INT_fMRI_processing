@@ -478,17 +478,12 @@ if __name__ == "__main__":
     np.save(os.path.join(file_path, "beta.npy"), beta)
 
     # Estimate the results
+    results[idx[test_index]] = np.trace(
+        np.transpose(XT, axes=(0, 2, 1)) @ beta, axis1=1, axis2=2
+    )
     if params["data_source"] == "ABIDE":
-        results[idx[test_index]] = (
-            0
-            if np.trace(np.transpose(XT, axes=(0, 2, 1)) @ beta, axis1=1, axis2=2)
-            < 0.5  # <- threshold for classification
-            else 1
-        )
-    elif params["data_source"] == "interTVA":
-        results[idx[test_index]] = np.trace(
-            np.transpose(XT, axes=(0, 2, 1)) @ beta, axis1=1, axis2=2
-        )
+        results[results > 0.5] = 1
+        results[results <= 0.5] = 0
 
     # Stats
     print(results[idx[test_index]])
