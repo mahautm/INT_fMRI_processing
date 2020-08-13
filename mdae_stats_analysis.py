@@ -1,3 +1,4 @@
+# This script has to be run AFTER mdae_stats.py, it will summarise the evaluation data in a table and save it as a png
 import sys
 import os
 import numpy as np
@@ -7,6 +8,26 @@ import pandas as pd
 
 
 def build_stat_table(dimensions, orig_path, stat_files, title=""):
+    """
+    Builds a table from given statistical files of differet multimodal auto-encoders
+
+    Parameters
+    ----------
+    dimensions : string,
+        used to build the path, should be the same as the name of the dimension file used to save,
+        could be a number, two numbers seperated by a hyphon, or a word (for 15-5_vertex for example)
+    orig_path : list or table of strings
+        The root path of the mdae saving folder, for a given modality or data source
+    stat_files :
+        Which data files to put in the table
+    title :
+    Title to use for the table
+
+    Output
+    ------
+    pyplot table with as rows the different stats from the stat_files as rows, 
+    and the diferent mdae from orig_path as lines
+    """
     fig, ax = plt.subplots()
     fig.patch.set_visible(False)
     ax.axis("off")

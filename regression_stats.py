@@ -1,45 +1,12 @@
+# This scripts will give the mse and r squared in two columns of different modalities chosen.
+# If different hyperparameters are used, and need to be taken into account during path building,
+# regression_stats_hyperparameters should be used.
+
+
 import numpy as np
 import sys
 import matplotlib.pyplot as plt
 import os
-
-# from mdae_step import
-
-
-def build_stat_table(dimensions, orig_path, stat_files, title=""):
-    fig, ax = plt.subplots()
-    fig.patch.set_visible(False)
-    ax.axis("off")
-    ax.axis("tight")
-
-    cell_text = []
-    rows = []
-    columns = []
-
-    for dim_index in range(len(dimensions)):
-        rows.append("{} dim encoding".format(dimensions[dim_index]))
-        row_cell_text = []
-        for filename in stat_files:
-            stat = np.load(os.path.join(orig_path, filename))[0]
-            row_cell_text.append(stat[dim_index])
-            columns.append(
-                filename[: len(filename) - 4]
-            )  # enlever le .npy à la fin des noms de fichier
-        cell_text.append(row_cell_text)
-    the_table = plt.table(
-        cellText=cell_text, rowLabels=rows, colLabels=columns, loc="center",
-    )
-    the_table.scale(4, 2.5)
-    plt.draw()
-    plt.title(title)
-    plt.savefig(
-        os.path.join(orig_path, "mse_summary.png"),
-        dpi=fig.dpi,
-        bbox_inches="tight",
-        pad_inches=0.5,
-    )
-    return the_table
-
 
 if __name__ == "__main__":
     # The dimensions are used accross 3 scripts, there should be a parameter file that is loaded, probably in json format

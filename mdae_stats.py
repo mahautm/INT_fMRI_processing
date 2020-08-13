@@ -1,3 +1,6 @@
+# calculates mse and rmse by comparing test data going through encoder and decoder to the expected result
+# will also calculate a specific score for each modality separately, and sum them to have the global result.
+# expects two parameters on run, data source and modality (see run at bottom of script)
 import matplotlib.pyplot as plt
 
 plt.switch_backend("agg")
@@ -5,7 +8,6 @@ import sys
 import os
 import json
 
-# from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from sklearn.metrics import mean_squared_error
 
 from math import sqrt
@@ -18,11 +20,6 @@ import mdae_step as mds
 def get_model_stats(
     data_orig, data_type, dimensions_1, dimensions_2, number_folds="10"
 ):
-
-    # multimodal_autoencoder = tf.keras.models.load_model(
-    #     "{}/{}/fold_{}/multimodal_autoencoder.h5".format(base_path,dim,fold)
-    # )
-
     # Tables:
     mse_train = []
     mse_test = []
@@ -61,11 +58,6 @@ def get_model_stats(
     # std rmse (rsfmri)
     std_rmse_rsfmri_train = []
     std_rmse_rsfmri_test = []
-
-    # Past prints, do not work anymore
-    # print(kf.get_n_splits(index_subjects))
-    # print("number of splits:", kf)
-    # print("number of features:", dimensions)
 
     cvscores_mse_test = []
     cvscores_rmse_test = []
@@ -407,6 +399,6 @@ if __name__ == "__main__":
     dimensions_1 = [15]
     dimensions_2 = [5]
 
-    data_orig = sys.argv[1]
+    data_orig = sys.argv[1]  # Could either be "ABIDE" or "interTVA"
     data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
     get_model_stats(data_orig, data_type, dimensions_1, dimensions_2, 10)

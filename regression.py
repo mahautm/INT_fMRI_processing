@@ -14,12 +14,30 @@ import json
 from mdae_step import build_path_and_vars, load_intertva_rsfmri, load_intertva_tfmri
 
 
-def load_data(params, dimension, fold, sub_file):
+def load_data(params, dimension, fold, sub_list):
     """
     Prepares normalised data for input and output of regression
+    Parameters
+    ----------
+    params : dictionary
+    dimension : string
+        name of the dimension folder, can be a number (number of dimensions in latent space)
+        two number hypenated (one for each modality), or have a word added (15-5_vertex) for
+        special versions. Must match existing folder
+    fold : int
+        which fold folder to load data from
+    sub_list : list of all subject names, in order (to correspond to Y, especially important for interTVA)
+
+    output
+    ------
+    XZ : 
+        normalised input matrix for regression
+    YZ : 
+        normalised float expected output matrix for regression (interTVA)
+        or binary classification output matrix for regression (abide)
 
     """
-    X = get_x_data(params, dimension, fold, subject_list=sub_file)
+    X = get_x_data(params, dimension, fold, subject_list=sub_list)
     XZ = np.array(X)
     Y = []
     if params["data_source"] == "ABIDE":
@@ -84,8 +102,24 @@ def get_x_data(
     params, dimension, fold, subject_list,
 ):
     """
-    lazybuilder for regression input data. If data has already been calculated, it is simply loaded.
-    Otherwise we get the model and run it once more
+    lazybuilder for regression input data. If data has already been calculated, it is simply loaded from file.
+    Otherwise we get the model and run it once on raw data and save the data for future use before loading.
+
+    Parameters
+    ----------
+    params : dictionary
+    dimension : string
+        name of the dimension folder, can be a number (number of dimensions in latent space)
+        two number hypenated (one for each modality), or have a word added (15-5_vertex) for
+        special versions. Must match existing folder
+    fold : int
+        which fold folder to load data from
+    sub_list : list of all subject names, in order (to correspond to Y, especially important for interTVA)
+
+    output
+    ------
+    X: list of floats
+        input matrix for regression, loaded from the autoencoder
     """
     X = []
     input_file_path = os.path.join(
@@ -114,6 +148,26 @@ def get_x_data(
 def build_x_data(
     dimension, fold, subject, params, out_file,
 ):
+    """
+    
+    Parameters
+    ----------
+    dimension : string
+        name of the dimension folder, can be a number (number of dimensions in latent space)
+        two number hypenated (one for each modality), or have a word added (15-5_vertex) for
+        special versions. Must match existing folder
+    fold : int
+        which fold folder to load data from
+    subject : string
+        subject for which data should be built as found both in subject list, corresponding to file name
+    params : dictionary
+    out_file : where to save the data once it is built
+
+    output
+    ------
+    latent_space : resulting data latent space from the encoding layer applied on input data
+
+    """
 
     # encoder_rsfmri = tf.keras.models.load_model(os.path.join(model_file_path,"/{}/fold_{}/encoder_rsfmri.h5").format(dimension,fold))
     # encoder_tfmri = tf.keras.models.load_model(os.path.join(model_file_path,"/{}/fold_{}/encoder_tfmri.h5").format(dimension,fold))
@@ -138,13 +192,13 @@ def build_x_data(
                 ),
             )
         )
-        prediction = model.predict([gyr_data, rsfmri_data])
+        latent_space = model.predict([gyr_data, rsfmri_data])
 
     elif params["modality"] == "tfMRI":
         tfmri_data = load_intertva_tfmri(
             subject, os.path.join(params["orig_path"], "features_tfMRI")
         )
-        prediction = model.predict([tfmri_data, rsfmri_data])
+        latent_space = model.predict([tfmri_data, rsfmri_data])
 
     path = os.path.join(out_file, str(dimension), "fold_{}".format(fold))
     if not os.path.exists(path):
@@ -157,13 +211,31 @@ def build_x_data(
             pass
 
     x_sub_data_path = os.path.join(path, "X_{}.npy".format(subject))
-    np.save(x_sub_data_path, prediction)
-    return prediction
+    np.save(x_sub_data_path, latent_space)
+    return latent_space
 
 
-def load_raw_data(params, fold, sub_file):
+def load_raw_data(params, fold, sub_list):
+    """
+    Pulls together data which has not been through the encoder to make an input vector and an output vector which corresponds
+
+    Parameters
+    ----------
+    params : dictionary
+    fold : int
+        which fold folder to load data from
+    sub_list : string list
+        list of all subject names, in order (to correspond to Y, especially important for interTVA)
+
+    output
+    ------
+    X : table of floats
+        input data for regression
+    Y : table of floats (1,len(sublist))
+        expected output for regression
+    """
     # Some repeated code from load_data : not super smart
-    X = get_raw_x_data(params, fold, subject_list=sub_file)
+    X = get_raw_x_data(params, fold, subject_list=sub_list)
     XZ = np.array(X)
     Y = []
     if params["data_source"] == "ABIDE":
@@ -233,6 +305,19 @@ def get_raw_x_data(
     or on gyrification, 
     or on tfmri
     or on a combination
+
+    Parameters
+    ----------
+    params : dictionary
+    fold : int
+        which fold folder to load data from
+    subject_list : string list
+        list of all subject names, in order (to correspond to Y, especially important for interTVA)
+
+    output
+    ------
+    X : float list
+        input data for regression
     """
     X = []
 
@@ -482,8 +567,7 @@ if __name__ == "__main__":
         np.transpose(XT, axes=(0, 2, 1)) @ beta, axis1=1, axis2=2
     )
     if params["data_source"] == "ABIDE":
-        results[results > 0.5] = 1
-        results[results <= 0.5] = 0
+ 
 
     # Stats
     print(results[idx[test_index]])
