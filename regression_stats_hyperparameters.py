@@ -83,7 +83,7 @@ if __name__ == "__main__":
     columns = [1e-3, 1e-6, 1e-7, 1e-8]
     for dim in dimensions:
         for modality in [
-            "tfMRI",
+            # "tfMRI",
             "gyrification",
             # "raw_input/tfMRI",
             # "raw_input/gyrification",
