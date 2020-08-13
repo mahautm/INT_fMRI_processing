@@ -138,5 +138,5 @@ if __name__ == "__main__":
                 bbox_inches="tight",
                 pad_inches=0.5,
             )
-            i += 1  # GNAGNAGNA
+            i += 1
 
