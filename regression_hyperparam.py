@@ -106,7 +106,7 @@ if __name__ == "__main__":
     params_grid["soft_thresh"] = [1e-5, 1e-6, 1e-7, 1e-8]
     params_grid["modality"] = ["gyrification", "tfMRI"]
     params_grid["data_source"] = ["ABIDE"]  # ["ABIDE", "interTVA"]
-    params_grid["auto_encoded"] = [True, False]  # [True, False]
+    params_grid["auto_encoded"] = [False]  # [True, False]
     params_grid["fold"] = 3
 
     for fold in range(1, params_grid["fold"] + 1):
