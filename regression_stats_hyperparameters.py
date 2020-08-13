@@ -73,8 +73,8 @@ if __name__ == "__main__":
     titles = [
         "tfMRI",
         "gyrification",
-        # "raw_input_tfMRI",
-        # "raw_input_gyrification",
+        "raw_input_tfMRI",
+        "raw_input_gyrification",
     ]
     i = 0
     # Here rows are for soft thres params
@@ -85,8 +85,8 @@ if __name__ == "__main__":
         for modality in [
             # "tfMRI",
             "gyrification",
-            # "raw_input/tfMRI",
-            # "raw_input/gyrification",
+            "raw_input/tfMRI",
+            "raw_input/gyrification",
         ]:
 
             cell_text = []
