@@ -45,7 +45,7 @@ if __name__ == "__main__":
     # The dimensions are used accross 3 scripts, there should be a parameter file that is loaded, probably in json format
     dimensions = ["15-5"]
     fold_number = 3
-    path = "/scratch/mmahaut/data/intertva/regression_output"
+    path = "/scratch/mmahaut/data/abide/regression_output"
 
     fig, ax = plt.subplots()
     fig.patch.set_visible(False)
