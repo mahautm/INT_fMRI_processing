@@ -27,68 +27,54 @@ def build_normalised_data(
     train_index,
     test_index,
 ):
-    last_index = -1
+    """
+    This function now runs with numpy array acceleration, as the for loop version took days to load
+    """
     train_gyr_data = []
     train_rsfmri_data = []
-
-    subject_gyr_data = np.array([])
-    subject_rs_data = np.array([])
-
-    for sub_vertex_index in index_subjects_vertices[train_index]:
-        if sub_vertex_index[0] != last_index:
-            subject_gyr_data = load_data(
-                data_orig,
-                sub_vertex_index[
-                    0
-                ],  # 0 as the first number in the meshgrid is for the subject
-                4 if data_type == "gyrification" else 1,
-                sub_list,
-                ref_subject,
-                orig_path,
-            )
-            subject_rs_data = load_data(
-                data_orig, sub_vertex_index[0], 2, sub_list, ref_subject, orig_path
-            )
-        train_gyr_data = np.concatenate(
-            (train_gyr_data, subject_gyr_data[sub_vertex_index[1]])
-        )
-        train_rsfmri_data = np.concatenate(
-            (train_rsfmri_data, subject_rs_data[sub_vertex_index[1]])
-        )
-        last_index = sub_vertex_index[0]
-
-    # Same for Test data
-    last_index = -1
     test_gyr_data = []
     test_rsfmri_data = []
 
     subject_gyr_data = np.array([])
     subject_rs_data = np.array([])
-    print("Shape of the training data:", train_gyr_data.shape)
     print("Load testdata...")
+    # seperate subjects from vertices
+    subjects_indexes = index_subjects_vertices.T[0]
+    train_vertices = index_subjects_vertices[train_index].T[1]
+    test_vertices = index_subjects_vertices[test_index].T[1]
 
-    for sub_vertex_index in index_subjects_vertices[train_index]:
-        if sub_vertex_index[0] != last_index:
-            subject_gyr_data = load_data(
-                data_orig,
-                sub_vertex_index[
-                    0
-                ],  # 0 as the first number in the meshgrid is for the subject
-                4 if data_type == "gyrification" else 1,
-                sub_list,
-                ref_subject,
-                orig_path,
-            )
-            subject_rs_data = load_data(
-                data_orig, sub_vertex_index[0], 2, sub_list, ref_subject, orig_path
-            )
+    for subject_index in np.unique(subjects_indexes):
+        # select the vertices we need for that specific subject
+        subject_train_vertices = train_vertices[subjects_indexes == subject_index]
+        subject_test_vertices = test_vertices[subjects_indexes == subject_index]
+
+        # load a subject
+        subject_gyr_data = load_data(
+            data_orig,
+            subject_index,
+            4 if data_type == "gyrification" else 1,
+            sub_list,
+            ref_subject,
+            orig_path,
+        )
+        subject_rs_data = load_data(
+            data_orig, subject_index, 2, sub_list, ref_subject, orig_path
+        )
+
+        # Add the subject's required vertices to data
         test_gyr_data = np.concatenate(
-            (test_gyr_data, subject_gyr_data[sub_vertex_index[1]])
+            test_gyr_data, subject_gyr_data[subject_test_vertices]
         )
         test_rsfmri_data = np.concatenate(
-            (test_rsfmri_data, subject_rs_data[sub_vertex_index[1]])
+            (test_rsfmri_data, subject_rs_data[subject_test_vertices])
         )
-        last_index = sub_vertex_index[0]
+        train_gyr_data = np.concatenate(
+            (train_gyr_data, subject_gyr_data[subject_train_vertices])
+        )
+        train_rsfmri_data = np.concatenate(
+            (train_rsfmri_data, subject_rs_data[subject_train_vertices])
+        )
+
     scaler = MinMaxScaler()
 
     normalized_train_gyr_data = scaler.fit_transform(train_gyr_data)
@@ -108,7 +94,7 @@ if __name__ == "__main__":
 
     data_orig = sys.argv[1]  # {"ABIDE", "interTVA"}
     data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
-    save_folder = sys.argv[3]  # Here for now the name 15-5_vertices has been chosen
+    save_folder = sys.argv[3]  # Here for now the name 15-5_vertex has been chosen
     fold = int(sys.argv[4])  # int belonging to [1,10]
 
     (
