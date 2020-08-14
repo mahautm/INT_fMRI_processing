@@ -64,7 +64,8 @@ def build_normalised_data(
         subject_rs_data = load_data(
             data_orig, subject_index, 2, sub_list, ref_subject, orig_path
         )
-
+        print(subject_gyr_data.shape)
+        print(subject_gyr_data)
         # Add the subject's required vertices to data
         test_gyr_data = np.concatenate(
             (test_gyr_data, subject_gyr_data[subject_test_vertices])
