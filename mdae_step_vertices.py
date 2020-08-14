@@ -30,15 +30,34 @@ def build_normalised_data(
     """
     This function now runs with numpy array vectorisation (not for everything... still some index), as the for loop version took days to load
     """
-    train_gyr_data = []
-    train_rsfmri_data = []
-    test_gyr_data = []
-    test_rsfmri_data = []
+    train_gyr_data = np.array([]).reshape(0, 2)
+    train_rsfmri_data = np.array([]).reshape(0, 2)
+    test_gyr_data = np.array([]).reshape(0, 2)
+    test_rsfmri_data = np.array([]).reshape(0, 2)
 
     subject_gyr_data = np.array([])
     subject_rs_data = np.array([])
     print("Load testdata...")
-    # seperate subjects from vertices
+    # seperate subjects from vertices. The arrays are supposed ordered, as any break from order wil break everything
+    all_subjects = np.unique(index_subjects_vertices.T[0])
+    # x = np.arrange(len(index_subjects_vertices))
+    # x[train_index] = True
+    # x[test_index] = False
+
+    # a = [index_subjects_vertices.T[0] == sub for sub in all_subjects]
+    # vertices_per_subject = [index_subjects_vertices.T[0][line] for line in a]
+    # test_gyr_data = [
+    #     load_data(
+    #         data_orig,
+    #         all_subjects[sub_index],
+    #         4 if data_type == "gyrification" else 1,
+    #         sub_list,
+    #         ref_subject,
+    #         orig_path,
+    #     )[vertices_per_subject[sub_index]]
+    #     for sub_index in len(all_subjects)
+    # ]
+
     train_subjects_indexes = index_subjects_vertices[train_index].T[0]
     test_subjects_indexes = index_subjects_vertices[test_index].T[0]
 
@@ -46,7 +65,9 @@ def build_normalised_data(
     test_vertices = index_subjects_vertices[test_index].T[1]
 
     for subject_index in np.unique(
-        index_subjects_vertices.T[0]  # for each unique subject index
+        index_subjects_vertices.T[
+            0
+        ]  # for each unique subject index, can't be rid of that for loop, need to load subject data
     ):
         # select the vertices we need for that specific subject
         subject_train_vertices = train_vertices[train_subjects_indexes == subject_index]
