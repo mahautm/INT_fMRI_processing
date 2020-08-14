@@ -95,18 +95,18 @@ def build_normalised_data(
         )  # here we have to have this control because each of the modalities have a different size. time lost :/
         test_rsfmri_data = (
             np.concatenate((test_rsfmri_data, subject_rs_data[subject_test_vertices]))
-            if test_gyr_data.size
-            else subject_gyr_data[subject_test_vertices]
+            if test_rsfmri_data.size
+            else subject_rs_data[subject_test_vertices]
         )
         train_gyr_data = (
             np.concatenate((train_gyr_data, subject_gyr_data[subject_train_vertices]))
-            if test_gyr_data.size
-            else subject_gyr_data[subject_test_vertices]
+            if train_gyr_data.size
+            else subject_gyr_data[subject_train_vertices]
         )
         train_rsfmri_data = (
             np.concatenate((train_rsfmri_data, subject_rs_data[subject_train_vertices]))
-            if test_gyr_data.size
-            else subject_gyr_data[subject_test_vertices]
+            if train_rsfmri_data.size
+            else subject_rs_data[subject_train_vertices]
         )
 
     scaler = MinMaxScaler()
