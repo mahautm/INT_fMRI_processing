@@ -567,7 +567,8 @@ if __name__ == "__main__":
         np.transpose(XT, axes=(0, 2, 1)) @ beta, axis1=1, axis2=2
     )
     if params["data_source"] == "ABIDE":
- 
+        results[results > 0.5] = 1
+        results[results <= 0.5] = 0
 
     # Stats
     print(results[idx[test_index]])
