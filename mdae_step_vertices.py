@@ -189,8 +189,8 @@ if __name__ == "__main__":
     ) = build_model(
         15,  # 15 rsfMRI dimensions in latent space as determined most efficient by IJCNN paper
         5,  # 5 tfMRI dimensions in latent space as determined most efficient in IJCNN paper
-        normalized_train_gyr_data[0].shape,
-        normalized_train_rsfmri_data[0].shape,
+        normalized_train_gyr_data[0].shape[0],  # should be 1d anyway...
+        normalized_train_rsfmri_data[0].shape[0],
         hidden_layer,
         output_layer,
     )
