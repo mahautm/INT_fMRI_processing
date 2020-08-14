@@ -115,7 +115,8 @@ if __name__ == "__main__":
         "fold"
     ] = 10  # More folds, means better representation, but more resources used
 
-    for fold in range(1, params_grid["fold"] + 1):
+    # for fold in range(1, params_grid["fold"] + 1):
+    for fold in [1, 2, 3, 4, 5, 6, 8, 9, 10]:
         for data_source in params_grid["data_source"]:
             for delta in params_grid["delta"]:
                 for soft_thresh in params_grid["soft_thresh"]:
