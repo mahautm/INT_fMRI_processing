@@ -46,7 +46,17 @@ if __name__ == "__main__":
                 for delta in columns:
                     mse = []
                     r_squared = []
-                    for fold in range(1, fold_number + 1):
+                    for fold in [
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        8,
+                        9,
+                        10,
+                    ]:  # range(1, fold_number + 1):
                         full_path = os.path.join(
                             path,
                             modality,
