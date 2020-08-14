@@ -46,17 +46,7 @@ if __name__ == "__main__":
                 for delta in columns:
                     mse = []
                     r_squared = []
-                    for fold in [
-                        1,
-                        2,
-                        3,
-                        4,
-                        5,
-                        6,
-                        8,
-                        9,
-                        10,
-                    ]:  # range(1, fold_number + 1):
+                    for fold in range(1, fold_number + 1):
                         full_path = os.path.join(
                             path,
                             modality,
@@ -65,11 +55,14 @@ if __name__ == "__main__":
                             "delta_{}".format(delta),
                             "soft_thres_{}".format(soft_thres),
                         )
-                        # print(full_path)
-                        mse.append(np.load(os.path.join(full_path, "mse.npy")))
-                        r_squared.append(
-                            np.load(os.path.join(full_path, "r_squared.npy"))
-                        )
+                        if os.path.exists(full_path):
+
+                            mse.append(np.load(os.path.join(full_path, "mse.npy")))
+                            r_squared.append(
+                                np.load(os.path.join(full_path, "r_squared.npy"))
+                            )
+                        else:
+                            print("missing : ", full_path)
                     print("MSE : ", mse)
                     print("MSE mean", np.mean(mse))
 
