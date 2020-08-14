@@ -30,10 +30,10 @@ def build_normalised_data(
     """
     This function now runs with numpy array vectorisation (not for everything... still some index), as the for loop version took days to load
     """
-    train_gyr_data = np.array([]).reshape(0, 2)
-    train_rsfmri_data = np.array([]).reshape(0, 2)
-    test_gyr_data = np.array([]).reshape(0, 2)
-    test_rsfmri_data = np.array([]).reshape(0, 2)
+    train_gyr_data = np.array([])
+    train_rsfmri_data = np.array([])
+    test_gyr_data = np.array([])
+    test_rsfmri_data = np.array([])
 
     subject_gyr_data = np.array([])
     subject_rs_data = np.array([])
@@ -88,17 +88,25 @@ def build_normalised_data(
         print(subject_gyr_data.shape)
         print(subject_gyr_data)
         # Add the subject's required vertices to data
-        test_gyr_data = np.concatenate(
-            (test_gyr_data, subject_gyr_data[subject_test_vertices])
+        test_gyr_data = (
+            np.concatenate((test_gyr_data, subject_gyr_data[subject_test_vertices]))
+            if test_gyr_data.size
+            else subject_gyr_data[subject_test_vertices]
+        )  # here we have to have this control because each of the modalities have a different size. time lost :/
+        test_rsfmri_data = (
+            np.concatenate((test_rsfmri_data, subject_rs_data[subject_test_vertices]))
+            if test_gyr_data.size
+            else subject_gyr_data[subject_test_vertices]
         )
-        test_rsfmri_data = np.concatenate(
-            (test_rsfmri_data, subject_rs_data[subject_test_vertices])
+        train_gyr_data = (
+            np.concatenate((train_gyr_data, subject_gyr_data[subject_train_vertices]))
+            if test_gyr_data.size
+            else subject_gyr_data[subject_test_vertices]
         )
-        train_gyr_data = np.concatenate(
-            (train_gyr_data, subject_gyr_data[subject_train_vertices])
-        )
-        train_rsfmri_data = np.concatenate(
-            (train_rsfmri_data, subject_rs_data[subject_train_vertices])
+        train_rsfmri_data = (
+            np.concatenate((train_rsfmri_data, subject_rs_data[subject_train_vertices]))
+            if test_gyr_data.size
+            else subject_gyr_data[subject_test_vertices]
         )
 
     scaler = MinMaxScaler()
