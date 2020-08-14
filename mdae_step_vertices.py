@@ -39,14 +39,20 @@ def build_normalised_data(
     subject_rs_data = np.array([])
     print("Load testdata...")
     # seperate subjects from vertices
-    subjects_indexes = index_subjects_vertices.T[0]
+    train_subjects_indexes = index_subjects_vertices[train_index].T[0]
+    test_subjects_indexes = index_subjects_vertices[test_index].T[0]
+
     train_vertices = index_subjects_vertices[train_index].T[1]
     test_vertices = index_subjects_vertices[test_index].T[1]
 
-    for subject_index in np.unique(subjects_indexes):
+    for subject_index in np.unique(
+        np.concatenate(
+            train_subjects_indexes, test_subjects_indexes
+        )  # for each unique subject index
+    ):
         # select the vertices we need for that specific subject
-        subject_train_vertices = train_vertices[subjects_indexes == subject_index]
-        subject_test_vertices = test_vertices[subjects_indexes == subject_index]
+        subject_train_vertices = train_vertices[train_subjects_indexes == subject_index]
+        subject_test_vertices = test_vertices[test_subjects_indexes == subject_index]
 
         # load a subject
         subject_gyr_data = load_data(
