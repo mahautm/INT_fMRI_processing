@@ -28,7 +28,7 @@ def build_normalised_data(
     test_index,
 ):
     """
-    This function now runs with numpy array acceleration, as the for loop version took days to load
+    This function now runs with numpy array vectorisation (not for everything... still some index), as the for loop version took days to load
     """
     train_gyr_data = []
     train_rsfmri_data = []
@@ -46,9 +46,7 @@ def build_normalised_data(
     test_vertices = index_subjects_vertices[test_index].T[1]
 
     for subject_index in np.unique(
-        np.concatenate(
-            train_subjects_indexes, test_subjects_indexes
-        )  # for each unique subject index
+        index_subjects_vertices.T[0]  # for each unique subject index
     ):
         # select the vertices we need for that specific subject
         subject_train_vertices = train_vertices[train_subjects_indexes == subject_index]
