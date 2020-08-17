@@ -240,6 +240,11 @@ def build_normalised_data(
     train_index,
     test_index,
 ):
+    """
+    Loads and normalises input data.
+
+
+    """
     train_gyr_data = np.concatenate(
         [
             load_data(
@@ -298,7 +303,9 @@ def build_normalised_data(
 # This is one I'm always using and that should really go in a function holder, or better : an object
 # might also need to be used in the mdae.py script instead of doing the writing part
 def build_path_and_vars(data_orig, data_type, dim_1, dim_2, fold):
-
+    """
+    Paths and variables used to access data should be built from here (centralisation)
+    """
     # Warning from previous script : That might be too many different paths. To solve that, one way would be to use os more,
     # Another would be to build a parameter object to drag everywhere, in between ? At least it is all in one place...
     if data_orig == "ABIDE":

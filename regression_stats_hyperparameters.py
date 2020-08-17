@@ -11,13 +11,13 @@ if __name__ == "__main__":
     # The dimensions are used accross 3 scripts, there should be a parameter file that is loaded, probably in json format
     dimensions = ["15-5"]
     fold_number = 3  # can be lower thant the actual number of folds calculated during regression, but not higher
-    path = "/scratch/mmahaut/data/abide/regression_output"  #
+    path = "/scratch/mmahaut/data/abide/regression_output"
     titles = [
         # "tfMRI",
         "gyrification",
         # "raw_input_tfMRI",
         "raw_input_gyrification",
-    ]  # Exists solely because using a / in the title screws up saving, and so modality cannot be it
+    ]  # Exists solely because using a / in the title screws up saving and so I could not use the "modality" variable
 
     fig, ax = plt.subplots()
     fig.patch.set_visible(False)
