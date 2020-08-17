@@ -100,7 +100,8 @@ def get_model_stats(
                     train_index,
                     test_index,
                 )
-
+                dim_2 = "15-5_vertex"
+                dim_1 = ""
                 multimodal_autoencoder = tf.keras.models.load_model(
                     "{}/{}-{}/fold_{}/multimodal_autoencoder.h5".format(
                         base_path, dim_1, dim_2, fold
@@ -378,8 +379,8 @@ def get_model_stats(
     plt.ylabel("Reconstruction error (MSE)")
     # showing legend
     plt.legend()
-    plt.savefig("reconstruction_error_mse.pdf")
-    plt.savefig("reconstruction_error_mse.png")
+    plt.savefig("{}/reconstruction_error_mse.pdf".format(base_path))
+    plt.savefig("{}/reconstruction_error_mse.png".format(base_path))
     plt.close()
     # plotting the rmse train
     # setting x and y axis range
@@ -389,8 +390,8 @@ def get_model_stats(
     plt.ylabel("Reconstruction error (RMSE)")
     # showing legend
     plt.legend()
-    plt.savefig("reconstruction_error_rmse.pdf")
-    plt.savefig("reconstruction_error_rmse.png")
+    plt.savefig("{}/reconstruction_error_rmse.pdf".format(base_path))
+    plt.savefig("{}/reconstruction_error_rmse.png".format(base_path))
     plt.close()
 
 
