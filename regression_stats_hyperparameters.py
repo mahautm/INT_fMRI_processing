@@ -11,12 +11,12 @@ if __name__ == "__main__":
     # The dimensions are used accross 3 scripts, there should be a parameter file that is loaded, probably in json format
     dimensions = ["15-5"]
     fold_number = 10  # can be lower thant the actual number of folds calculated during regression, but not higher
-    path = "/scratch/mmahaut/data/intertva/regression_output"  #
+    path = "/scratch/mmahaut/data/abide/regression_output"  #
     titles = [
         # "tfMRI",
         "gyrification",
         # "raw_input_tfMRI",
-        # "raw_input_gyrification",
+        "raw_input_gyrification",
     ]  # Exists solely because using a / in the title screws up saving, and so modality cannot be it
 
     fig, ax = plt.subplots()
@@ -28,16 +28,17 @@ if __name__ == "__main__":
     rsquared = []
 
     i = 0
-    # Here rows are for soft thres params
-    rows = [2e-6, 1e-6, 9e-7, 8e-7]
     # Here collumns are for delta params
-    columns = [1e-8, 1e-9, 1e-10]
+    columns = [1e-9, 1e-10, 1e-11]
+    # Here rows are for soft thres params
+    rows = [1e-9, 1e-10, 1e-11]
+
     for dim in dimensions:
         for modality in [
             # "tfMRI",
             "gyrification",
             # "raw_input/tfMRI",
-            # "raw_input/gyrification",
+            "raw_input/gyrification",
         ]:  # USED as an addition to the path variable
 
             cell_text = []
