@@ -39,7 +39,7 @@ def build_normalised_data(
     subject_rs_data = np.array([])
     print("Load testdata...")
     # seperate subjects from vertices. The arrays are supposed ordered, as any break from order wil break everything
-    all_subjects = np.unique(index_subjects_vertices.T[0])
+    # all_subjects = np.unique(index_subjects_vertices.T[0])
     # x = np.arrange(len(index_subjects_vertices))
     # x[train_index] = True
     # x[test_index] = False
@@ -212,16 +212,16 @@ if __name__ == "__main__":
     # Save the results weights
 
     multimodal_autoencoder.save(
-        "{}/{}/fold_{}/multimodal_autoencoder.h5".format(base_path, save_folder, fold)
+        "{}/-{}/fold_{}/multimodal_autoencoder.h5".format(base_path, save_folder, fold)
     )
     encoder_shared_layer.save(
-        "{}/{}/fold_{}/encoder_shared_layer.h5".format(base_path, save_folder, fold)
+        "{}/-{}/fold_{}/encoder_shared_layer.h5".format(base_path, save_folder, fold)
     )
     encoder_gyr.save(
-        "{}/{}/fold_{}/encoder_gyr.h5".format(base_path, save_folder, fold)
+        "{}/-{}/fold_{}/encoder_gyr.h5".format(base_path, save_folder, fold)
     )
     encoder_rsfmri.save(
-        "{}/{}/fold_{}/encoder_rsfmri.h5".format(base_path, save_folder, fold)
+        "{}/-{}/fold_{}/encoder_rsfmri.h5".format(base_path, save_folder, fold)
     )
 
     plt.plot(history.history["loss"], label="loss_fold_{}".format(fold))
@@ -231,7 +231,7 @@ if __name__ == "__main__":
     plt.ylabel("loss")
     plt.xlabel("epoch")
     plt.legend()
-    plt.savefig("{}/{}/fold_{}/loss.png".format(base_path, save_folder, fold))
-    plt.savefig("{}/{}/fold_{}/loss.pdf".format(base_path, save_folder, fold))
+    plt.savefig("{}/-{}/fold_{}/loss.png".format(base_path, save_folder, fold))
+    plt.savefig("{}/-{}/fold_{}/loss.pdf".format(base_path, save_folder, fold))
     plt.close()
 
