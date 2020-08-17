@@ -16,7 +16,7 @@ if __name__ == "__main__":
     data_type = sys.argv[2]  # tfMRI or gyrification
 
     # IJCNN paper points to 20 being the best dimension, with 5 to rsfMRI and 15 to tfMRI
-     dimensions_1 = [15]
+    dimensions_1 = [15]
     dimensions_2 = [5]
 
     # In the ABIDE case, we need to get the Y data to ensure proper repartition of asd and non-asd subjects
@@ -71,7 +71,14 @@ if __name__ == "__main__":
                             pass
                     np.save(os.path.join(fold_path, "train_index.npy"), train_index)
                     np.save(os.path.join(fold_path, "test_index.npy"), test_index)
-                    run_slurm_job_mdae(data_orig, data_type, "", "15-5_vertex", fold, script_name="mdae_step_vertices.py")
+                    run_slurm_job_mdae(
+                        data_orig,
+                        data_type,
+                        "",
+                        "15-5_vertex",
+                        fold,
+                        script_name="mdae_step_vertices.py",
+                    )
 
     elif data_orig == "interTVA":
         kf = KFold(n_splits=10)
@@ -110,7 +117,14 @@ if __name__ == "__main__":
                             pass
                     np.save(os.path.join(fold_path, "train_index.npy"), train_index)
                     np.save(os.path.join(fold_path, "test_index.npy"), test_index)
-                    run_slurm_job_mdae(data_orig, data_type, "", "15-5_vertex", fold, script_name="mdae_step_vertices.py")
+                    run_slurm_job_mdae(
+                        data_orig,
+                        data_type,
+                        "",
+                        "15-5_vertex",
+                        fold,
+                        script_name="mdae_step_vertices.py",
+                    )
     else:
         print(
             "Warning !! : Please provide data origin as parameter when calling script: either 'ABIDE' or 'interTVA' "
