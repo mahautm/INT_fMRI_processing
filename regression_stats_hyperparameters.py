@@ -10,7 +10,7 @@ import os
 if __name__ == "__main__":
     # The dimensions are used accross 3 scripts, there should be a parameter file that is loaded, probably in json format
     dimensions = ["15-5"]
-    fold_number = 10  # can be lower thant the actual number of folds calculated during regression, but not higher
+    fold_number = 3  # can be lower thant the actual number of folds calculated during regression, but not higher
     path = "/scratch/mmahaut/data/abide/regression_output"  #
     titles = [
         # "tfMRI",
