@@ -21,9 +21,7 @@ from mdae_step_vertices import build_normalised_data
 from mdae_step import build_path_and_vars
 
 
-def get_model_stats(
-    data_orig, data_type, dimensions_1, dimensions_2, number_folds="10"
-):
+def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
     """
 
     """
@@ -80,172 +78,158 @@ def get_model_stats(
     cvscores_rmse_rsfmri_test = []
 
     # Training
-    for dim_1 in dimensions_1:
-        for dim_2 in dimensions_2:
-            for fold in range(1, number_folds + 1):
+    for dim in dimensions:
+        for fold in range(1, number_folds + 1):
 
-                # Vertex design changes everything, lets add some code to make it work
-                (
-                    train_index,
-                    test_index,
-                    ref_subject,
-                    orig_path,
-                    base_path,
-                    index_subjects,
-                    sub_list,
-                ) = build_path_and_vars(data_orig, data_type, dim_1, dim_2, fold)
-                (
-                    normalized_train_gyr_data,
-                    normalized_test_gyr_data,
-                    normalized_train_rsfmri_data,
-                    normalized_test_rsfmri_data,
-                ) = build_normalised_data(
-                    data_orig,
-                    data_type,
-                    ref_subject,
-                    orig_path,
-                    sub_list,
-                    index_subjects,
-                    train_index,
-                    test_index,
-                )
-                dim_2 = "15-5_vertex"
-                dim_1 = ""
-                multimodal_autoencoder = tf.keras.models.load_model(
-                    "{}/{}-{}/fold_{}/multimodal_autoencoder.h5".format(
-                        base_path, dim_1, dim_2, fold
-                    )
-                )
+            # Vertex design changes everything, lets add some code to make it work
+            (
+                train_index,
+                test_index,
+                ref_subject,
+                orig_path,
+                base_path,
+                index_subjects,
+                sub_list,
+            ) = build_path_and_vars(data_orig, data_type, "", dim, fold)
+            (
+                normalized_train_gyr_data,
+                normalized_test_gyr_data,
+                normalized_train_rsfmri_data,
+                normalized_test_rsfmri_data,
+            ) = build_normalised_data(
+                data_orig,
+                data_type,
+                ref_subject,
+                orig_path,
+                sub_list,
+                index_subjects,
+                train_index,
+                test_index,
+            )
+            # This is hard coding a temporary solution : not good
 
-                print("Reconstruction of training data... ")
-                [X_train_new_gyr, X_train_new_rsfmri] = multimodal_autoencoder.predict(
-                    [normalized_train_gyr_data, normalized_train_rsfmri_data]
-                )
+            multimodal_autoencoder = tf.keras.models.load_model(
+                "{}/-{}/fold_{}/multimodal_autoencoder.h5".format(base_path, dim, fold)
+            )
 
-                # gyr
-                print(
-                    "Max value of predicted training gyr data ", np.max(X_train_new_gyr)
-                )
-                print(
-                    "Min value of predicted training gyr data", np.min(X_train_new_gyr)
-                )
-                print("Reconstructed gyr matrix shape:", X_train_new_gyr.shape)
-                val_mse_train_gyr = mean_squared_error(
-                    normalized_train_gyr_data, X_train_new_gyr
-                )
-                cvscores_mse_gyr_train.append(val_mse_train_gyr)
-                print("Reconstruction MSE of gyr:", val_mse_train_gyr)
-                val_rmse_gyr = sqrt(val_mse_train_gyr)
-                print("Reconstruction RMSE of gyr : ", val_rmse_gyr)
-                cvscores_rmse_gyr_train.append(val_rmse_gyr)
+            print("Reconstruction of training data... ")
+            [X_train_new_gyr, X_train_new_rsfmri] = multimodal_autoencoder.predict(
+                [normalized_train_gyr_data, normalized_train_rsfmri_data]
+            )
 
-                # rsfmri
+            # gyr
+            print("Max value of predicted training gyr data ", np.max(X_train_new_gyr))
+            print("Min value of predicted training gyr data", np.min(X_train_new_gyr))
+            print("Reconstructed gyr matrix shape:", X_train_new_gyr.shape)
+            val_mse_train_gyr = mean_squared_error(
+                normalized_train_gyr_data, X_train_new_gyr
+            )
+            cvscores_mse_gyr_train.append(val_mse_train_gyr)
+            print("Reconstruction MSE of gyr:", val_mse_train_gyr)
+            val_rmse_gyr = sqrt(val_mse_train_gyr)
+            print("Reconstruction RMSE of gyr : ", val_rmse_gyr)
+            cvscores_rmse_gyr_train.append(val_rmse_gyr)
 
-                print(
-                    "Max value of predicted training rsfmri data ",
-                    np.max(X_train_new_rsfmri),
-                )
-                print(
-                    "Min value of predicted training rsfmri data",
-                    np.min(X_train_new_rsfmri),
-                )
-                print("Reconstructed rsfmri matrix shape:", X_train_new_rsfmri.shape)
-                val_mse_train_rsfmri = mean_squared_error(
-                    normalized_train_rsfmri_data, X_train_new_rsfmri
-                )
-                cvscores_mse_rsfmri_train.append(val_mse_train_rsfmri)
-                print("Reconstruction MSE of rsfmri:", val_mse_train_rsfmri)
-                val_rmse_rsfmri = sqrt(val_mse_train_rsfmri)
-                print("Reconstruction RMSE of rsfmri : ", val_rmse_rsfmri)
-                cvscores_rmse_rsfmri_train.append(val_rmse_rsfmri)
+            # rsfmri
 
-                # sum of MSE (gyr + rsfmri)
-                cvscores_mse_train.append(
-                    np.sum([val_mse_train_gyr, val_mse_train_rsfmri])
-                )
-                # sum of RMSE (gyr + rsfmri)
-                cvscores_rmse_train.append(
-                    sqrt(np.sum([val_mse_train_gyr, val_mse_train_rsfmri]))
-                )
-                # mean of MSE (gyr + rsfmri)/2
+            print(
+                "Max value of predicted training rsfmri data ",
+                np.max(X_train_new_rsfmri),
+            )
+            print(
+                "Min value of predicted training rsfmri data",
+                np.min(X_train_new_rsfmri),
+            )
+            print("Reconstructed rsfmri matrix shape:", X_train_new_rsfmri.shape)
+            val_mse_train_rsfmri = mean_squared_error(
+                normalized_train_rsfmri_data, X_train_new_rsfmri
+            )
+            cvscores_mse_rsfmri_train.append(val_mse_train_rsfmri)
+            print("Reconstruction MSE of rsfmri:", val_mse_train_rsfmri)
+            val_rmse_rsfmri = sqrt(val_mse_train_rsfmri)
+            print("Reconstruction RMSE of rsfmri : ", val_rmse_rsfmri)
+            cvscores_rmse_rsfmri_train.append(val_rmse_rsfmri)
 
-                # Reconstruction of test data
-                print("Reconstruction of test data... ")
-                [X_test_new_gyr, X_test_new_rsfmri] = multimodal_autoencoder.predict(
-                    [normalized_test_gyr_data, normalized_test_rsfmri_data]
-                )
+            # sum of MSE (gyr + rsfmri)
+            cvscores_mse_train.append(np.sum([val_mse_train_gyr, val_mse_train_rsfmri]))
+            # sum of RMSE (gyr + rsfmri)
+            cvscores_rmse_train.append(
+                sqrt(np.sum([val_mse_train_gyr, val_mse_train_rsfmri]))
+            )
+            # mean of MSE (gyr + rsfmri)/2
 
-                # Test
-                # gyr
-                print(
-                    "Max value of predicted testing gyr data ", np.max(X_test_new_gyr)
-                )
-                print("Min value of predicted testing gyr data", np.min(X_test_new_gyr))
-                print("Reconstructed gyr matrix shape:", X_test_new_gyr.shape)
-                val_mse_test_gyr = mean_squared_error(
-                    normalized_test_gyr_data, X_test_new_gyr
-                )
-                cvscores_mse_gyr_test.append(val_mse_test_gyr)
-                print("Reconstruction MSE of gyr:", val_mse_test_gyr)
-                val_rmse_gyr = sqrt(val_mse_test_gyr)
-                print("Reconstruction RMSE of gyr : ", val_rmse_gyr)
-                cvscores_rmse_gyr_test.append(val_rmse_gyr)
+            # Reconstruction of test data
+            print("Reconstruction of test data... ")
+            [X_test_new_gyr, X_test_new_rsfmri] = multimodal_autoencoder.predict(
+                [normalized_test_gyr_data, normalized_test_rsfmri_data]
+            )
 
-                # rsfmri
+            # Test
+            # gyr
+            print("Max value of predicted testing gyr data ", np.max(X_test_new_gyr))
+            print("Min value of predicted testing gyr data", np.min(X_test_new_gyr))
+            print("Reconstructed gyr matrix shape:", X_test_new_gyr.shape)
+            val_mse_test_gyr = mean_squared_error(
+                normalized_test_gyr_data, X_test_new_gyr
+            )
+            cvscores_mse_gyr_test.append(val_mse_test_gyr)
+            print("Reconstruction MSE of gyr:", val_mse_test_gyr)
+            val_rmse_gyr = sqrt(val_mse_test_gyr)
+            print("Reconstruction RMSE of gyr : ", val_rmse_gyr)
+            cvscores_rmse_gyr_test.append(val_rmse_gyr)
 
-                print(
-                    "Max value of predicted testing rsfmri data ",
-                    np.max(X_test_new_rsfmri),
-                )
-                print(
-                    "Min value of predicted testing rsfmri data",
-                    np.min(X_test_new_rsfmri),
-                )
-                print("Reconstructed rsfmri matrix shape:", X_test_new_rsfmri.shape)
-                val_mse_test_rsfmri = mean_squared_error(
-                    normalized_test_rsfmri_data, X_test_new_rsfmri
-                )
-                cvscores_mse_rsfmri_test.append(val_mse_test_rsfmri)
-                print("Reconstruction MSE of rsfmri:", val_mse_test_rsfmri)
-                val_rmse_rsfmri = sqrt(val_mse_test_rsfmri)
-                print("Reconstruction RMSE of rsfmri : ", val_rmse_rsfmri)
-                cvscores_rmse_rsfmri_test.append(val_rmse_rsfmri)
+            # rsfmri
 
-                # sum of MSE (gyr + rsfmri)
-                cvscores_mse_test.append(
-                    np.sum([val_mse_test_gyr, val_mse_test_rsfmri])
-                )
-                # sum of MSE (gyr + rsfmri)
-                cvscores_rmse_test.append(
-                    sqrt(np.sum([val_mse_test_gyr, val_mse_test_rsfmri]))
-                )
+            print(
+                "Max value of predicted testing rsfmri data ",
+                np.max(X_test_new_rsfmri),
+            )
+            print(
+                "Min value of predicted testing rsfmri data", np.min(X_test_new_rsfmri),
+            )
+            print("Reconstructed rsfmri matrix shape:", X_test_new_rsfmri.shape)
+            val_mse_test_rsfmri = mean_squared_error(
+                normalized_test_rsfmri_data, X_test_new_rsfmri
+            )
+            cvscores_mse_rsfmri_test.append(val_mse_test_rsfmri)
+            print("Reconstruction MSE of rsfmri:", val_mse_test_rsfmri)
+            val_rmse_rsfmri = sqrt(val_mse_test_rsfmri)
+            print("Reconstruction RMSE of rsfmri : ", val_rmse_rsfmri)
+            cvscores_rmse_rsfmri_test.append(val_rmse_rsfmri)
 
-            # Attempt to prevent memory leak on skylake machine, legacy from when this was a loop
-            # K.clear_session()
+            # sum of MSE (gyr + rsfmri)
+            cvscores_mse_test.append(np.sum([val_mse_test_gyr, val_mse_test_rsfmri]))
+            # sum of MSE (gyr + rsfmri)
+            cvscores_rmse_test.append(
+                sqrt(np.sum([val_mse_test_gyr, val_mse_test_rsfmri]))
+            )
+
+        # Attempt to prevent memory leak on skylake machine, legacy from when this was a loop
+        # K.clear_session()
 
         # Save MSE, RMSE (gyr + rsfmr)
         print("shape of vector mse train", np.array([cvscores_mse_train]).shape)
         print(cvscores_mse_train)
         np.save(
-            "{}/{}-{}/cvscores_mse_train.npy".format(base_path, dim_1, dim_2),
+            "{}/-{}/cvscores_mse_train.npy".format(base_path, dim),
             np.array([cvscores_mse_train]),
         )
         print("shape of  mse vector(test):", np.array([cvscores_mse_test]).shape)
         print(cvscores_mse_test)
         np.save(
-            "{}/{}-{}/cvscores_mse_test.npy".format(base_path, dim_1, dim_2),
+            "{}/-{}/cvscores_mse_test.npy".format(base_path, dim),
             np.array([cvscores_mse_test]),
         )
         print("shape of rmse vector (train):", np.array([cvscores_rmse_train]).shape)
         print(cvscores_rmse_train)
         np.save(
-            "{}/{}-{}/cvscores_rmse_train.npy".format(base_path, dim_1, dim_2),
+            "{}/-{}/cvscores_rmse_train.npy".format(base_path, dim),
             np.array([cvscores_rmse_train]),
         )
         print("shape of rmse vector (test):", np.array([cvscores_rmse_test]).shape)
         print(cvscores_rmse_test)
         np.save(
-            "{}/{}-{}/cvscores_rmse_test.npy".format(base_path, dim_1, dim_2),
+            "{}/-{}/cvscores_rmse_test.npy".format(base_path, dim),
             np.array([cvscores_rmse_test]),
         )
         print(
@@ -267,13 +251,13 @@ def get_model_stats(
         )
         print(cvscores_mse_gyr_train)
         np.save(
-            "{}/{}-{}/cvscores_mse_gyr_train.npy".format(base_path, dim_1, dim_2),
+            "{}/-{}/cvscores_mse_gyr_train.npy".format(base_path, dim),
             np.array([cvscores_mse_gyr_train]),
         )
         print("shape of  mse vector(test):", np.array([cvscores_mse_gyr_test]).shape)
         print(cvscores_mse_gyr_test)
         np.save(
-            "{}/{}-{}/cvscores_mse_gyr_test.npy".format(base_path, dim_1, dim_2),
+            "{}/-{}/cvscores_mse_gyr_test.npy".format(base_path, dim),
             np.array([cvscores_mse_gyr_test]),
         )
         print(
@@ -281,7 +265,7 @@ def get_model_stats(
         )
         print(cvscores_rmse_gyr_train)
         np.save(
-            "{}/{}-{}/cvscores_rmse_gyr_train.npy".format(base_path, dim_1, dim_2),
+            "{}/-{}/cvscores_rmse_gyr_train.npy".format(base_path, dim),
             np.array([cvscores_rmse_gyr_test]),
         )
         print(
@@ -289,7 +273,7 @@ def get_model_stats(
         )
         print(cvscores_rmse_gyr_test)
         np.save(
-            "{}/{}-{}/cvscores_rmse_gyr_test.npy".format(base_path, dim_1, dim_2),
+            "{}/-{}/cvscores_rmse_gyr_test.npy".format(base_path, dim),
             np.array([cvscores_rmse_gyr_test]),
         )
         mse_gyr_train.append(np.mean(cvscores_mse_gyr_train))
@@ -308,13 +292,13 @@ def get_model_stats(
         )
         print(cvscores_mse_rsfmri_train)
         np.save(
-            "{}/{}-{}/cvscores_mse_rsfmri_train.npy".format(base_path, dim_1, dim_2),
+            "{}/-{}/cvscores_mse_rsfmri_train.npy".format(base_path, dim),
             np.array([cvscores_mse_rsfmri_train]),
         )
         print("shape of  mse vector(test):", np.array([cvscores_mse_rsfmri_test]).shape)
         print(cvscores_mse_rsfmri_test)
         np.save(
-            "{}/{}-{}/cvscores_mse_rsfmri_test.npy".format(base_path, dim_1, dim_2),
+            "{}/-{}/cvscores_mse_rsfmri_test.npy".format(base_path, dim),
             np.array([cvscores_mse_rsfmri_test]),
         )
         print(
@@ -323,7 +307,7 @@ def get_model_stats(
         )
         print(cvscores_rmse_rsfmri_train)
         np.save(
-            "{}/{}-{}/cvscores_rmse_rsfmri_train.npy".format(base_path, dim_1, dim_2),
+            "{}/-{}/cvscores_rmse_rsfmri_train.npy".format(base_path, dim),
             np.array([cvscores_rmse_rsfmri_test]),
         )
         print(
@@ -332,7 +316,7 @@ def get_model_stats(
         )
         print(cvscores_rmse_rsfmri_test)
         np.save(
-            "{}/{}-{}/cvscores_rmse_rsfmri_test.npy".format(base_path, dim_1, dim_2),
+            "{}/-{}/cvscores_rmse_rsfmri_test.npy".format(base_path, dim),
             np.array([cvscores_rmse_rsfmri_test]),
         )
         mse_rsfmri_train.append(np.mean(cvscores_mse_rsfmri_train))
@@ -405,10 +389,9 @@ def get_model_stats(
 
 
 if __name__ == "__main__":
-    # The dimensions are used accross 3 scripts, there should be a parameter file that is loaded, probably in json format
-    dimensions_1 = [15]
-    dimensions_2 = [5]
+    # The dimension is used accross 3 scripts, there should be a parameter file that is loaded, probably in json format
+    dimensions = ["15-5_vertex"]
 
     data_orig = sys.argv[1]  # Could either be "ABIDE" or "interTVA"
     data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
-    get_model_stats(data_orig, data_type, dimensions_1, dimensions_2, 10)
+    get_model_stats(data_orig, data_type, dimensions, 10)
