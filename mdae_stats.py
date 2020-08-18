@@ -14,12 +14,19 @@ from math import sqrt
 import numpy as np
 import tensorflow as tf
 
-import mdae_step as mds
+# !! if this is not used with vertices training, use the function from mdae_step only
+from mdae_step_vertices import build_normalised_data
+
+# from mdae_step import build_normalised_data
+from mdae_step import build_path_and_vars
 
 
 def get_model_stats(
     data_orig, data_type, dimensions_1, dimensions_2, number_folds="10"
 ):
+    """
+
+    """
     # Tables:
     mse_train = []
     mse_test = []
@@ -76,6 +83,8 @@ def get_model_stats(
     for dim_1 in dimensions_1:
         for dim_2 in dimensions_2:
             for fold in range(1, number_folds + 1):
+
+                # Vertex design changes everything, lets add some code to make it work
                 (
                     train_index,
                     test_index,
@@ -84,13 +93,13 @@ def get_model_stats(
                     base_path,
                     index_subjects,
                     sub_list,
-                ) = mds.build_path_and_vars(data_orig, data_type, dim_1, dim_2, fold)
+                ) = build_path_and_vars(data_orig, data_type, dim_1, dim_2, fold)
                 (
                     normalized_train_gyr_data,
                     normalized_test_gyr_data,
                     normalized_train_rsfmri_data,
                     normalized_test_rsfmri_data,
-                ) = mds.build_normalised_data(
+                ) = build_normalised_data(
                     data_orig,
                     data_type,
                     ref_subject,
