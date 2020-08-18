@@ -91,6 +91,11 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
                 index_subjects,
                 sub_list,
             ) = build_path_and_vars(data_orig, data_type, "", dim, fold)
+
+            index_vertices = np.arange(0, 20484)
+            index_subject_vertices = np.array(
+                np.meshgrid(index_subjects, index_vertices)
+            ).T.reshape(-1, 2)
             (
                 normalized_train_gyr_data,
                 normalized_test_gyr_data,
@@ -102,7 +107,7 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
                 ref_subject,
                 orig_path,
                 sub_list,
-                index_subjects,
+                index_subject_vertices,
                 train_index,
                 test_index,
             )
