@@ -371,8 +371,8 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
     # plotting the mse train
 
     # Here what we really want is all the combinations between dimensions_1 and 2, and not just dimensions_1
-    plt.plot(dimensions_1, mse_train, label="mse_train")
-    plt.plot(dimensions_1, mse_test, label="mse_test")
+    plt.plot(dimensions, mse_train, label="mse_train")
+    plt.plot(dimensions, mse_test, label="mse_test")
     plt.xlabel("Encoding dimension")
     plt.ylabel("Reconstruction error (MSE)")
     # showing legend
@@ -382,8 +382,8 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
     plt.close()
     # plotting the rmse train
     # setting x and y axis range
-    plt.plot(dimensions_1, rmse_train, label="rmse_train")
-    plt.plot(dimensions_1, rmse_test, label="rmse_test")
+    plt.plot(dimensions, rmse_train, label="rmse_train")
+    plt.plot(dimensions, rmse_test, label="rmse_test")
     plt.xlabel("Encoding dimension")
     plt.ylabel("Reconstruction error (RMSE)")
     # showing legend
