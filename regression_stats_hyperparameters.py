@@ -35,10 +35,10 @@ if __name__ == "__main__":
 
     for dim in dimensions:
         for modality in [
-            # "tfMRI",
-            "gyrification",
-            # "raw_input/tfMRI",
-            "raw_input/gyrification",
+            "tfMRI",
+            # "gyrification",
+            "raw_input/tfMRI",
+            # "raw_input/gyrification",
         ]:  # USED as an addition to the path variable
 
             cell_text = []
