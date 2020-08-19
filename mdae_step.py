@@ -243,6 +243,23 @@ def build_normalised_data(
     """
     Loads and normalises input data.
 
+    Parameters
+    ----------
+    data_orig : {"ABIDE","interTVA"}
+        indicates which data set is used. ABIDE is a dataset with subjects on the autism spectrum and control subjects,
+        InterTVA is a dataset where non-pathological subjects are given sound recognition tasks. 
+    
+    data_type : {"tfMRI","gyrification"}
+        The multi-modal auto-encoder uses two modalities to build it's representations. One is resting-state fMRI, and the other
+        is either task fMRI (tfMRI) or an anatomical modality which represents the folds in the subject's brain, (gyrification)
+
+    ref_subject : string
+        subject used as reference for eigenvector sign in gyrification modality. Required as it appears in file name.
+
+    orig_path : string, path
+        root of where we can find the data to load
+    
+    sub_list : list of strings
 
     """
     train_gyr_data = np.concatenate(
@@ -352,7 +369,9 @@ def build_path_and_vars(data_orig, data_type, dim_1, dim_2, fold):
 if __name__ == "__main__":
 
     data_orig = sys.argv[1]  # {"ABIDE", "interTVA"}
-    data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
+    data_type = sys.argv[
+        2
+    ]  # could be "tfMRI" or "gyrification" (or tfMRI+gyr, or trimodal)
     dim_1 = int(sys.argv[3])  # 15 according to paper works best
     dim_2 = int(sys.argv[4])  # 5 according to paper works best
     fold = int(sys.argv[5])  # int belonging to [1,10]

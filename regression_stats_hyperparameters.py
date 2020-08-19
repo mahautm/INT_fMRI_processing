@@ -17,7 +17,7 @@ if __name__ == "__main__":
         # "gyrification",
         "raw_input_tfMRI",
         # "raw_input_gyrification",
-    ]  # Exists solely because using a / in the title screws up saving and so I could not use the "modality" variable
+    ]  # Exists solely because using "/"" in the title screws up saving and so I could not use the "modality" variable
 
     fig, ax = plt.subplots()
     fig.patch.set_visible(False)
