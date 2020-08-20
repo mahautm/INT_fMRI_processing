@@ -144,8 +144,8 @@ if __name__ == "__main__":
     # IJCNN paper points to 20 being the best dimension, with 5 to rsfMRI and 15 to tfMRI
 
     # dimensions = [20] # Legacy... it used to give equal importance to both
-    dimensions_1 = [15]
-    dimensions_2 = [5]
+    dimensions_1 = [18, 17, 16, 14, 13, 12, 11, 10]
+    dimensions_2 = [2, 3, 4, 6, 7, 8, 9, 10]
 
     # In the ABIDE case, we need to get the Y data to ensure proper repartition of asd and non-asd subjects
     Y = []
