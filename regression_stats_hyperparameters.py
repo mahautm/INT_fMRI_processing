@@ -14,9 +14,9 @@ if __name__ == "__main__":
     path = "/scratch/mmahaut/data/intertva/regression_output"
     titles = [
         "tfMRI",
-        "gyrification",
-        "raw_input_tfMRI",
-        "raw_input_gyrification",
+        # "gyrification",
+        # "raw_input_tfMRI",
+        # "raw_input_gyrification",
     ]  # Exists solely because using "/"" in the title screws up saving and so I could not use the "modality" variable
 
     fig, ax = plt.subplots()
@@ -36,9 +36,9 @@ if __name__ == "__main__":
     for dim in dimensions:
         for modality in [
             "tfMRI",
-            "gyrification",
-            "raw_input/tfMRI",
-            "raw_input/gyrification",
+            # "gyrification",
+            # "raw_input/tfMRI",
+            # "raw_input/gyrification",
         ]:  # USED as an addition to the path variable
 
             cell_text = []
