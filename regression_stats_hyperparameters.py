@@ -53,8 +53,8 @@ if __name__ == "__main__":
                             modality,
                             str(dim),
                             "fold_{}".format(fold),
-                            "delta_{}".format(delta),
-                            "soft_thres_{}".format(soft_thres),
+                            "delta_{}".format(float(delta)),
+                            "soft_thres_{}".format(float(soft_thres)),
                         )
                         if os.path.exists(full_path):
 
