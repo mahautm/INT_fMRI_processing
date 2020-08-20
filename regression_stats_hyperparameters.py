@@ -29,9 +29,9 @@ if __name__ == "__main__":
 
     i = 0
     # Here collumns are for delta params
-    columns = [1e-3, 1e-2, 1e-1, 1]
+    columns = [0, 1e-2, 1e-3, 1e-4]
     # Here rows are for soft thres params
-    rows = [5e-4, 1e-4, 1e-3, 1e-2, 1e-1, 1]
+    rows = [5e-5, 1e-4, 2e-4, 3e-4, 4e-4, 5e-4]
 
     for dim in dimensions:
         for modality in [

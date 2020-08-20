@@ -106,11 +106,11 @@ def run_slurm_job_regression(
 if __name__ == "__main__":
 
     params_grid = {}
-    params_grid["delta"] = [1e-3, 1e-2, 1e-1, 1]  # list values to grid_search on
-    params_grid["soft_thresh"] = [5e-4, 1e-4, 1e-3, 1e-2, 1e-1, 1]
-    params_grid["modality"] = ["gyrification", "tfMRI"]  # ["gyrification", "tfMRI"]
+    params_grid["delta"] = [0, 1e-2, 1e-3, 1e-4]  # list values to grid_search on
+    params_grid["soft_thresh"] = [5e-5, 1e-4, 2e-4, 3e-4, 4e-4, 5e-4]
+    params_grid["modality"] = ["tfMRI"]  # ["gyrification", "tfMRI"]
     params_grid["data_source"] = ["interTVA"]  # ["ABIDE", "interTVA"]
-    params_grid["auto_encoded"] = [True, False]  # [True, False]
+    params_grid["auto_encoded"] = [True]  # [True, False]
     params_grid[
         "fold"
     ] = 10  # More folds, means better representation, but more resources used
