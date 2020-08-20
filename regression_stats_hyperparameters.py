@@ -14,9 +14,9 @@ if __name__ == "__main__":
     path = "/scratch/mmahaut/data/intertva/regression_output"
     titles = [
         "tfMRI",
-        # "gyrification",
+        "gyrification",
         "raw_input_tfMRI",
-        # "raw_input_gyrification",
+        "raw_input_gyrification",
     ]  # Exists solely because using "/"" in the title screws up saving and so I could not use the "modality" variable
 
     fig, ax = plt.subplots()
@@ -29,16 +29,16 @@ if __name__ == "__main__":
 
     i = 0
     # Here collumns are for delta params
-    columns = [1e-5, 1e-6, 1e-7]
+    columns = [1e-3, 1e-2, 1e-1, 1]
     # Here rows are for soft thres params
-    rows = [1e-9, 1e-10, 1e-11, 1e-12]
+    rows = [5e-4, 1e-4, 1e-3, 1e-2, 1e-1, 1]
 
     for dim in dimensions:
         for modality in [
             "tfMRI",
-            # "gyrification",
+            "gyrification",
             "raw_input/tfMRI",
-            # "raw_input/gyrification",
+            "raw_input/gyrification",
         ]:  # USED as an addition to the path variable
 
             cell_text = []
