@@ -6,6 +6,10 @@ from keras.optimizers import Adam
 
 
 def build_model(dim_1, dim_2, input_shape_1, input_shape_2, hidden_layer, output_layer):
+    print(dim_1, dim_2)
+    dim_1 = int(dim_1)
+    dim_2 = int(dim_2)
+
     # Apply linear autoencoder
     # Inputs Shape
     input_view_1 = Input(shape=(input_shape_1))
