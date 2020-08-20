@@ -33,13 +33,17 @@ def build_model(dim_1, dim_2, input_shape_1, input_shape_2, hidden_layer, output
     # Decoder Model
     decoded_1 = Dense(dim_1, activation=hidden_layer)(shared_layer)
     decoded_1 = Dense(100, activation=hidden_layer)(decoded_1)
-    decoded_1 = Dense(input_shape_1, activation=output_layer, name="dec_1",)(decoded_1)
+    decoded_1 = Dense(input_shape_1[0], activation=output_layer, name="dec_1",)(
+        decoded_1
+    )
     print("decoded_1", decoded_1.shape)
 
     # Second view
     decoded_2 = Dense(dim_2, activation=hidden_layer)(shared_layer)
     decoded_2 = Dense(100, activation=hidden_layer)(decoded_2)
-    decoded_2 = Dense(input_shape_2, activation=output_layer, name="dec_2",)(decoded_2)
+    decoded_2 = Dense(input_shape_2[0], activation=output_layer, name="dec_2",)(
+        decoded_2
+    )
     print("decoded_2", decoded_2.shape)
 
     # This model maps an input to its reconstruction
