@@ -68,7 +68,9 @@ if __name__ == "__main__":
     dimensions_1 = [18, 17, 16, 14, 13, 12, 11, 10]
     dimensions_2 = [2, 3, 4, 6, 7, 8, 9, 10]
     dimensions = np.array([])
-
+    for dim_1 in dimensions_1:
+        for dim_2 in dimensions_2:
+            dimensions = dimensions.append(str(dim_1) + str(dim_2))
     # data_orig = sys.argv[1]
     # data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
     paths_to_analyse = [
