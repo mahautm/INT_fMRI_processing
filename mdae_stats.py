@@ -395,8 +395,15 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
 
 if __name__ == "__main__":
     # The dimension is used accross 3 scripts, there should be a parameter file that is loaded, probably in json format
-    dimensions = ["15-5_vertex"]
+    # dimensions = ["15-5_vertex"]
 
+    dimensions_1 = [18, 17, 16, 14, 13, 12, 11, 10]
+    dimensions_2 = [2, 3, 4, 6, 7, 8, 9, 10]
+    dimensions = np.array([])
+
+    for dim_1 in dimensions_1:
+        for dim_2 in dimensions_2:
+            dimensions = [..., str(dim_1) + str(dim_2)]
     data_orig = sys.argv[1]  # Could either be "ABIDE" or "interTVA"
     data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
     get_model_stats(data_orig, data_type, dimensions, 10)
