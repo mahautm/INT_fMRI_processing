@@ -219,7 +219,7 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
                 sqrt(np.sum([val_mse_test_gyr, val_mse_test_rsfmri])),
             )
 
-            # Attempt to prevent memory leak on skylake machine, legacy from when this was a loop
+            # Attempt to prevent memory leak on skylake machine, it does not seem to work.
             K.clear_session()
             gc.collect()
 
@@ -343,6 +343,8 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
         np.append(std_rmse_rsfmri_train, np.std(cvscores_rmse_rsfmri_train))
         np.append(rmse_rsfmri_test, np.mean(cvscores_rmse_rsfmri_test))
         np.append(std_rmse_rsfmri_test, np.std(cvscores_rmse_rsfmri_test))
+        gc.collect()
+    gc.collect()
 
     # save MSE, RMSE, and STD vectors for training and test sets
     np.save("{}/mse_train_mean.npy".format(base_path), np.array([mse_train]))
