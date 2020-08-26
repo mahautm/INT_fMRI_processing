@@ -29,56 +29,56 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
 
     """
     # Tables:
-    mse_train = []
-    mse_test = []
+    mse_train = np.array([])
+    mse_test = np.array([])
     # RMSE (gyr+ rsfmri)
-    rmse_train = []
-    rmse_test = []
+    rmse_train = np.array([])
+    rmse_test = np.array([])
     #
     # Standard deviation MSE (gyr+ rsfmri)
-    std_mse_train = []
-    std_mse_test = []
+    std_mse_train = np.array([])
+    std_mse_test = np.array([])
     # Standard deviation RMSE (gyr+ rsfmri)
-    std_rmse_train = []
-    std_rmse_test = []
+    std_rmse_train = np.array([])
+    std_rmse_test = np.array([])
     # MSE (gyr)
-    mse_gyr_train = []
-    mse_gyr_test = []
+    mse_gyr_train = np.array([])
+    mse_gyr_test = np.array([])
     # RMSE (gyr)
-    rmse_gyr_train = []
-    rmse_gyr_test = []
+    rmse_gyr_train = np.array([])
+    rmse_gyr_test = np.array([])
     # std mse (gyr)
-    std_mse_gyr_train = []
-    std_mse_gyr_test = []
+    std_mse_gyr_train = np.array([])
+    std_mse_gyr_test = np.array([])
     # std rmse (gyr)
-    std_rmse_gyr_train = []
-    std_rmse_gyr_test = []
+    std_rmse_gyr_train = np.array([])
+    std_rmse_gyr_test = np.array([])
 
     # MSE (rsfmri)
-    mse_rsfmri_train = []
-    mse_rsfmri_test = []
+    mse_rsfmri_train = np.array([])
+    mse_rsfmri_test = np.array([])
     # RMSE (rsfmri)
-    rmse_rsfmri_train = []
-    rmse_rsfmri_test = []
+    rmse_rsfmri_train = np.array([])
+    rmse_rsfmri_test = np.array([])
     # std mse (rsfmri)
-    std_mse_rsfmri_train = []
-    std_mse_rsfmri_test = []
+    std_mse_rsfmri_train = np.array([])
+    std_mse_rsfmri_test = np.array([])
     # std rmse (rsfmri)
-    std_rmse_rsfmri_train = []
-    std_rmse_rsfmri_test = []
+    std_rmse_rsfmri_train = np.array([])
+    std_rmse_rsfmri_test = np.array([])
 
-    cvscores_mse_test = []
-    cvscores_rmse_test = []
-    cvscores_mse_train = []
-    cvscores_rmse_train = []
-    cvscores_mse_gyr_train = []
-    cvscores_mse_gyr_test = []
-    cvscores_rmse_gyr_train = []
-    cvscores_rmse_gyr_test = []
-    cvscores_mse_rsfmri_train = []
-    cvscores_mse_rsfmri_test = []
-    cvscores_rmse_rsfmri_train = []
-    cvscores_rmse_rsfmri_test = []
+    cvscores_mse_test = np.array([])
+    cvscores_rmse_test = np.array([])
+    cvscores_mse_train = np.array([])
+    cvscores_rmse_train = np.array([])
+    cvscores_mse_gyr_train = np.array([])
+    cvscores_mse_gyr_test = np.array([])
+    cvscores_rmse_gyr_train = np.array([])
+    cvscores_rmse_gyr_test = np.array([])
+    cvscores_mse_rsfmri_train = np.array([])
+    cvscores_mse_rsfmri_test = np.array([])
+    cvscores_rmse_rsfmri_train = np.array([])
+    cvscores_rmse_rsfmri_test = np.array([])
 
     # Training
     for dim in dimensions:
@@ -213,9 +213,9 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
                 sqrt(np.sum([val_mse_test_gyr, val_mse_test_rsfmri]))
             )
 
-        # Attempt to prevent memory leak on skylake machine, legacy from when this was a loop
-        K.clear_session()
-        gc.collect()
+            # Attempt to prevent memory leak on skylake machine, legacy from when this was a loop
+            K.clear_session()
+            gc.collect()
 
         # Save MSE, RMSE (gyr + rsfmr)
         print("shape of vector mse train", np.array([cvscores_mse_train]).shape)
