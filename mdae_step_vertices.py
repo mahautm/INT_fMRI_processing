@@ -108,7 +108,9 @@ if __name__ == "__main__":
 
     data_orig = sys.argv[1]  # {"ABIDE", "interTVA"}
     data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
-    save_folder = sys.argv[3]  # Here for now the name 15-5_vertex has been chosen
+    save_folder = "-" + str(
+        sys.argv[3]
+    )  # Here for now the name 15-5_vertex has been chosen
     fold = int(sys.argv[4])  # int belonging to [1,10]
 
     (
@@ -119,7 +121,7 @@ if __name__ == "__main__":
         base_path,
         index_subjects,
         sub_list,
-    ) = build_path_and_vars(data_orig, data_type, "", save_folder, fold)
+    ) = build_path_and_vars(data_orig, data_type, save_folder, fold)
 
     # activation functions, relu / linear gives best results according to IJCNN paper, my test on dim 20 doesn't seem to change much
     hidden_layer = "relu"

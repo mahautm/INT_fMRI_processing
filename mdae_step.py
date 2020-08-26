@@ -260,6 +260,13 @@ def build_normalised_data(
         root of where we can find the data to load
     
     sub_list : list of strings
+        All subjects that the training will take effect on.
+
+    index_subjects : 
+
+    train_index : 
+
+    test_index : 
 
     """
     train_gyr_data = np.concatenate(
@@ -319,9 +326,27 @@ def build_normalised_data(
 
 # This is one I'm always using and that should really go in a function holder, or better : an object
 # might also need to be used in the mdae.py script instead of doing the writing part
-def build_path_and_vars(data_orig, data_type, dim_1, dim_2, fold):
+def build_path_and_vars(data_orig, data_type, dim, fold):
     """
     Paths and variables used to access data should be built from here (centralisation)
+
+    Parameters
+    ----------
+    data_orig : {"ABIDE","interTVA"}
+        indicates which data set is used. ABIDE is a dataset with subjects on the autism spectrum and control subjects,
+        InterTVA is a dataset where non-pathological subjects are given sound recognition tasks. 
+    
+    data_type : {"tfMRI","gyrification"}
+        The multi-modal auto-encoder uses two modalities to build it's representations. One is resting-state fMRI, and the other
+        is either task fMRI (tfMRI) or an anatomical modality which represents the folds in the subject's brain, (gyrification)
+    
+    dim : string 
+        name of the folder corresponding to the number of dimensions used in the encoding layer. Should be two hyphenated dimensions,
+        one for each modality (ie : "15-5", meaning 15 dimensions for the first modality and 5 for the second). Can sometimes be suffixed
+        (ex (-15-5_vertex))
+
+    fold : int
+        which data training fold to use
     """
     # Warning from previous script : That might be too many different paths. To solve that, one way would be to use os more,
     # Another would be to build a parameter object to drag everywhere, in between ? At least it is all in one place...
@@ -343,12 +368,8 @@ def build_path_and_vars(data_orig, data_type, dim_1, dim_2, fold):
             "Warning !! : Please provide data origin as parameter when calling script: either 'ABIDE' or 'interTVA' "
         )
 
-    train_index = np.load(
-        "{}/{}-{}/fold_{}/train_index.npy".format(base_path, dim_1, dim_2, fold)
-    )
-    test_index = np.load(
-        "{}/{}-{}/fold_{}/test_index.npy".format(base_path, dim_1, dim_2, fold)
-    )
+    train_index = np.load("{}/{}/fold_{}/train_index.npy".format(base_path, dim, fold))
+    test_index = np.load("{}/{}/fold_{}/test_index.npy".format(base_path, dim, fold))
 
     sub_list_file = open(sub_list_files)
     sub_list = json.load(sub_list_file)
@@ -375,7 +396,7 @@ if __name__ == "__main__":
     dim_1 = int(sys.argv[3])  # 15 according to paper works best
     dim_2 = int(sys.argv[4])  # 5 according to paper works best
     fold = int(sys.argv[5])  # int belonging to [1,10]
-
+    dim = str(dim_1) + "-" + str(dim_2)
     (
         train_index,
         test_index,
@@ -384,10 +405,8 @@ if __name__ == "__main__":
         base_path,
         index_subjects,
         sub_list,
-    ) = build_path_and_vars(data_orig, data_type, dim_1, dim_2, fold)
-    fold_path = os.path.join(
-        base_path, "{}-{}".format(dim_1, dim_2), "fold_{}".format(str(fold))
-    )
+    ) = build_path_and_vars(data_orig, data_type, dim, fold)
+    fold_path = os.path.join(base_path, "{}".format(dim), "fold_{}".format(str(fold)))
 
     # activation functions, relu / linear gives best results according to IJCNN paper, my test on dim 20 doesn't seem to change much
     hidden_layer = "relu"
@@ -447,19 +466,13 @@ if __name__ == "__main__":
     # Save the results weights
 
     multimodal_autoencoder.save(
-        "{}/{}-{}/fold_{}/multimodal_autoencoder.h5".format(
-            base_path, dim_1, dim_2, fold
-        )
+        "{}/{}/fold_{}/multimodal_autoencoder.h5".format(base_path, dim, fold)
     )
     encoder_shared_layer.save(
-        "{}/{}-{}/fold_{}/encoder_shared_layer.h5".format(base_path, dim_1, dim_2, fold)
+        "{}/{}/fold_{}/encoder_shared_layer.h5".format(base_path, dim, fold)
     )
-    encoder_gyr.save(
-        "{}/{}-{}/fold_{}/encoder_gyr.h5".format(base_path, dim_1, dim_2, fold)
-    )
-    encoder_rsfmri.save(
-        "{}/{}-{}/fold_{}/encoder_rsfmri.h5".format(base_path, dim_1, dim_2, fold)
-    )
+    encoder_gyr.save("{}/{}/fold_{}/encoder_gyr.h5".format(base_path, dim, fold))
+    encoder_rsfmri.save("{}/{}/fold_{}/encoder_rsfmri.h5".format(base_path, dim, fold))
 
     plt.plot(history.history["loss"], label="loss_fold_{}".format(fold))
     plt.plot(history.history["val_loss"], label="val_loss_fold_{}".format(fold))
@@ -468,7 +481,7 @@ if __name__ == "__main__":
     plt.ylabel("loss")
     plt.xlabel("epoch")
     plt.legend()
-    plt.savefig("{}/{}-{}/fold_{}/loss.png".format(base_path, dim_1, dim_2, fold))
-    plt.savefig("{}/{}-{}/fold_{}/loss.pdf".format(base_path, dim_1, dim_2, fold))
+    plt.savefig("{}/{}/fold_{}/loss.png".format(base_path, dim, fold))
+    plt.savefig("{}/{}/fold_{}/loss.pdf".format(base_path, dim, fold))
     plt.close()
 

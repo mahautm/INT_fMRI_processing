@@ -532,8 +532,7 @@ if __name__ == "__main__":
     ) = build_path_and_vars(
         params["data_source"],
         params["modality"],
-        params["dim_1"],
-        params["dim_2"],
+        str(params["dim_1"]) + "-" + str(params["dim_2"]),
         params["fold"],
     )
     results = np.zeros(len(sub_list))

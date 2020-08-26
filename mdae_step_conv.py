@@ -19,7 +19,7 @@ if __name__ == "__main__":
     data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
     save_folder = sys.argv[3]
     fold = int(sys.argv[4])  # int belonging to [1,10]
-
+    dim = "15-5"
     (
         train_index,
         test_index,
@@ -28,7 +28,7 @@ if __name__ == "__main__":
         base_path,
         index_subjects,
         sub_list,
-    ) = build_path_and_vars(data_orig, data_type, 15, 5, fold)
+    ) = build_path_and_vars(data_orig, data_type, dim, fold)
 
     # activation functions, relu / linear gives best results according to IJCNN paper, my test on dim 20 doesn't seem to change much
     hidden_layer = "relu"
