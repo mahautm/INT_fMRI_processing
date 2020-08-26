@@ -91,7 +91,7 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
                 base_path,
                 index_subjects,
                 sub_list,
-            ) = build_path_and_vars(data_orig, data_type, "", dim, fold)
+            ) = build_path_and_vars(data_orig, data_type, dim, fold)
 
             index_vertices = np.arange(0, 20484)
             index_subject_vertices = np.array(
@@ -404,7 +404,7 @@ if __name__ == "__main__":
 
     for dim_1 in dimensions_1:
         for dim_2 in dimensions_2:
-            dimensions = np.append(dimensions, str(dim_1) +"-"+ str(dim_2))
+            dimensions = np.append(dimensions, str(dim_1) + "-" + str(dim_2))
     data_orig = sys.argv[1]  # Could either be "ABIDE" or "interTVA"
     data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
     get_model_stats(data_orig, data_type, dimensions, 10)
