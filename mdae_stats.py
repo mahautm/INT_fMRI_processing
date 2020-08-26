@@ -133,11 +133,11 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
             val_mse_train_gyr = mean_squared_error(
                 normalized_train_gyr_data, X_train_new_gyr
             )
-            cvscores_mse_gyr_train.append(val_mse_train_gyr)
+            np.append(cvscores_mse_gyr_train, val_mse_train_gyr)
             print("Reconstruction MSE of gyr:", val_mse_train_gyr)
             val_rmse_gyr = sqrt(val_mse_train_gyr)
             print("Reconstruction RMSE of gyr : ", val_rmse_gyr)
-            cvscores_rmse_gyr_train.append(val_rmse_gyr)
+            np.append(cvscores_rmse_gyr_train, val_rmse_gyr)
 
             # rsfmri
 
@@ -153,17 +153,20 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
             val_mse_train_rsfmri = mean_squared_error(
                 normalized_train_rsfmri_data, X_train_new_rsfmri
             )
-            cvscores_mse_rsfmri_train.append(val_mse_train_rsfmri)
+            np.append(cvscores_mse_rsfmri_train, val_mse_train_rsfmri)
             print("Reconstruction MSE of rsfmri:", val_mse_train_rsfmri)
             val_rmse_rsfmri = sqrt(val_mse_train_rsfmri)
             print("Reconstruction RMSE of rsfmri : ", val_rmse_rsfmri)
-            cvscores_rmse_rsfmri_train.append(val_rmse_rsfmri)
+            np.append(cvscores_rmse_rsfmri_train, val_rmse_rsfmri)
 
             # sum of MSE (gyr + rsfmri)
-            cvscores_mse_train.append(np.sum([val_mse_train_gyr, val_mse_train_rsfmri]))
+            np.append(
+                cvscores_mse_train, np.sum([val_mse_train_gyr, val_mse_train_rsfmri])
+            )
             # sum of RMSE (gyr + rsfmri)
-            cvscores_rmse_train.append(
-                sqrt(np.sum([val_mse_train_gyr, val_mse_train_rsfmri]))
+            np.append(
+                cvscores_rmse_train,
+                sqrt(np.sum([val_mse_train_gyr, val_mse_train_rsfmri])),
             )
             # mean of MSE (gyr + rsfmri)/2
 
@@ -181,11 +184,11 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
             val_mse_test_gyr = mean_squared_error(
                 normalized_test_gyr_data, X_test_new_gyr
             )
-            cvscores_mse_gyr_test.append(val_mse_test_gyr)
+            np.append(cvscores_mse_gyr_test, val_mse_test_gyr)
             print("Reconstruction MSE of gyr:", val_mse_test_gyr)
             val_rmse_gyr = sqrt(val_mse_test_gyr)
             print("Reconstruction RMSE of gyr : ", val_rmse_gyr)
-            cvscores_rmse_gyr_test.append(val_rmse_gyr)
+            np.append(cvscores_rmse_gyr_test, val_rmse_gyr)
 
             # rsfmri
 
@@ -200,17 +203,20 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
             val_mse_test_rsfmri = mean_squared_error(
                 normalized_test_rsfmri_data, X_test_new_rsfmri
             )
-            cvscores_mse_rsfmri_test.append(val_mse_test_rsfmri)
+            np.append(cvscores_mse_rsfmri_test, val_mse_test_rsfmri)
             print("Reconstruction MSE of rsfmri:", val_mse_test_rsfmri)
             val_rmse_rsfmri = sqrt(val_mse_test_rsfmri)
             print("Reconstruction RMSE of rsfmri : ", val_rmse_rsfmri)
-            cvscores_rmse_rsfmri_test.append(val_rmse_rsfmri)
+            np.append(cvscores_rmse_rsfmri_test, val_rmse_rsfmri)
 
             # sum of MSE (gyr + rsfmri)
-            cvscores_mse_test.append(np.sum([val_mse_test_gyr, val_mse_test_rsfmri]))
+            np.append(
+                cvscores_mse_test, np.sum([val_mse_test_gyr, val_mse_test_rsfmri])
+            )
             # sum of MSE (gyr + rsfmri)
-            cvscores_rmse_test.append(
-                sqrt(np.sum([val_mse_test_gyr, val_mse_test_rsfmri]))
+            np.append(
+                cvscores_rmse_test,
+                sqrt(np.sum([val_mse_test_gyr, val_mse_test_rsfmri])),
             )
 
             # Attempt to prevent memory leak on skylake machine, legacy from when this was a loop
@@ -246,14 +252,14 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
             "%.3f%% (+/- %.5f%%)"
             % (np.mean(cvscores_mse_test), np.std(cvscores_mse_test))
         )
-        mse_train.append(np.mean(cvscores_mse_train))
-        std_mse_train.append(np.std(cvscores_mse_train))
-        mse_test.append(np.mean(cvscores_mse_test))
-        std_mse_test.append(np.std(cvscores_mse_test))
-        rmse_train.append(np.mean(cvscores_rmse_train))
-        std_rmse_train.append(np.std(cvscores_rmse_train))
-        rmse_test.append(np.mean(cvscores_rmse_test))
-        std_rmse_test.append(np.std(cvscores_rmse_test))
+        np.append(mse_train, np.mean(cvscores_mse_train))
+        np.append(std_mse_train, np.std(cvscores_mse_train))
+        np.append(mse_test, np.mean(cvscores_mse_test))
+        np.append(std_mse_test, np.std(cvscores_mse_test))
+        np.append(rmse_train, np.mean(cvscores_rmse_train))
+        np.append(std_rmse_train, np.std(cvscores_rmse_train))
+        np.append(rmse_test, np.mean(cvscores_rmse_test))
+        np.append(std_rmse_test, np.std(cvscores_rmse_test))
 
         # Save MSE, RMSE (gyr)
         print(
@@ -286,14 +292,14 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
             "{}/{}/cvscores_rmse_gyr_test.npy".format(base_path, dim),
             np.array([cvscores_rmse_gyr_test]),
         )
-        mse_gyr_train.append(np.mean(cvscores_mse_gyr_train))
-        std_mse_gyr_train.append(np.std(cvscores_mse_gyr_train))
-        mse_gyr_test.append(np.mean(cvscores_mse_gyr_test))
-        std_mse_gyr_test.append(np.std(cvscores_mse_gyr_test))
-        rmse_gyr_train.append(np.mean(cvscores_rmse_gyr_train))
-        std_rmse_gyr_train.append(np.std(cvscores_rmse_gyr_train))
-        rmse_gyr_test.append(np.mean(cvscores_rmse_gyr_test))
-        std_rmse_gyr_test.append(np.std(cvscores_rmse_gyr_test))
+        np.append(mse_gyr_train, np.mean(cvscores_mse_gyr_train))
+        np.append(std_mse_gyr_train, np.std(cvscores_mse_gyr_train))
+        np.append(mse_gyr_test, np.mean(cvscores_mse_gyr_test))
+        np.append(std_mse_gyr_test, np.std(cvscores_mse_gyr_test))
+        np.append(rmse_gyr_train, np.mean(cvscores_rmse_gyr_train))
+        np.append(std_rmse_gyr_train, np.std(cvscores_rmse_gyr_train))
+        np.append(rmse_gyr_test, np.mean(cvscores_rmse_gyr_test))
+        np.append(std_rmse_gyr_test, np.std(cvscores_rmse_gyr_test))
 
         # Save MSE, RMSE (rsfmri)
         print(
@@ -329,14 +335,14 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
             "{}/{}/cvscores_rmse_rsfmri_test.npy".format(base_path, dim),
             np.array([cvscores_rmse_rsfmri_test]),
         )
-        mse_rsfmri_train.append(np.mean(cvscores_mse_rsfmri_train))
-        std_mse_rsfmri_train.append(np.std(cvscores_mse_rsfmri_train))
-        mse_rsfmri_test.append(np.mean(cvscores_mse_rsfmri_test))
-        std_mse_rsfmri_test.append(np.std(cvscores_mse_rsfmri_test))
-        rmse_rsfmri_train.append(np.mean(cvscores_rmse_rsfmri_train))
-        std_rmse_rsfmri_train.append(np.std(cvscores_rmse_rsfmri_train))
-        rmse_rsfmri_test.append(np.mean(cvscores_rmse_rsfmri_test))
-        std_rmse_rsfmri_test.append(np.std(cvscores_rmse_rsfmri_test))
+        np.append(mse_rsfmri_train, np.mean(cvscores_mse_rsfmri_train))
+        np.append(std_mse_rsfmri_train, np.std(cvscores_mse_rsfmri_train))
+        np.append(mse_rsfmri_test, np.mean(cvscores_mse_rsfmri_test))
+        np.append(std_mse_rsfmri_test, np.std(cvscores_mse_rsfmri_test))
+        np.append(rmse_rsfmri_train, np.mean(cvscores_rmse_rsfmri_train))
+        np.append(std_rmse_rsfmri_train, np.std(cvscores_rmse_rsfmri_train))
+        np.append(rmse_rsfmri_test, np.mean(cvscores_rmse_rsfmri_test))
+        np.append(std_rmse_rsfmri_test, np.std(cvscores_rmse_rsfmri_test))
 
     # save MSE, RMSE, and STD vectors for training and test sets
     np.save("{}/mse_train_mean.npy".format(base_path), np.array([mse_train]))
