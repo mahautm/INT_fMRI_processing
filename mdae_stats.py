@@ -2,6 +2,8 @@
 # will also calculate a specific score for each modality separately, and sum them to have the global result.
 # expects two parameters on run, data source and modality (see run at bottom of script)
 import matplotlib.pyplot as plt
+import keras.backend as K
+
 
 plt.switch_backend("agg")
 import sys
@@ -93,10 +95,10 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
                 sub_list,
             ) = build_path_and_vars(data_orig, data_type, dim, fold)
 
-            index_vertices = np.arange(0, 20484)
-            index_subject_vertices = np.array(
-                np.meshgrid(index_subjects, index_vertices)
-            ).T.reshape(-1, 2)
+            # index_vertices = np.arange(0, 20484)
+            # index_subject_vertices = np.array(
+            #     np.meshgrid(index_subjects, index_vertices)
+            # ).T.reshape(-1, 2)
             (
                 normalized_train_gyr_data,
                 normalized_test_gyr_data,
@@ -108,14 +110,15 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
                 ref_subject,
                 orig_path,
                 sub_list,
-                index_subject_vertices,
+                # index_subject_vertices,
+                index_subjects,
                 train_index,
                 test_index,
             )
             # This is hard coding a temporary solution : not good
 
             multimodal_autoencoder = tf.keras.models.load_model(
-                "{}/-{}/fold_{}/multimodal_autoencoder.h5".format(base_path, dim, fold)
+                "{}/{}/fold_{}/multimodal_autoencoder.h5".format(base_path, dim, fold)
             )
 
             print("Reconstruction of training data... ")
@@ -211,31 +214,32 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
             )
 
         # Attempt to prevent memory leak on skylake machine, legacy from when this was a loop
-        # K.clear_session()
+        K.clear_session()
+        gc.collect()
 
         # Save MSE, RMSE (gyr + rsfmr)
         print("shape of vector mse train", np.array([cvscores_mse_train]).shape)
         print(cvscores_mse_train)
         np.save(
-            "{}/-{}/cvscores_mse_train.npy".format(base_path, dim),
+            "{}/{}/cvscores_mse_train.npy".format(base_path, dim),
             np.array([cvscores_mse_train]),
         )
         print("shape of  mse vector(test):", np.array([cvscores_mse_test]).shape)
         print(cvscores_mse_test)
         np.save(
-            "{}/-{}/cvscores_mse_test.npy".format(base_path, dim),
+            "{}/{}/cvscores_mse_test.npy".format(base_path, dim),
             np.array([cvscores_mse_test]),
         )
         print("shape of rmse vector (train):", np.array([cvscores_rmse_train]).shape)
         print(cvscores_rmse_train)
         np.save(
-            "{}/-{}/cvscores_rmse_train.npy".format(base_path, dim),
+            "{}/{}/cvscores_rmse_train.npy".format(base_path, dim),
             np.array([cvscores_rmse_train]),
         )
         print("shape of rmse vector (test):", np.array([cvscores_rmse_test]).shape)
         print(cvscores_rmse_test)
         np.save(
-            "{}/-{}/cvscores_rmse_test.npy".format(base_path, dim),
+            "{}/{}/cvscores_rmse_test.npy".format(base_path, dim),
             np.array([cvscores_rmse_test]),
         )
         print(
@@ -257,13 +261,13 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
         )
         print(cvscores_mse_gyr_train)
         np.save(
-            "{}/-{}/cvscores_mse_gyr_train.npy".format(base_path, dim),
+            "{}/{}/cvscores_mse_gyr_train.npy".format(base_path, dim),
             np.array([cvscores_mse_gyr_train]),
         )
         print("shape of  mse vector(test):", np.array([cvscores_mse_gyr_test]).shape)
         print(cvscores_mse_gyr_test)
         np.save(
-            "{}/-{}/cvscores_mse_gyr_test.npy".format(base_path, dim),
+            "{}/{}/cvscores_mse_gyr_test.npy".format(base_path, dim),
             np.array([cvscores_mse_gyr_test]),
         )
         print(
@@ -271,7 +275,7 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
         )
         print(cvscores_rmse_gyr_train)
         np.save(
-            "{}/-{}/cvscores_rmse_gyr_train.npy".format(base_path, dim),
+            "{}/{}/cvscores_rmse_gyr_train.npy".format(base_path, dim),
             np.array([cvscores_rmse_gyr_test]),
         )
         print(
@@ -279,7 +283,7 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
         )
         print(cvscores_rmse_gyr_test)
         np.save(
-            "{}/-{}/cvscores_rmse_gyr_test.npy".format(base_path, dim),
+            "{}/{}/cvscores_rmse_gyr_test.npy".format(base_path, dim),
             np.array([cvscores_rmse_gyr_test]),
         )
         mse_gyr_train.append(np.mean(cvscores_mse_gyr_train))
@@ -298,13 +302,13 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
         )
         print(cvscores_mse_rsfmri_train)
         np.save(
-            "{}/-{}/cvscores_mse_rsfmri_train.npy".format(base_path, dim),
+            "{}/{}/cvscores_mse_rsfmri_train.npy".format(base_path, dim),
             np.array([cvscores_mse_rsfmri_train]),
         )
         print("shape of  mse vector(test):", np.array([cvscores_mse_rsfmri_test]).shape)
         print(cvscores_mse_rsfmri_test)
         np.save(
-            "{}/-{}/cvscores_mse_rsfmri_test.npy".format(base_path, dim),
+            "{}/{}/cvscores_mse_rsfmri_test.npy".format(base_path, dim),
             np.array([cvscores_mse_rsfmri_test]),
         )
         print(
@@ -313,7 +317,7 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
         )
         print(cvscores_rmse_rsfmri_train)
         np.save(
-            "{}/-{}/cvscores_rmse_rsfmri_train.npy".format(base_path, dim),
+            "{}/{}/cvscores_rmse_rsfmri_train.npy".format(base_path, dim),
             np.array([cvscores_rmse_rsfmri_test]),
         )
         print(
@@ -322,7 +326,7 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
         )
         print(cvscores_rmse_rsfmri_test)
         np.save(
-            "{}/-{}/cvscores_rmse_rsfmri_test.npy".format(base_path, dim),
+            "{}/{}/cvscores_rmse_rsfmri_test.npy".format(base_path, dim),
             np.array([cvscores_rmse_rsfmri_test]),
         )
         mse_rsfmri_train.append(np.mean(cvscores_mse_rsfmri_train))
@@ -408,4 +412,3 @@ if __name__ == "__main__":
     data_orig = sys.argv[1]  # Could either be "ABIDE" or "interTVA"
     data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
     get_model_stats(data_orig, data_type, dimensions, 10)
-    gc.collect()
