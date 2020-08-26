@@ -17,7 +17,8 @@ from sklearn.model_selection import KFold, StratifiedKFold
 
 # from keras.callbacks import ModelCheckpoint
 from keras.models import load_model
-import keras.backend as K
+
+# import keras.backend as K
 
 from mdae_models import build_convolutional_model, build_trimodal_model, build_model
 
@@ -142,9 +143,9 @@ def load_data(
     view: int {1,2,3,4,5}
         View 1: task fMRI
         View 2: resting-state fMRI
-        View 3: concatenated views (task-fMRI + rest-fMRI)  --UNUSED, commented
+        View 3: concatenated views (task-fMRI + rest-fMRI)  --UNUSED, legacy, commented
         View 4: gyrification anatomical MRI modality
-        View 5: concatenated views (gyr-MRI + rest-fMRI)    --UNUSED, commented
+        View 5: concatenated views (gyr-MRI + rest-fMRI)    --UNUSED, legacy, commented
 
     ref_sub: string
         the subject the gyrification matrices were based on during the sign homogeneity phase
@@ -346,7 +347,8 @@ def build_path_and_vars(data_orig, data_type, dim, fold):
         (ex (-15-5_vertex))
 
     fold : int
-        which data training fold to use
+        number of the folder designating the training fold (the data separation between training and testing). 
+        If the folder you wish to access is named "fold_6", then the fold parameter should be set to 6.
     """
     # Warning from previous script : That might be too many different paths. To solve that, one way would be to use os more,
     # Another would be to build a parameter object to drag everywhere, in between ? At least it is all in one place...
