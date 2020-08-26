@@ -7,6 +7,7 @@ plt.switch_backend("agg")
 import sys
 import os
 import json
+import gc
 
 from sklearn.metrics import mean_squared_error
 
@@ -407,3 +408,4 @@ if __name__ == "__main__":
     data_orig = sys.argv[1]  # Could either be "ABIDE" or "interTVA"
     data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
     get_model_stats(data_orig, data_type, dimensions, 10)
+    gc.collect()

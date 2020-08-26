@@ -64,7 +64,11 @@ def build_stat_table(dimensions, orig_path, stat_files, title=""):
 
 if __name__ == "__main__":
     # The dimensions are used accross 3 scripts, there should be a parameter file that is loaded, probably in json format
-    dimensions = ["15-5"]
+    # dimensions = ["15-5"]
+    dimensions_1 = [18, 17, 16, 14, 13, 12, 11, 10]
+    dimensions_2 = [2, 3, 4, 6, 7, 8, 9, 10]
+    dimensions = np.array([])
+
     # data_orig = sys.argv[1]
     # data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
     paths_to_analyse = [
