@@ -404,7 +404,7 @@ if __name__ == "__main__":
 
     for dim_1 in dimensions_1:
         for dim_2 in dimensions_2:
-            dimensions = dimensions.append(str(dim_1) + str(dim_2))
+            dimensions = np.append(dimensions, str(dim_1) + str(dim_2))
     data_orig = sys.argv[1]  # Could either be "ABIDE" or "interTVA"
     data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
     get_model_stats(data_orig, data_type, dimensions, 10)

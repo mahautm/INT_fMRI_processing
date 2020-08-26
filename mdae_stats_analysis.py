@@ -70,7 +70,7 @@ if __name__ == "__main__":
     dimensions = np.array([])
     for dim_1 in dimensions_1:
         for dim_2 in dimensions_2:
-            dimensions = dimensions.append(str(dim_1) + str(dim_2))
+            dimensions = np.append(dimensions, str(dim_1) + str(dim_2))
     # data_orig = sys.argv[1]
     # data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
     paths_to_analyse = [
