@@ -1,3 +1,5 @@
+# !! TODO : REMOVE USE OF load_intertva_rsfmri, load_intertva_tfmri,
+
 import convexminimization as cvm
 import pickle
 import scipy.sparse as ssp
@@ -11,10 +13,15 @@ import sys
 import errno
 import numpy as np
 import json
-from mdae_step import build_path_and_vars, load_intertva_rsfmri, load_intertva_tfmri
+from mdae_step import (
+    build_path_and_vars,
+    load_raw_data,
+    load_intertva_rsfmri,
+    load_intertva_tfmri,
+)
 
 
-def load_data(params, dimension, fold, sub_list):
+def build_xy_data(params, dimension, fold, sub_list):
     """
     Prepares normalised data for input and output of regression
     Parameters
@@ -121,32 +128,32 @@ def get_x_data(
     X: list of floats
         input matrix for regression, loaded from the autoencoder
     """
-    X = []
+    X = np.array([])
     input_file_path = os.path.join(
         params["orig_path"], "ae_output_{}".format(params["modality"])
     )
 
-    for subject in subject_list:
+    for i in range(len(subject_list)):
         x_sub_data_path = os.path.join(
             input_file_path,
             str(dimension),
             "fold_{}".format(fold),
-            "X_{}.npy".format(subject),
+            "X_{}.npy".format(subject_list[i]),
         )
         if not os.path.exists(x_sub_data_path):
             x_sub_data = build_x_data(
-                dimension, fold, subject, params, out_file=input_file_path,
+                dimension, fold, subject_list, i, params, out_file=input_file_path,
             )
         else:
             x_sub_data = np.load(x_sub_data_path)
-        X.append(x_sub_data)
+        X = np.append(X, x_sub_data)
 
     return X
     # interTVA data has already been run on taskFMRI, on frioul
 
 
 def build_x_data(
-    dimension, fold, subject, params, out_file,
+    dimension, fold, subject_list, subject_index, params, out_file,
 ):
     """
     
@@ -178,27 +185,26 @@ def build_x_data(
     )
 
     # rsfmri data was not built with the feature extraction script, and therefore this function can fetch it from frioul
-    rsfmri_data = load_intertva_rsfmri(
-        subject, os.path.join(params["orig_path"], "features_rsfMRI")
+
+    data_1 = load_raw_data(
+        params["data_source"],
+        subject_index,
+        # 1 is for tfMRI
+        4 if params["modality"] == "gyrification" else 1,
+        subject_list,
+        params["ref_subject"],
+        params["orig_path"],
     )
-
-    if params["modality"] == "gyrification":
-        gyr_data = np.load(
-            os.path.join(
-                params["orig_path"],
-                "features_gyrification",
-                "{}_eig_vec_{}_onref_{}.npy".format(
-                    subject, params["template"], params["ref_subject"]
-                ),
-            )
-        )
-        latent_space = model.predict([gyr_data, rsfmri_data])
-
-    elif params["modality"] == "tfMRI":
-        tfmri_data = load_intertva_tfmri(
-            subject, os.path.join(params["orig_path"], "features_tfMRI")
-        )
-        latent_space = model.predict([tfmri_data, rsfmri_data])
+    data_2 = load_raw_data(
+        params["data_source"],
+        subject_index,
+        # 2 is for rsfMRI
+        2,
+        subject_list,
+        params["ref_subject"],
+        params["orig_path"],
+    )
+    latent_space = model.predict([data_1, data_2])
 
     path = os.path.join(out_file, str(dimension), "fold_{}".format(fold))
     if not os.path.exists(path):
@@ -210,12 +216,12 @@ def build_x_data(
                 raise
             pass
 
-    x_sub_data_path = os.path.join(path, "X_{}.npy".format(subject))
+    x_sub_data_path = os.path.join(path, "X_{}.npy".format(subject_list[subject_index]))
     np.save(x_sub_data_path, latent_space)
     return latent_space
 
 
-def load_raw_data(params, fold, sub_list):
+def build_raw_xy_data(params, fold, sub_list):
     """
     Pulls together data which has not been through the encoder to make an input vector and an output vector which corresponds
 
@@ -527,7 +533,7 @@ if __name__ == "__main__":
         params["ref_subject"],
         params["orig_path"],
         params["base_path"],
-        idx,
+        params["index"],
         sub_list,
     ) = build_path_and_vars(
         params["data_source"],
@@ -539,14 +545,14 @@ if __name__ == "__main__":
 
     print("Fold #{}".format(params["fold"]))
     # Chargement des données
-    X, Y = load_data(params, params["dim"], params["fold"], sub_list)
-    print("TRAIN:", idx[train_index], "TEST:", idx[test_index])
+    X, Y = build_xy_data(params, params["dim"], params["fold"], sub_list)
+    print("TRAIN:", params["index"][train_index], "TEST:", params["index"][test_index])
     # Ensemble d'entrainement
-    XE = X[idx[train_index], :, :]
-    YE = Y[idx[train_index]]
+    XE = X[params["index"][train_index], :, :]
+    YE = Y[params["index"][train_index]]
     # Ensemble de test
-    XT = X[idx[test_index], :, :]
-    YT = Y[idx[test_index]]
+    XT = X[params["index"][test_index], :, :]
+    YT = Y[params["index"][test_index]]
     beta = estimate_beta(XE, YE, params)
 
     file_path = "{}/regression_output/{}/{}/fold_{}/delta_{}/soft_thres_{}".format(
@@ -562,7 +568,7 @@ if __name__ == "__main__":
     np.save(os.path.join(file_path, "beta.npy"), beta)
 
     # Estimate the results
-    results[idx[test_index]] = np.trace(
+    results[params["index"][test_index]] = np.trace(
         np.transpose(XT, axes=(0, 2, 1)) @ beta, axis1=1, axis2=2
     )
     if params["data_source"] == "ABIDE":
@@ -570,22 +576,24 @@ if __name__ == "__main__":
         results[results <= 0.5] = 0
 
     # Stats
-    print(results[idx[test_index]])
+    print(results[params["index"][test_index]])
     print(
         "MSE, fold_{}".format(params["fold"]),
-        mean_squared_error(YT, results[idx[test_index]]),
+        mean_squared_error(YT, results[params["index"][test_index]]),
     )
     print(
         "R2 score, fold_{}".format(params["fold"]),
-        r2_score(YT, results[idx[test_index]]),
+        r2_score(YT, results[params["index"][test_index]]),
     )
     np.save(
         os.path.join(file_path, "mse.npy"),
-        mean_squared_error(YT, results[idx[test_index]]),
+        mean_squared_error(YT, results[params["index"][test_index]]),
     )
     np.save(
         os.path.join(file_path, "r_squared.npy"),
-        r2_score(YT, results[idx[test_index]]),
+        r2_score(YT, results[params["index"][test_index]]),
     )
-    np.save(os.path.join(file_path, "results.npy"), results[idx[test_index]])
+    np.save(
+        os.path.join(file_path, "results.npy"), results[params["index"][test_index]]
+    )
 

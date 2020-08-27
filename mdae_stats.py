@@ -24,6 +24,9 @@ from mdae_step import build_normalised_data
 from mdae_step import build_path_and_vars
 from mdae import run_slurm_job_mdae
 
+# We should not be using stuff from the regression modules... building a "utilitary" module would be cleaner
+from regression import get_x_data
+
 
 def get_model_stats(data_orig, data_type, dim, fold):
     """
@@ -114,15 +117,26 @@ def get_model_stats(data_orig, data_type, dim, fold):
         test_index,
     )
 
-    multimodal_autoencoder = tf.keras.models.load_model(
-        "{}/{}/fold_{}/multimodal_autoencoder.h5".format(base_path, dim, fold)
-    )
-
     print("Reconstruction of training data... ")
-    [X_train_new_gyr, X_train_new_rsfmri] = multimodal_autoencoder.predict(
-        [normalized_train_gyr_data, normalized_train_rsfmri_data]
-    )
+    # changing to regression syntax, not great, get_x_data should be in this script
+    params = {
+        "orig_path": orig_path,
+        "modality": data_type,
+        "base_path": base_path,
+        "data_source": data_orig,
+        "ref_subject": ref_subject,
+    }
 
+    # !! Might be easier and faster (vectorised) if we work with np.arrays and not lists
+    X_train = get_x_data(params, dim, fold, sub_list[train_index])
+    # Xtrain data arrives with all data in a list, per subject
+    # to seperate them into the two different modalities, first we determine where the seperation is
+    dim_limit = int(dim.split("-")[0])
+    # Then, we transpose the matrix to access the latent layer, cut appropriately,
+    # and transpose again to get back to the original state
+    [X_train_new_gyr, X_train_new_rsfmri] = [
+        [sub.T[dim_limit:].T, sub.T[:dim_limit].T] for sub in X_train
+    ]
     # gyr
     print("Max value of predicted training gyr data ", np.max(X_train_new_gyr))
     print("Min value of predicted training gyr data", np.min(X_train_new_gyr))
@@ -162,10 +176,12 @@ def get_model_stats(data_orig, data_type, dim, fold):
 
     # Reconstruction of test data
     print("Reconstruction of test data... ")
-    [X_test_new_gyr, X_test_new_rsfmri] = multimodal_autoencoder.predict(
-        [normalized_test_gyr_data, normalized_test_rsfmri_data]
-    )
-
+    # changing to regression syntax, not great, get_x_data should be in this script
+    X_test = get_x_data(params, dim, fold, sub_list[test_index])
+    #   explanation above line 137
+    [X_test_new_gyr, X_test_new_rsfmri] = [
+        [sub.T[dim_limit:].T, sub.T[:dim_limit].T] for sub in X_test
+    ]
     # Test
     # gyr
     print("Max value of predicted testing gyr data ", np.max(X_test_new_gyr))
@@ -239,25 +255,25 @@ def get_model_stats(data_orig, data_type, dim, fold):
     print("shape of vector mse train (gyr)", np.array([cvscores_mse_gyr_train]).shape)
     print(cvscores_mse_gyr_train)
     np.save(
-        "{}/{}/cvscores_mse_gyr_train.npy".format(base_path, dim),
+        "{}/{}/fold_{}/cvscores_mse_gyr_train.npy".format(base_path, dim, fold),
         np.array([cvscores_mse_gyr_train]),
     )
     print("shape of  mse vector(test):", np.array([cvscores_mse_gyr_test]).shape)
     print(cvscores_mse_gyr_test)
     np.save(
-        "{}/{}/cvscores_mse_gyr_test.npy".format(base_path, dim),
+        "{}/{}/fold_{}/cvscores_mse_gyr_test.npy".format(base_path, dim, fold),
         np.array([cvscores_mse_gyr_test]),
     )
     print("shape of rmse vector (train):", np.array([cvscores_rmse_gyr_train]).shape)
     print(cvscores_rmse_gyr_train)
     np.save(
-        "{}/{}/cvscores_rmse_gyr_train.npy".format(base_path, dim),
+        "{}/{}/fold_{}/cvscores_rmse_gyr_train.npy".format(base_path, dim, fold),
         np.array([cvscores_rmse_gyr_test]),
     )
     print("shape of rmse vector gyr (test):", np.array([cvscores_rmse_gyr_test]).shape)
     print(cvscores_rmse_gyr_test)
     np.save(
-        "{}/{}/cvscores_rmse_gyr_test.npy".format(base_path, dim),
+        "{}/{}/fold_{}/cvscores_rmse_gyr_test.npy".format(base_path, dim, fold),
         np.array([cvscores_rmse_gyr_test]),
     )
 
@@ -267,13 +283,13 @@ def get_model_stats(data_orig, data_type, dim, fold):
     )
     print(cvscores_mse_rsfmri_train)
     np.save(
-        "{}/{}/cvscores_mse_rsfmri_train.npy".format(base_path, dim),
+        "{}/{}/fold_{}/cvscores_mse_rsfmri_train.npy".format(base_path, dim, fold),
         np.array([cvscores_mse_rsfmri_train]),
     )
     print("shape of  mse vector(test):", np.array([cvscores_mse_rsfmri_test]).shape)
     print(cvscores_mse_rsfmri_test)
     np.save(
-        "{}/{}/cvscores_mse_rsfmri_test.npy".format(base_path, dim),
+        "{}/{}/fold_{}/cvscores_mse_rsfmri_test.npy".format(base_path, dim, fold),
         np.array([cvscores_mse_rsfmri_test]),
     )
     print(
@@ -281,7 +297,7 @@ def get_model_stats(data_orig, data_type, dim, fold):
     )
     print(cvscores_rmse_rsfmri_train)
     np.save(
-        "{}/{}/cvscores_rmse_rsfmri_train.npy".format(base_path, dim),
+        "{}/{}/fold_{}/cvscores_rmse_rsfmri_train.npy".format(base_path, dim, fold),
         np.array([cvscores_rmse_rsfmri_test]),
     )
     print(
@@ -290,7 +306,7 @@ def get_model_stats(data_orig, data_type, dim, fold):
     )
     print(cvscores_rmse_rsfmri_test)
     np.save(
-        "{}/{}/cvscores_rmse_rsfmri_test.npy".format(base_path, dim),
+        "{}/{}/fold_{}/cvscores_rmse_rsfmri_test.npy".format(base_path, dim, fold),
         np.array([cvscores_rmse_rsfmri_test]),
     )
 

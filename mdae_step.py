@@ -123,7 +123,7 @@ def load_intertva_tfmri(subject, path):
     return tfmri_data
 
 
-def load_data(
+def load_raw_data(
     data_orig, sub_index, view, sub_list, ref_sub, orig_path,
 ):
     """
@@ -138,7 +138,8 @@ def load_data(
         indicates which data set is used. ABIDE is a dataset with subjects on the autism spectrum and control subjects,
         InterTVA is a dataset where non-pathological subjects are given sound recognition tasks. 
 
-    sub_index:
+    sub_index: int
+        index of the subject in sub_list
 
     view: int {1,2,3,4,5}
         View 1: task fMRI
@@ -150,7 +151,8 @@ def load_data(
     ref_sub: string
         the subject the gyrification matrices were based on during the sign homogeneity phase
     
-    sub_list :
+    sub_list : list of strings
+        list of all available subjects
     
     orig_path: string, path
         where we can find the data to load
@@ -242,6 +244,8 @@ def build_normalised_data(
     test_index,
 ):
     """
+    !! : pb here, the prefix "gyr" is used, when it is not necesserally that modality which is used
+    !! should be corrected to data_1, data_2, as in other marts of the script, with comments to help differentiate
     Loads and normalises input data.
 
     Parameters
@@ -272,7 +276,7 @@ def build_normalised_data(
     """
     train_gyr_data = np.concatenate(
         [
-            load_data(
+            load_raw_data(
                 data_orig,
                 sub_index,
                 4 if data_type == "gyrification" else 1,
@@ -285,7 +289,7 @@ def build_normalised_data(
     )
     train_rsfmri_data = np.concatenate(
         [
-            load_data(data_orig, sub_index, 2, sub_list, ref_subject, orig_path)
+            load_raw_data(data_orig, sub_index, 2, sub_list, ref_subject, orig_path)
             for sub_index in index_subjects[train_index]
         ]
     )
@@ -293,7 +297,7 @@ def build_normalised_data(
     print("Load testdata...")
     test_gyr_data = np.concatenate(
         [
-            load_data(
+            load_raw_data(
                 data_orig,
                 sub_index,
                 4 if data_type == "gyrification" else 1,
@@ -306,7 +310,7 @@ def build_normalised_data(
     )
     test_rsfmri_data = np.concatenate(
         [
-            load_data(data_orig, sub_index, 2, sub_list, ref_subject, orig_path)
+            load_raw_data(data_orig, sub_index, 2, sub_list, ref_subject, orig_path)
             for sub_index in index_subjects[test_index]
         ]
     )

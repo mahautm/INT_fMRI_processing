@@ -1,21 +1,15 @@
 # Same as regression, but with slight modifications to the paths so that they do not overwrite mdae processed data
 
-import convexminimization as cvm
-import pickle
 import scipy.sparse as ssp
-from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 
 import tensorflow as tf
 import os
 import sys
-import errno
 import numpy as np
-import json
-from mdae_step import build_path_and_vars, load_intertva_rsfmri, load_intertva_tfmri
 
-from regression import estimate_beta, load_graph, load_raw_data
+from regression import estimate_beta, load_graph, build_raw_xy_data
 
 
 ######
@@ -73,7 +67,7 @@ if __name__ == "__main__":
 
     print("Fold #{}".format(params["fold"]))
     # Chargement des données
-    X, Y = load_raw_data(params, params["fold"], sub_list)
+    X, Y = build_raw_xy_data(params, params["fold"], sub_list)
     print("TRAIN:", idx[train_index], "TEST:", idx[test_index])
     # Ensemble d'entrainement
     XE = X[idx[train_index], :, :]
