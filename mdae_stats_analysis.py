@@ -108,24 +108,24 @@ def regroup_stats(base_path, dimensions, nb_folds):
         # Save MSE, RMSE (gyr + rsfmr)
         cvscores_mse_train = [
             np.load("{}/{}/fold_{}/cvscores_mse_train.npy".format(base_path, dim, fold))
-            for fold in range(nb_folds + 1)
+            for fold in range(1, nb_folds + 1)
         ]
 
         cvscores_mse_test = [
             np.load("{}/{}/fold_{}/cvscores_mse_test.npy".format(base_path, dim, fold))
-            for fold in range(nb_folds + 1)
+            for fold in range(1, nb_folds + 1)
         ]
 
         cvscores_rmse_train = [
             np.load(
                 "{}/{}/fold_{}/cvscores_rmse_train.npy".format(base_path, dim, fold)
             )
-            for fold in range(nb_folds + 1)
+            for fold in range(1, nb_folds + 1)
         ]
 
         cvscores_rmse_test = [
             np.load("{}/{}/fold_{}/cvscores_rmse_test.npy".format(base_path, dim, fold))
-            for fold in range(nb_folds + 1)
+            for fold in range(1, nb_folds + 1)
         ]
         np.append(mse_train, np.mean(cvscores_mse_train))
         np.append(std_mse_train, np.std(cvscores_mse_train))
@@ -141,26 +141,26 @@ def regroup_stats(base_path, dimensions, nb_folds):
             np.load(
                 "{}/{}/fold_{}/cvscores_mse_gyr_train.npy".format(base_path, dim, fold)
             )
-            for fold in range(nb_folds + 1)
+            for fold in range(1, nb_folds + 1)
         ]
 
         cvscores_mse_gyr_test = [
             np.load(
                 "{}/{}/fold_{}/cvscores_mse_gyr_test.npy".format(base_path, dim, fold)
             )
-            for fold in range(nb_folds + 1)
+            for fold in range(1, nb_folds + 1)
         ]
         cvscores_rmse_gyr_train = [
             np.load(
                 "{}/{}/fold_{}/cvscores_rmse_gyr_train.npy".format(base_path, dim, fold)
             )
-            for fold in range(nb_folds + 1)
+            for fold in range(1, nb_folds + 1)
         ]
         cvscores_rmse_gyr_test = [
             np.load(
                 "{}/{}/fold_{}/cvscores_rmse_gyr_test.npy".format(base_path, dim, fold)
             )
-            for fold in range(nb_folds + 1)
+            for fold in range(1, nb_folds + 1)
         ]
         np.append(mse_gyr_train, np.mean(cvscores_mse_gyr_train))
         np.append(std_mse_gyr_train, np.std(cvscores_mse_gyr_train))
@@ -178,7 +178,7 @@ def regroup_stats(base_path, dimensions, nb_folds):
                     base_path, dim, fold
                 )
             )
-            for fold in range(nb_folds + 1)
+            for fold in range(1, nb_folds + 1)
         ]
 
         cvscores_mse_rsfmri_test = [
@@ -187,7 +187,7 @@ def regroup_stats(base_path, dimensions, nb_folds):
                     base_path, dim, fold
                 )
             )
-            for fold in range(nb_folds + 1)
+            for fold in range(1, nb_folds + 1)
         ]
 
         cvscores_rmse_rsfmri_train = [
@@ -196,7 +196,7 @@ def regroup_stats(base_path, dimensions, nb_folds):
                     base_path, dim, fold
                 )
             )
-            for fold in range(nb_folds + 1)
+            for fold in range(1, nb_folds + 1)
         ]
 
         cvscores_rmse_rsfmri_test = [
@@ -205,7 +205,7 @@ def regroup_stats(base_path, dimensions, nb_folds):
                     base_path, dim, fold
                 )
             )
-            for fold in range(nb_folds + 1)
+            for fold in range(1, nb_folds + 1)
         ]
         np.append(mse_rsfmri_train, np.mean(cvscores_mse_rsfmri_train))
         np.append(std_mse_rsfmri_train, np.std(cvscores_mse_rsfmri_train))

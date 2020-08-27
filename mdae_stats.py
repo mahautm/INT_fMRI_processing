@@ -27,7 +27,8 @@ from mdae import run_slurm_job_mdae
 
 def get_model_stats(data_orig, data_type, dim, fold):
     """
-
+!! Piste d'acceleration : les lazy_loaders utilisés pour les prédictions dans le script de la régression 
+!! seraient probablement très pertinents ici aussi.
     """
     # Tables:
     # mse_train = np.array([])
