@@ -310,7 +310,7 @@ if __name__ == "__main__":
     for dim_1 in dimensions_1:
         for dim_2 in dimensions_2:
             dimensions = np.append(dimensions, str(dim_1) + "-" + str(dim_2))
-            for fold in range(nb_folds, nb_folds + 1):
+            for fold in range(nb_folds + 1):
                 run_slurm_job_mdae(
                     data_orig,
                     data_type,
