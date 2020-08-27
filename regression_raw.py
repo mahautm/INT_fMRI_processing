@@ -8,7 +8,7 @@ import tensorflow as tf
 import os
 import sys
 import numpy as np
-
+from mdae_step import build_path_and_vars
 from regression import estimate_beta, load_graph, build_raw_xy_data
 
 
