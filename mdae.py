@@ -24,6 +24,8 @@ def run_slurm_job_mdae(
     script_name="mdae_step.py",
 ):
     """
+    !! In time, change dimension 1 - dimension 2 to a single dimension variable and check if there is no code repetition with another
+    !! run_slurm_job function hanging out somewhere
     This will write a .sh file to train a multi-modal auto-encoder on a specific set of subjects with SLURM, and then execute it.
 
     Parameters
