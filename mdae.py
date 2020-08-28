@@ -22,6 +22,7 @@ def run_slurm_job_mdae(
     slurm_dir="/scratch/mmahaut/scripts/slurm",
     code_dir="/scratch/mmahaut/scripts/INT_fMRI_processing",
     script_name="mdae_step.py",
+    time_wall="12:00:00",
 ):
     """
     !! In time, change dimension 1 - dimension 2 to a single dimension variable and check if there is no code repetition with another
@@ -67,6 +68,9 @@ def run_slurm_job_mdae(
 
     script_name : string, path, default "mdae_step.py"
         script file name
+    
+    time_wall : string, hh:mm:ss time format, default "12:00:00"
+        time after which running script will be killed
     """
 
     job_name = "{}_dim{}-{}_fold{}_mdae".format(
@@ -82,7 +86,7 @@ def run_slurm_job_mdae(
         fh.writelines("#SBATCH --job-name={}\n".format(job_name))
         fh.writelines("#SBATCH -o {}/{}_%j.out\n".format(logs_dir, job_name))
         fh.writelines("#SBATCH -e {}/{}_%j.err\n".format(logs_dir, job_name))
-        fh.writelines("#SBATCH --time=12:00:00\n")
+        fh.writelines("#SBATCH --time={}\n".format(time_wall))
         fh.writelines("#SBATCH --account=b125\n")
         fh.writelines("#SBATCH --partition=skylake\n")
         # fh.writelines("#SBATCH --gres-flags=enforce-binding\n")

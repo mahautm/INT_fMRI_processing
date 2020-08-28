@@ -335,5 +335,6 @@ if __name__ == "__main__":
                     "",
                     fold,
                     script_name="mdae_stats_step.py",
+                    time_wall="01:00:00",
                 )
 
