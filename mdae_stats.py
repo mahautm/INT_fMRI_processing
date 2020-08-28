@@ -128,7 +128,8 @@ def get_model_stats(data_orig, data_type, dim, fold):
     }
 
     # !! Might be easier and faster (vectorised) if we work with np.arrays and not lists
-    X_train = get_x_data(params, dim, fold, sub_list[train_index])
+    X = get_x_data(params, dim, fold, sub_list)
+    X_train = X[train_index]
     # Xtrain data arrives with all data in a list, per subject
     # to seperate them into the two different modalities, first we determine where the seperation is
     dim_limit = int(dim.split("-")[0])
@@ -177,7 +178,7 @@ def get_model_stats(data_orig, data_type, dim, fold):
     # Reconstruction of test data
     print("Reconstruction of test data... ")
     # changing to regression syntax, not great, get_x_data should be in this script
-    X_test = get_x_data(params, dim, fold, sub_list[test_index])
+    X_test = X[test_index]
     #   explanation above line 137
     [X_test_new_gyr, X_test_new_rsfmri] = [
         [sub.T[dim_limit:].T, sub.T[:dim_limit].T] for sub in X_test
