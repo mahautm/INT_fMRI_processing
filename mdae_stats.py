@@ -142,7 +142,10 @@ def get_model_stats(data_orig, data_type, dim, fold):
     print("Max value of predicted training gyr data ", np.max(X_train_new_gyr))
     print("Min value of predicted training gyr data", np.min(X_train_new_gyr))
     print("Reconstructed gyr matrix shape:", X_train_new_gyr.shape)
-    val_mse_train_gyr = mean_squared_error(normalized_train_gyr_data, X_train_new_gyr)
+    # X_train_new_gyr is flattened to match the training shape used in normalized_train_gyr_data
+    val_mse_train_gyr = mean_squared_error(
+        normalized_train_gyr_data, X_train_new_gyr.T.reshape(dim_limit, -1)
+    )
     np.append(cvscores_mse_gyr_train, val_mse_train_gyr)
     print("Reconstruction MSE of gyr:", val_mse_train_gyr)
     val_rmse_gyr = sqrt(val_mse_train_gyr)
@@ -159,7 +162,8 @@ def get_model_stats(data_orig, data_type, dim, fold):
     )
     print("Reconstructed rsfmri matrix shape:", X_train_new_rsfmri.shape)
     val_mse_train_rsfmri = mean_squared_error(
-        normalized_train_rsfmri_data, X_train_new_rsfmri
+        normalized_train_rsfmri_data,
+        X_train_new_rsfmri.T.reshape(int(dim.split("-")[0]), -1),
     )
     np.append(cvscores_mse_rsfmri_train, val_mse_train_rsfmri)
     print("Reconstruction MSE of rsfmri:", val_mse_train_rsfmri)
@@ -187,7 +191,9 @@ def get_model_stats(data_orig, data_type, dim, fold):
     print("Max value of predicted testing gyr data ", np.max(X_test_new_gyr))
     print("Min value of predicted testing gyr data", np.min(X_test_new_gyr))
     print("Reconstructed gyr matrix shape:", X_test_new_gyr.shape)
-    val_mse_test_gyr = mean_squared_error(normalized_test_gyr_data, X_test_new_gyr)
+    val_mse_test_gyr = mean_squared_error(
+        normalized_test_gyr_data, X_test_new_gyr.T.reshape(dim_limit, -1)
+    )
     np.append(cvscores_mse_gyr_test, val_mse_test_gyr)
     print("Reconstruction MSE of gyr:", val_mse_test_gyr)
     val_rmse_gyr = sqrt(val_mse_test_gyr)
@@ -204,7 +210,8 @@ def get_model_stats(data_orig, data_type, dim, fold):
     )
     print("Reconstructed rsfmri matrix shape:", X_test_new_rsfmri.shape)
     val_mse_test_rsfmri = mean_squared_error(
-        normalized_test_rsfmri_data, X_test_new_rsfmri
+        normalized_test_rsfmri_data,
+        X_test_new_rsfmri.T.reshape(int(dim.split("-")[0]), -1),
     )
     np.append(cvscores_mse_rsfmri_test, val_mse_test_rsfmri)
     print("Reconstruction MSE of rsfmri:", val_mse_test_rsfmri)

@@ -531,7 +531,7 @@ if __name__ == "__main__":
         params["ref_subject"],
         params["orig_path"],
         params["base_path"],
-        params["index"],
+        sub_index,
         sub_list,
     ) = build_path_and_vars(
         params["data_source"],
@@ -544,13 +544,13 @@ if __name__ == "__main__":
     print("Fold #{}".format(params["fold"]))
     # Chargement des données
     X, Y = build_xy_data(params, params["dim"], params["fold"], sub_list)
-    print("TRAIN:", params["index"][train_index], "TEST:", params["index"][test_index])
+    print("TRAIN:", sub_index[train_index], "TEST:", sub_index[test_index])
     # Ensemble d'entrainement
-    XE = X[params["index"][train_index], :, :]
-    YE = Y[params["index"][train_index]]
+    XE = X[sub_index[train_index], :, :]
+    YE = Y[sub_index[train_index]]
     # Ensemble de test
-    XT = X[params["index"][test_index], :, :]
-    YT = Y[params["index"][test_index]]
+    XT = X[sub_index[test_index], :, :]
+    YT = Y[sub_index[test_index]]
     beta = estimate_beta(XE, YE, params)
 
     file_path = "{}/regression_output/{}/{}/fold_{}/delta_{}/soft_thres_{}".format(
@@ -566,7 +566,7 @@ if __name__ == "__main__":
     np.save(os.path.join(file_path, "beta.npy"), beta)
 
     # Estimate the results
-    results[params["index"][test_index]] = np.trace(
+    results[sub_index[test_index]] = np.trace(
         np.transpose(XT, axes=(0, 2, 1)) @ beta, axis1=1, axis2=2
     )
     if params["data_source"] == "ABIDE":
@@ -574,24 +574,22 @@ if __name__ == "__main__":
         results[results <= 0.5] = 0
 
     # Stats
-    print(results[params["index"][test_index]])
+    print(results[sub_index[test_index]])
     print(
         "MSE, fold_{}".format(params["fold"]),
-        mean_squared_error(YT, results[params["index"][test_index]]),
+        mean_squared_error(YT, results[sub_index[test_index]]),
     )
     print(
         "R2 score, fold_{}".format(params["fold"]),
-        r2_score(YT, results[params["index"][test_index]]),
+        r2_score(YT, results[sub_index[test_index]]),
     )
     np.save(
         os.path.join(file_path, "mse.npy"),
-        mean_squared_error(YT, results[params["index"][test_index]]),
+        mean_squared_error(YT, results[sub_index[test_index]]),
     )
     np.save(
         os.path.join(file_path, "r_squared.npy"),
-        r2_score(YT, results[params["index"][test_index]]),
+        r2_score(YT, results[sub_index[test_index]]),
     )
-    np.save(
-        os.path.join(file_path, "results.npy"), results[params["index"][test_index]]
-    )
+    np.save(os.path.join(file_path, "results.npy"), results[sub_index[test_index]])
 
