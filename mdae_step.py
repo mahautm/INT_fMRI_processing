@@ -458,8 +458,8 @@ if __name__ == "__main__":
     history = multimodal_autoencoder.fit(
         [normalized_train_gyr_data, normalized_train_rsfmri_data],
         [normalized_train_gyr_data, normalized_train_rsfmri_data],
-        epochs=70,
-        batch_size=100,
+        epochs=300,
+        batch_size=500,
         shuffle=True,
         validation_data=(
             [normalized_test_gyr_data, normalized_test_rsfmri_data],

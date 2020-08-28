@@ -17,12 +17,14 @@ def build_model(dim_1, dim_2, input_shape_1, input_shape_2, hidden_layer, output
 
     # Encoder Model
     # First view
-    encoded_1 = Dense(100, activation=hidden_layer)(input_view_1)  # Layer 1, View 1
+    encoded_1 = Dense(140, activation=hidden_layer)(input_view_1)  # Layer 1, View 1
+    encoded_1 = Dense(120, activation=hidden_layer)(encoded_1)  # Layer 1, View 1
     encoded_1 = Dense(dim_1, activation=hidden_layer)(encoded_1)
     print("encoded 1 shape", encoded_1.shape)
 
     # Second view
-    encoded_2 = Dense(100, activation=hidden_layer)(input_view_2)  # Layer 1, View 2
+    encoded_2 = Dense(140, activation=hidden_layer)(input_view_2)  # Layer 1, View 2
+    encoded_2 = Dense(120, activation=hidden_layer)(encoded_2)  # Layer 2, View 2
     encoded_2 = Dense(dim_2, activation=hidden_layer)(encoded_2)
     print("encoded 2 shape", encoded_2.shape)
 
@@ -31,16 +33,16 @@ def build_model(dim_1, dim_2, input_shape_1, input_shape_2, hidden_layer, output
     print("Shared Layer", shared_layer.shape)
 
     # Decoder Model
-    decoded_1 = Dense(dim_1, activation=hidden_layer)(shared_layer)
-    decoded_1 = Dense(100, activation=hidden_layer)(decoded_1)
+    decoded_1 = Dense(120, activation=hidden_layer)(shared_layer)
+    decoded_1 = Dense(140, activation=hidden_layer)(decoded_1)
     decoded_1 = Dense(input_shape_1[0], activation=output_layer, name="dec_1",)(
         decoded_1
     )
     print("decoded_1", decoded_1.shape)
 
     # Second view
-    decoded_2 = Dense(dim_2, activation=hidden_layer)(shared_layer)
-    decoded_2 = Dense(100, activation=hidden_layer)(decoded_2)
+    decoded_2 = Dense(120, activation=hidden_layer)(shared_layer)
+    decoded_2 = Dense(140, activation=hidden_layer)(decoded_2)
     decoded_2 = Dense(input_shape_2[0], activation=output_layer, name="dec_2",)(
         decoded_2
     )
