@@ -135,9 +135,9 @@ def get_model_stats(data_orig, data_type, dim, fold):
     dim_limit = int(dim.split("-")[0])
     # Then, we transpose the matrix to access the latent layer, cut appropriately,
     # and transpose again to get back to the original state
-    [X_train_new_gyr, X_train_new_rsfmri] = [
-        [sub.T[dim_limit:].T, sub.T[:dim_limit].T] for sub in X_train
-    ]
+    X_train_new_gyr = [sub.T[:dim_limit].T for sub in X_train]
+    X_train_new_rsfmri = [sub.T[dim_limit:].T for sub in X_train]
+
     # gyr
     print("Max value of predicted training gyr data ", np.max(X_train_new_gyr))
     print("Min value of predicted training gyr data", np.min(X_train_new_gyr))
@@ -179,10 +179,9 @@ def get_model_stats(data_orig, data_type, dim, fold):
     print("Reconstruction of test data... ")
     # changing to regression syntax, not great, get_x_data should be in this script
     X_test = X[test_index]
-    #   explanation above line 137
-    [X_test_new_gyr, X_test_new_rsfmri] = [
-        [sub.T[dim_limit:].T, sub.T[:dim_limit].T] for sub in X_test
-    ]
+    #   explanation above line 138
+    X_test_new_gyr = [sub.T[:dim_limit].T for sub in X_test]
+    X_test_new_rsfmri = [sub.T[dim_limit:].T for sub in X_test]
     # Test
     # gyr
     print("Max value of predicted testing gyr data ", np.max(X_test_new_gyr))
