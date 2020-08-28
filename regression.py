@@ -44,8 +44,7 @@ def build_xy_data(params, dimension, fold, sub_list):
         or binary classification output matrix for regression (abide)
 
     """
-    X = get_x_data(params, dimension, fold, subject_list=sub_list)
-    XZ = np.array(X)
+    XZ = get_x_data(params, dimension, fold, subject_list=sub_list)
     Y = []
     if params["data_source"] == "ABIDE":
         classified_file = open(
@@ -128,11 +127,10 @@ def get_x_data(
     X: list of floats
         input matrix for regression, loaded from the autoencoder
     """
-    X = np.array([])
+    X = []
     input_file_path = os.path.join(
         params["orig_path"], "ae_output_{}".format(params["modality"])
     )
-
     for i in range(len(subject_list)):
         x_sub_data_path = os.path.join(
             input_file_path,
@@ -146,8 +144,8 @@ def get_x_data(
             )
         else:
             x_sub_data = np.load(x_sub_data_path)
-        X = np.append(X, x_sub_data)
-
+        X.append(x_sub_data)
+    X = np.array(X)
     return X
     # interTVA data has already been run on taskFMRI, on frioul
 
