@@ -117,26 +117,35 @@ def get_model_stats(data_orig, data_type, dim, fold):
         test_index,
     )
 
-    print("Reconstruction of training data... ")
-    # changing to regression syntax, not great, get_x_data should be in this script
-    params = {
-        "orig_path": orig_path,
-        "modality": data_type,
-        "base_path": base_path,
-        "data_source": data_orig,
-        "ref_subject": ref_subject,
-    }
+    multimodal_autoencoder = tf.keras.models.load_model(
+        "{}/{}/fold_{}/multimodal_autoencoder.h5".format(base_path, dim, fold)
+    )
 
-    # !! Might be easier and faster (vectorised) if we work with np.arrays and not lists
-    X = get_x_data(params, dim, fold, sub_list)
-    X_train = X[train_index]
-    # Xtrain data arrives with all data in a list, per subject
-    # to seperate them into the two different modalities, first we determine where the seperation is
-    dim_limit = int(dim.split("-")[0])
-    # Then, we transpose the matrix to access the latent layer, cut appropriately,
-    # and transpose again to get back to the original state
-    X_train_new_gyr = np.array([sub.T[:dim_limit].T for sub in X_train])
-    X_train_new_rsfmri = np.array([sub.T[dim_limit:].T for sub in X_train])
+    print("Reconstruction of training data... ")
+    [X_train_new_gyr, X_train_new_rsfmri] = multimodal_autoencoder.predict(
+        [normalized_train_gyr_data, normalized_train_rsfmri_data]
+    )
+
+    # print("Reconstruction of training data... ")
+    # changing to regression syntax, not great, get_x_data should be in this script
+    # params = {
+    #     "orig_path": orig_path,
+    #     "modality": data_type,
+    #     "base_path": base_path,
+    #     "data_source": data_orig,
+    #     "ref_subject": ref_subject,
+    # }
+
+    # # !! Might be easier and faster (vectorised) if we work with np.arrays and not lists
+    # X = get_x_data(params, dim, fold, sub_list)
+    # X_train = X[train_index]
+    # # Xtrain data arrives with all data in a list, per subject
+    # # to seperate them into the two different modalities, first we determine where the seperation is
+    # dim_limit = int(dim.split("-")[0])
+    # # Then, we transpose the matrix to access the latent layer, cut appropriately,
+    # # and transpose again to get back to the original state
+    # X_train_new_gyr = np.array([sub.T[:dim_limit].T for sub in X_train])
+    # X_train_new_rsfmri = np.array([sub.T[dim_limit:].T for sub in X_train])
 
     # gyr
     print("Max value of predicted training gyr data ", np.max(X_train_new_gyr))
@@ -144,7 +153,7 @@ def get_model_stats(data_orig, data_type, dim, fold):
     print("Reconstructed gyr matrix shape:", X_train_new_gyr.shape)
     # X_train_new_gyr is flattened to match the training shape used in normalized_train_gyr_data
     val_mse_train_gyr = mean_squared_error(
-        normalized_train_gyr_data, X_train_new_gyr.T.reshape(dim_limit, -1)
+        normalized_train_gyr_data, X_train_new_gyr  # .T.reshape(dim_limit, -1)
     )
     np.append(cvscores_mse_gyr_train, val_mse_train_gyr)
     print("Reconstruction MSE of gyr:", val_mse_train_gyr)
@@ -163,7 +172,7 @@ def get_model_stats(data_orig, data_type, dim, fold):
     print("Reconstructed rsfmri matrix shape:", X_train_new_rsfmri.shape)
     val_mse_train_rsfmri = mean_squared_error(
         normalized_train_rsfmri_data,
-        X_train_new_rsfmri.T.reshape(int(dim.split("-")[0]), -1),
+        X_train_new_rsfmri,  # .T.reshape(int(dim.split("-")[0]), -1),
     )
     np.append(cvscores_mse_rsfmri_train, val_mse_train_rsfmri)
     print("Reconstruction MSE of rsfmri:", val_mse_train_rsfmri)
@@ -182,17 +191,20 @@ def get_model_stats(data_orig, data_type, dim, fold):
     # Reconstruction of test data
     print("Reconstruction of test data... ")
     # changing to regression syntax, not great, get_x_data should be in this script
-    X_test = X[test_index]
-    #   explanation above line 138
-    X_test_new_gyr = np.array([sub.T[:dim_limit].T for sub in X_test])
-    X_test_new_rsfmri = np.array([sub.T[dim_limit:].T for sub in X_test])
+    # X_test = X[test_index]
+    # #   explanation above line 138
+    # X_test_new_gyr = np.array([sub.T[:dim_limit].T for sub in X_test])
+    # X_test_new_rsfmri = np.array([sub.T[dim_limit:].T for sub in X_test])
+    [X_test_new_gyr, X_test_new_rsfmri] = multimodal_autoencoder.predict(
+        [normalized_test_gyr_data, normalized_test_rsfmri_data]
+    )
     # Test
     # gyr
     print("Max value of predicted testing gyr data ", np.max(X_test_new_gyr))
     print("Min value of predicted testing gyr data", np.min(X_test_new_gyr))
     print("Reconstructed gyr matrix shape:", X_test_new_gyr.shape)
     val_mse_test_gyr = mean_squared_error(
-        normalized_test_gyr_data, X_test_new_gyr.T.reshape(dim_limit, -1)
+        normalized_test_gyr_data, X_test_new_gyr  # .T.reshape(dim_limit, -1)
     )
     np.append(cvscores_mse_gyr_test, val_mse_test_gyr)
     print("Reconstruction MSE of gyr:", val_mse_test_gyr)
@@ -211,7 +223,7 @@ def get_model_stats(data_orig, data_type, dim, fold):
     print("Reconstructed rsfmri matrix shape:", X_test_new_rsfmri.shape)
     val_mse_test_rsfmri = mean_squared_error(
         normalized_test_rsfmri_data,
-        X_test_new_rsfmri.T.reshape(int(dim.split("-")[0]), -1),
+        X_test_new_rsfmri,  # .T.reshape(int(dim.split("-")[0]), -1),
     )
     np.append(cvscores_mse_rsfmri_test, val_mse_test_rsfmri)
     print("Reconstruction MSE of rsfmri:", val_mse_test_rsfmri)
@@ -326,8 +338,8 @@ if __name__ == "__main__":
 
     # The dimension is used accross 3 scripts, there should be a parameter file that is loaded, probably in json format
     # dimensions = ["15-5_vertex"]
-    dimensions_1 = [18, 17, 16, 14, 13, 12, 11, 10]
-    dimensions_2 = [2, 3, 4, 6, 7, 8, 9, 10]
+    dimensions_1 = [18, 17, 16, 15, 14, 13, 12, 11, 10]
+    dimensions_2 = [2, 3, 4, 6, 5, 7, 8, 9, 10]
     dimensions = np.array([])
 
     for dim_1 in dimensions_1:
