@@ -41,8 +41,13 @@ def build_stat_table(dimensions, orig_path, stat_files, title=""):
         rows.append("{} dim encoding".format(dimensions[dim_index]))
         row_cell_text = []
         for filename in stat_files:
-            stat = np.load(os.path.join(orig_path, filename))[0]
-            row_cell_text.append(stat[dim_index])
+            file_path = os.path.join(orig_path, filename)
+            stat = np.NaN
+            if os.path.exists(file_path):
+                stat = np.load(file_path)[0]
+            else:
+                print("file does not exist : " + file_path)
+            row_cell_text.append(stat)
             columns.append(
                 filename[: len(filename) - 4]
             )  # enlever le .npy à la fin des noms de fichier
@@ -279,8 +284,8 @@ def regroup_stats(base_path, dimensions, nb_folds):
 if __name__ == "__main__":
     # The dimensions are used accross 3 scripts, there should be a parameter file that is loaded, probably in json format
     # dimensions = ["15-5"]
-    dimensions_1 = [18, 17, 16, 14, 13, 12, 11, 10]
-    dimensions_2 = [2, 3, 4, 6, 7, 8, 9, 10]
+    dimensions_1 = [18, 17, 16, 15, 14, 13, 12, 11, 10]
+    dimensions_2 = [2, 3, 4, 6, 5, 7, 8, 9, 10]
     nb_folds = 10
     dimensions = np.array([])
     for dim_1 in dimensions_1:
