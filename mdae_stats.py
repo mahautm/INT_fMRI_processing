@@ -447,7 +447,7 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
                 base_path,
                 index_subjects,
                 sub_list,
-            ) = build_path_and_vars(data_orig, data_type, "", dim, fold)
+            ) = build_path_and_vars(data_orig, data_type, dim, fold)
 
             index_vertices = np.arange(0, 20484)
             index_subject_vertices = np.array(
