@@ -284,8 +284,8 @@ def regroup_stats(base_path, dimensions, nb_folds):
 if __name__ == "__main__":
     # The dimensions are used accross 3 scripts, there should be a parameter file that is loaded, probably in json format
     # dimensions = ["15-5"]
-    dimensions_1 = [18, 17, 16, 15, 14, 13, 12, 11, 10]
-    dimensions_2 = [2, 3, 4, 6, 5, 7, 8, 9, 10]
+    dimensions_1 = [18, 17, 16, 14, 13, 12, 11, 10]
+    dimensions_2 = [2, 3, 4, 6, 7, 8, 9, 10]
     nb_folds = 10
     dimensions = np.array([])
     for dim_1 in dimensions_1:
