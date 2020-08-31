@@ -383,13 +383,13 @@ if __name__ == "__main__":
     # data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
     paths_to_analyse = [
         "/scratch/mmahaut/data/intertva/ae",
-        "/scratch/mmahaut/data/intertva/ae_gyrification",
-        "/scratch/mmahaut/data/abide/ae_gyrification",
+        # "/scratch/mmahaut/data/intertva/ae_gyrification",
+        # "/scratch/mmahaut/data/abide/ae_gyrification",
     ]
     titles = [
         "interTVA tfMRI MSE",
-        "interTVA gyrification MSE",
-        "ABIDE gyrification MSE",
+        # "interTVA gyrification MSE",
+        # "ABIDE gyrification MSE",
     ]
     stat_files = [
         "rmse_test_mean.npy",
