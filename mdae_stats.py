@@ -373,9 +373,9 @@ import numpy as np
 import tensorflow as tf
 
 # !! if this is not used with vertices training, use the function from mdae_step only
-from mdae_step_vertices import build_normalised_data
+# from mdae_step_vertices import build_normalised_data
 
-# from mdae_step import build_normalised_data
+from mdae_step import build_normalised_data
 from mdae_step import build_path_and_vars
 
 
