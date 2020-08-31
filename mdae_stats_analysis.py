@@ -283,14 +283,14 @@ def regroup_stats(base_path, dimensions, nb_folds):
 
 if __name__ == "__main__":
     # The dimensions are used accross 3 scripts, there should be a parameter file that is loaded, probably in json format
-    # dimensions = ["15-5"]
-    dimensions_1 = [18, 17, 16, 14, 13, 12, 11, 10]
-    dimensions_2 = [2, 3, 4, 6, 7, 8, 9, 10]
-    nb_folds = 10
-    dimensions = np.array([])
-    for dim_1 in dimensions_1:
-        for dim_2 in dimensions_2:
-            dimensions = np.append(dimensions, str(dim_1) + "-" + str(dim_2))
+    dimensions = ["15-5"]
+    # dimensions_1 = [18, 17, 16, 14, 13, 12, 11, 10]
+    # dimensions_2 = [2, 3, 4, 6, 7, 8, 9, 10]
+    # nb_folds = 10
+    # dimensions = np.array([])
+    # for dim_1 in dimensions_1:
+    #     for dim_2 in dimensions_2:
+    #         dimensions = np.append(dimensions, str(dim_1) + "-" + str(dim_2))
     # data_orig = sys.argv[1]
     # data_type = sys.argv[2]  # could be "tfMRI" or "gyrification"
     paths_to_analyse = [
