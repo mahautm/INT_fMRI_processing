@@ -41,13 +41,8 @@ def build_stat_table(dimensions, orig_path, stat_files, title=""):
         rows.append("{} dim encoding".format(dimensions[dim_index]))
         row_cell_text = []
         for filename in stat_files:
-            file_path = os.path.join(orig_path, filename)
-            stat = np.NaN
-            if os.path.exists(file_path):
-                stat = np.load(file_path)[0]
-            else:
-                print("file does not exist : " + file_path)
-            row_cell_text.append(stat)
+            stat = np.load(os.path.join(orig_path, filename))[0]
+            row_cell_text.append(stat[dim_index])
             columns.append(
                 filename[: len(filename) - 4]
             )  # enlever le .npy à la fin des noms de fichier
