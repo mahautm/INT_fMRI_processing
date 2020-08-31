@@ -270,15 +270,15 @@ def regroup_stats(base_path, dimensions, nb_folds):
     # plt.close()
     # plotting the rmse train
     # setting x and y axis range
-    plt.plot(dimensions, rmse_train, label="rmse_train")
-    plt.plot(dimensions, rmse_test, label="rmse_test")
-    plt.xlabel("Encoding dimension")
-    plt.ylabel("Reconstruction error (RMSE)")
-    # showing legend
-    plt.legend()
-    plt.savefig("{}/reconstruction_error_rmse.pdf".format(base_path))
-    plt.savefig("{}/reconstruction_error_rmse.png".format(base_path))
-    plt.close()
+    # plt.plot(dimensions, rmse_train, label="rmse_train")
+    # plt.plot(dimensions, rmse_test, label="rmse_test")
+    # plt.xlabel("Encoding dimension")
+    # plt.ylabel("Reconstruction error (RMSE)")
+    # # showing legend
+    # plt.legend()
+    # plt.savefig("{}/reconstruction_error_rmse.pdf".format(base_path))
+    # plt.savefig("{}/reconstruction_error_rmse.png".format(base_path))
+    # plt.close()
 
 
 if __name__ == "__main__":
