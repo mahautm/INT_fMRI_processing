@@ -234,14 +234,7 @@ def load_raw_data(
 
 
 def build_normalised_data(
-    data_orig,
-    data_type,
-    ref_subject,
-    orig_path,
-    sub_list,
-    index_subjects,
-    train_index,
-    test_index,
+    data_orig, data_type, ref_subject, orig_path, sub_list, train_index, test_index,
 ):
     """
     !! : pb here, the prefix "gyr" is used, when it is not necesserally that modality which is used
@@ -267,13 +260,12 @@ def build_normalised_data(
     sub_list : list of strings
         All subjects that the training will take effect on.
 
-    index_subjects : 
-
     train_index : 
 
     test_index : 
 
     """
+    index_subjects = np.arange(0, len(sub_list))
     train_gyr_data = np.concatenate(
         [
             load_raw_data(
@@ -380,15 +372,12 @@ def build_path_and_vars(data_orig, data_type, dim, fold):
     sub_list_file = open(sub_list_files)
     sub_list = json.load(sub_list_file)
 
-    index_subjects = np.arange(0, len(sub_list))
-
     return (
         train_index,
         test_index,
         ref_subject,
         orig_path,
         base_path,
-        index_subjects,  # This one's presence just adds a variable to return where it's not always needed, and might later be removed
         sub_list,
     )
 
@@ -409,7 +398,6 @@ if __name__ == "__main__":
         ref_subject,
         orig_path,
         base_path,
-        index_subjects,
         sub_list,
     ) = build_path_and_vars(data_orig, data_type, dim, fold)
     fold_path = os.path.join(base_path, "{}".format(dim), "fold_{}".format(str(fold)))
@@ -418,6 +406,7 @@ if __name__ == "__main__":
     hidden_layer = "relu"
     output_layer = "linear"
 
+    index_subjects = np.arange(0, len(sub_list))
     print(f"Fold #{fold}")
     print(
         "TRAIN:", index_subjects[train_index], "TEST:", index_subjects[test_index],
@@ -431,14 +420,7 @@ if __name__ == "__main__":
         normalized_train_rsfmri_data,
         normalized_test_rsfmri_data,
     ) = build_normalised_data(
-        data_orig,
-        data_type,
-        ref_subject,
-        orig_path,
-        sub_list,
-        index_subjects,
-        train_index,
-        test_index,
+        data_orig, data_type, ref_subject, orig_path, sub_list, train_index, test_index,
     )
     # Getting rid of dir here ...
     (

@@ -531,7 +531,6 @@ if __name__ == "__main__":
         params["ref_subject"],
         params["orig_path"],
         params["base_path"],
-        sub_index,
         sub_list,
     ) = build_path_and_vars(
         params["data_source"],
@@ -540,7 +539,7 @@ if __name__ == "__main__":
         params["fold"],
     )
     results = np.zeros(len(sub_list))
-
+    sub_index = np.arange(0, len(sub_list))
     print("Fold #{}".format(params["fold"]))
     # Chargement des données
     X, Y = build_xy_data(params, params["dim"], params["fold"], sub_list)

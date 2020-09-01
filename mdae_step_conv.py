@@ -26,14 +26,13 @@ if __name__ == "__main__":
         ref_subject,
         orig_path,
         base_path,
-        index_subjects,
         sub_list,
     ) = build_path_and_vars(data_orig, data_type, dim, fold)
 
     # activation functions, relu / linear gives best results according to IJCNN paper, my test on dim 20 doesn't seem to change much
     hidden_layer = "relu"
     output_layer = "linear"
-
+    index_subjects = np.arange(0, len(sub_list))
     print(f"Fold #{fold}")
     print(
         "TRAIN:", index_subjects[train_index], "TEST:", index_subjects[test_index],
@@ -47,23 +46,17 @@ if __name__ == "__main__":
         normalized_train_rsfmri_data,
         normalized_test_rsfmri_data,
     ) = build_normalised_data(
-        data_orig,
-        data_type,
-        ref_subject,
-        orig_path,
-        sub_list,
-        index_subjects,
-        train_index,
-        test_index,
+        data_orig, data_type, ref_subject, orig_path, sub_list, train_index, test_index,
     )
-    # Getting rid of dir here ...
     (
         multimodal_autoencoder,
         encoder_rsfmri,
         encoder_shared_layer,
         encoder_gyr,
     ) = build_convolutional_model(
-        normalized_train_gyr_data[0].shape,
+        normalized_train_gyr_data[
+            0
+        ].shape,  # maybe here I should use len() instead of shape
         normalized_train_rsfmri_data[0].shape,
         hidden_layer,
         output_layer,

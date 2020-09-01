@@ -55,7 +55,6 @@ if __name__ == "__main__":
         params["ref_subject"],
         params["orig_path"],
         params["base_path"],
-        idx,
         sub_list,
     ) = build_path_and_vars(
         params["data_source"],
@@ -63,6 +62,7 @@ if __name__ == "__main__":
         str(params["dim_1"]) + "-" + str(params["dim_2"]),
         params["fold"],
     )
+    idx = np.arange(0, len(sub_list))
     results = np.zeros(len(sub_list))
 
     print("Fold #{}".format(params["fold"]))

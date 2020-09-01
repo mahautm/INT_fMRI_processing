@@ -11,7 +11,7 @@ import numpy as np
 from mdae_models import build_model
 from mdae_step import (
     build_path_and_vars,
-    load_data,
+    load_raw_data,
 )  # build_normalised_data is redefined is this function to be a vertex function
 
 from sklearn.preprocessing import MinMaxScaler
@@ -55,7 +55,7 @@ def build_normalised_data(
         subject_test_vertices = test_vertices[test_subjects_indexes == subject_index]
 
         # load a subject
-        subject_gyr_data = load_data(
+        subject_gyr_data = load_raw_data(
             data_orig,
             subject_index,
             4 if data_type == "gyrification" else 1,
@@ -63,7 +63,7 @@ def build_normalised_data(
             ref_subject,
             orig_path,
         )
-        subject_rs_data = load_data(
+        subject_rs_data = load_raw_data(
             data_orig, subject_index, 2, sub_list, ref_subject, orig_path
         )
 
