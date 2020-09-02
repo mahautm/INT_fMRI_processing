@@ -56,8 +56,8 @@ def load_data(sub, view):
 
 
 # Path
-path = "/home/asellami/data_fsaverage5"
-
+path = "/scratch/mmahaut/data/intertva/past_data"
+out_path = "/scratch/mmahaut/data/intertva/ae/reproducibility"
 print("View 1: task-fMRI")
 print("View 2: resting-state fMRI")
 print("View=3: concatenated views (task-fMRI + rest-fMRI)")
@@ -169,7 +169,7 @@ for dim in batch_1:
     for train_index, test_index in kf.split(index_subjects):
         fold += 1
         # create directory
-        directory = "{}/fold_{}".format(dim, fold)
+        directory = "{}/{}/fold_{}".format(out_path, dim, fold)
         if not os.path.exists(directory):
             os.makedirs(directory)
         print(f"Fold #{fold}")
@@ -315,16 +315,12 @@ for dim in batch_1:
             ),
         )
         decoder_rsfmri.summary()
-        multimodal_autoencoder.save(
-            "{}/fold_{}/multimodal_autoencoder.h5".format(dim, fold)
-        )
-        encoder_shared_layer.save(
-            "{}/fold_{}/encoder_shared_layer.h5".format(dim, fold)
-        )
-        encoder_tfmri.save("{}/fold_{}/encoder_tfmri.h5".format(dim, fold))
-        encoder_rsfmri.save("{}/fold_{}/encoder_rsfmri.h5".format(dim, fold))
-        decoder_tfmri.save("{}/fold_{}/decoder_tfmri.h5".format(dim, fold))
-        decoder_rsfmri.save("{}/fold_{}/decoder_rsfmri.h5".format(dim, fold))
+        multimodal_autoencoder.save("{}/multimodal_autoencoder.h5".format(directory))
+        encoder_shared_layer.save("{}/encoder_shared_layer.h5".format(directory))
+        encoder_tfmri.save("{}/encoder_tfmri.h5".format(directory))
+        encoder_rsfmri.save("{}/encoder_rsfmri.h5".format(directory))
+        decoder_tfmri.save("{}/decoder_tfmri.h5".format(directory))
+        decoder_rsfmri.save("{}/decoder_rsfmri.h5".format(directory))
         # plot our loss
         plt.plot(history.history["loss"], label="loss_fold_{}".format(fold))
         plt.plot(history.history["val_loss"], label="val_loss_fold_{}".format(fold))
@@ -333,8 +329,8 @@ for dim in batch_1:
         plt.ylabel("loss")
         plt.xlabel("epoch")
         plt.legend()
-        plt.savefig("{}/fold_{}/loss.png".format(dim, fold))
-        plt.savefig("{}/fold_{}/loss.pdf".format(dim, fold))
+        plt.savefig("{}/loss.png".format(directory))
+        plt.savefig("{}/loss.pdf".format(directory))
         plt.close()
 
         # Reconstruction of training data
@@ -425,16 +421,28 @@ for dim in batch_1:
     # Save MSE, RMSE (tfmri +rsfmr)
     print("shape of vector mse train", np.array([cvscores_mse_train]).shape)
     print(cvscores_mse_train)
-    np.save("{}/cvscores_mse_train.npy".format(dim), np.array([cvscores_mse_train]))
+    np.save(
+        "{}/{}/cvscores_mse_train.npy".format(out_path, dim),
+        np.array([cvscores_mse_train]),
+    )
     print("shape of  mse vector(test):", np.array([cvscores_mse_test]).shape)
     print(cvscores_mse_test)
-    np.save("{}/cvscores_mse_test.npy".format(dim), np.array([cvscores_mse_test]))
+    np.save(
+        "{}/{}/cvscores_mse_test.npy".format(out_path, dim),
+        np.array([cvscores_mse_test]),
+    )
     print("shape of rmse vector (train):", np.array([cvscores_rmse_train]).shape)
     print(cvscores_rmse_train)
-    np.save("{}/cvscores_rmse_train.npy".format(dim), np.array([cvscores_rmse_train]))
+    np.save(
+        "{}/{}/cvscores_rmse_train.npy".format(out_path, dim),
+        np.array([cvscores_rmse_train]),
+    )
     print("shape of rmse vector (test):", np.array([cvscores_rmse_test]).shape)
     print(cvscores_rmse_test)
-    np.save("{}/cvscores_rmse_test.npy".format(dim), np.array([cvscores_rmse_test]))
+    np.save(
+        "{}/{}/cvscores_rmse_test.npy".format(out_path, dim),
+        np.array([cvscores_rmse_test]),
+    )
     print(
         "%.3f%% (+/- %.5f%%)" % (np.mean(cvscores_mse_test), np.std(cvscores_mse_test))
     )
@@ -453,19 +461,19 @@ for dim in batch_1:
     )
     print(cvscores_mse_tfmri_train)
     np.save(
-        "{}/cvscores_mse_tfmri_train.npy".format(dim),
+        "{}/{}/cvscores_mse_tfmri_train.npy".format(out_path, dim),
         np.array([cvscores_mse_tfmri_train]),
     )
     print("shape of  mse vector(test):", np.array([cvscores_mse_tfmri_test]).shape)
     print(cvscores_mse_tfmri_test)
     np.save(
-        "{}/cvscores_mse_tfmri_test.npy".format(dim),
+        "{}/{}/cvscores_mse_tfmri_test.npy".format(out_path, dim),
         np.array([cvscores_mse_tfmri_test]),
     )
     print("shape of rmse vector (train):", np.array([cvscores_rmse_tfmri_train]).shape)
     print(cvscores_rmse_tfmri_train)
     np.save(
-        "{}/cvscores_rmse_tfmri_train.npy".format(dim),
+        "{}/{}/cvscores_rmse_tfmri_train.npy".format(out_path, dim),
         np.array([cvscores_rmse_tfmri_test]),
     )
     print(
@@ -473,7 +481,7 @@ for dim in batch_1:
     )
     print(cvscores_rmse_tfmri_test)
     np.save(
-        "{}/cvscores_rmse_tfmri_test.npy".format(dim),
+        "{}/{}/cvscores_rmse_tfmri_test.npy".format(out_path, dim),
         np.array([cvscores_rmse_tfmri_test]),
     )
     mse_tfmri_train.append(np.mean(cvscores_mse_tfmri_train))
@@ -492,19 +500,19 @@ for dim in batch_1:
     )
     print(cvscores_mse_rsfmri_train)
     np.save(
-        "{}/cvscores_mse_rsfmri_train.npy".format(dim),
+        "{}/{}/cvscores_mse_rsfmri_train.npy".format(out_path, dim),
         np.array([cvscores_mse_rsfmri_train]),
     )
     print("shape of  mse vector(test):", np.array([cvscores_mse_rsfmri_test]).shape)
     print(cvscores_mse_rsfmri_test)
     np.save(
-        "{}/cvscores_mse_rsfmri_test.npy".format(dim),
+        "{}/{}/cvscores_mse_rsfmri_test.npy".format(out_path, dim),
         np.array([cvscores_mse_rsfmri_test]),
     )
     print("shape of rmse vector (train):", np.array([cvscores_rmse_rsfmri_train]).shape)
     print(cvscores_rmse_rsfmri_train)
     np.save(
-        "{}/cvscores_rmse_rsfmri_train.npy".format(dim),
+        "{}/{}/cvscores_rmse_rsfmri_train.npy".format(out_path, dim),
         np.array([cvscores_rmse_rsfmri_test]),
     )
     print(
@@ -513,7 +521,7 @@ for dim in batch_1:
     )
     print(cvscores_rmse_rsfmri_test)
     np.save(
-        "{}/cvscores_rmse_rsfmri_test.npy".format(dim),
+        "{}/{}/cvscores_rmse_rsfmri_test.npy".format(out_path, dim),
         np.array([cvscores_rmse_rsfmri_test]),
     )
     mse_rsfmri_train.append(np.mean(cvscores_mse_rsfmri_train))
@@ -527,24 +535,26 @@ for dim in batch_1:
 
 
 # save MSE, RMSE, and STD vectors for training and test sets
-np.save("mse_train_mean.npy", np.array([mse_train]))
-np.save("rmse_train_mean.npy", np.array([rmse_train]))
-np.save("std_mse_train_mean.npy", np.array([std_mse_train]))
-np.save("std_rmse_train_mean.npy", np.array([std_rmse_train]))
-np.save("mse_test_mean.npy", np.array([mse_test]))
-np.save("rmse_test_mean.npy", np.array([rmse_test]))
-np.save("std_mse_test_mean.npy", np.array([std_mse_test]))
-np.save("std_rmse_test_mean.npy", np.array([std_rmse_test]))
+np.save("{}/mse_train_mean.npy".format(out_path), np.array([mse_train]))
+np.save("{}/rmse_train_mean.npy".format(out_path), np.array([rmse_train]))
+np.save("{}/std_mse_train_mean.npy".format(out_path), np.array([std_mse_train]))
+np.save("{}/std_rmse_train_mean.npy".format(out_path), np.array([std_rmse_train]))
+np.save("{}/mse_test_mean.npy".format(out_path), np.array([mse_test]))
+np.save("{}/rmse_test_mean.npy".format(out_path), np.array([rmse_test]))
+np.save("{}/std_mse_test_mean.npy".format(out_path), np.array([std_mse_test]))
+np.save("{}/std_rmse_test_mean.npy".format(out_path), np.array([std_rmse_test]))
 
 
 # save MSE, RMSE, and STD vectors for training and test sets (rsfmri)
 
-np.save("mse_test_mean_rsfmri.npy", np.array([mse_rsfmri_test]))
-np.save("rmse_test_mean_rsfmri.npy", np.array([rmse_rsfmri_test]))
-np.save("mse_train_mean_rsfmri.npy", np.array([mse_rsfmri_train]))
-np.save("rmse_train_mean_rsfmri.npy", np.array([rmse_rsfmri_train]))
-np.save("std_mse_mean_rsfmri.npy", np.array([std_mse_rsfmri_test]))
-np.save("std_rmse_mean_rsfmri.npy", np.array([std_rmse_rsfmri_test]))
+np.save("{}/mse_test_mean_rsfmri.npy".format(out_path), np.array([mse_rsfmri_test]))
+np.save("{}/rmse_test_mean_rsfmri.npy".format(out_path), np.array([rmse_rsfmri_test]))
+np.save("{}/mse_train_mean_rsfmri.npy".format(out_path), np.array([mse_rsfmri_train]))
+np.save("{}/rmse_train_mean_rsfmri.npy".format(out_path), np.array([rmse_rsfmri_train]))
+np.save("{}/std_mse_mean_rsfmri.npy".format(out_path), np.array([std_mse_rsfmri_test]))
+np.save(
+    "{}/std_rmse_mean_rsfmri.npy".format(out_path), np.array([std_rmse_rsfmri_test])
+)
 
 
 # plotting the mse train
@@ -556,8 +566,8 @@ plt.xlabel("Encoding dimension")
 plt.ylabel("Reconstruction error (MSE)")
 # showing legend
 plt.legend()
-plt.savefig("reconstruction_error_mse.pdf")
-plt.savefig("reconstruction_error_mse.png")
+plt.savefig("{}/reconstruction_error_mse.pdf".format(out_path))
+plt.savefig("{}/reconstruction_error_mse.png".format(out_path))
 plt.close()
 # plotting the rmse train
 # setting x and y axis range
@@ -567,6 +577,6 @@ plt.xlabel("Encoding dimension")
 plt.ylabel("Reconstruction error (RMSE)")
 # showing legend
 plt.legend()
-plt.savefig("reconstruction_error_rmse.pdf")
-plt.savefig("reconstruction_error_rmse.png")
+plt.savefig("{}/reconstruction_error_rmse.pdf".format(out_path))
+plt.savefig("{}/reconstruction_error_rmse.png".format(out_path))
 plt.close()
