@@ -16,68 +16,6 @@ def load_data(fold):
     for i in range(3, 43):
         if i == 36:  # Avoid missing data
             continue
-        mat = np.load(
-            "/scratch/mmahaut/data/intertva/past_data/representation_learning/relu_linear_three_layers/tfmri/10/fold_{}/X_{}.npy".format(
-                fold, i
-            )
-        )
-        X.append(mat)
-
-    XZ = np.array(X)
-
-    Y = [
-        81.25,
-        81.25,
-        93.75,
-        93.75,
-        93.75,
-        62.5,
-        81.25,
-        100,
-        100,
-        87.5,
-        87.5,
-        68.75,
-        68.75,
-        87.5,
-        93.75,
-        100,
-        62.5,
-        87.5,
-        93.75,
-        87.5,
-        81.25,
-        81.25,
-        81.25,
-        93.75,
-        50,
-        62.5,
-        93.75,
-        81.25,
-        81.25,
-        87.5,
-        68.75,
-        81.25,
-        87.5,
-        87.5,
-        87.5,
-        75,
-        93.75,
-        93.75,
-        93.75,
-    ]
-    YZ = np.array(Y)
-    x = np.array(Y)
-    YZ = (x - min(x)) / (max(x) - min(x))
-    return XZ, YZ
-
-
-def load_concat_data(fold):
-    # Les données dans une liste (pour commencer)
-    X = []
-    for i in range(3, 43):
-        if i == 36:  # Avoid missing data
-            continue
         mat_tf = np.load(
             "/scratch/mmahaut/data/intertva/past_data/representation_learning/relu_linear_three_layers/tfmri/10/fold_{}/X_{}.npy".format(
                 fold, i
