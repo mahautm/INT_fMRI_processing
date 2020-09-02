@@ -17,7 +17,7 @@ def load_data(fold):
         if i == 36:  # Avoid missing data
             continue
         mat = np.load(
-            "/scratch/mmahaut/data/intertva/past_data/representation_learning/relu_linear_three_layers/concat/2/fold_{}/X_{}.npy".format(
+            "/scratch/mmahaut/data/intertva/past_data/representation_learning/relu_linear_three_layers/tfmri/10/fold_{}/X_{}.npy".format(
                 fold, i
             )
         )
@@ -219,7 +219,9 @@ params["mu_min"] = 1e-7
 params["soft_thresh"] = 0.0
 params["delta"] = 0.0
 params["graph"] = laplacian
-file_path = "/scratch/mmahaut/data/intertva/regression_output/tfMRI/reproducibility/"
+file_path = (
+    "/scratch/mmahaut/data/intertva/regression_output/tfMRI/reproducibility/tfmri10"
+)
 
 
 if __name__ == "__main__":
