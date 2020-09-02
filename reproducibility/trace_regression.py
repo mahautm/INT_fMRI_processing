@@ -219,10 +219,12 @@ params["mu_min"] = 1e-7
 params["soft_thresh"] = 0.0
 params["delta"] = 0.0
 params["graph"] = laplacian
-
 file_path = "/scratch/mmahaut/data/intertva/regression_output/tfMRI/reproducibility/"
 
+
 if __name__ == "__main__":
+    if not os.path.exists(os.path.join(file_path, "fold_{}".format(fold))):
+        os.makedirs(os.path.join(file_path, "fold_{}".format(fold)))
     # 10-fold validation
     idx = np.arange(39)
     kf = KFold(n_splits=10)
