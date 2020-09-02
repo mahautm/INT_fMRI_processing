@@ -6,15 +6,10 @@ import numpy as np
 import sys
 import matplotlib.pyplot as plt
 import os
-from mdae_step import build_path_and_vars
-
-from sklearn.metrics import mean_squared_error
-from sklearn.metrics import r2_score
 
 if __name__ == "__main__":
     # The dimensions are used accross 3 scripts, there should be a parameter file that is loaded, probably in json format
     dimensions = ["15-5"]
-
     fold_number = 10  # can be lower thant the actual number of folds calculated during regression, but not higher
     path = "/scratch/mmahaut/data/intertva/regression_output"
     titles = [
@@ -23,47 +18,7 @@ if __name__ == "__main__":
         # "raw_input_tfMRI",
         # "raw_input_gyrification",
     ]  # Exists solely because using "/"" in the title screws up saving and so I could not use the "modality" variable
-    Y = [
-        81.25,
-        81.25,
-        93.75,
-        93.75,
-        93.75,
-        62.5,
-        81.25,
-        100,
-        100,
-        87.5,
-        87.5,
-        68.75,
-        68.75,
-        87.5,
-        93.75,
-        100,
-        62.5,
-        87.5,
-        93.75,
-        87.5,
-        81.25,
-        81.25,
-        81.25,
-        93.75,
-        50,
-        62.5,
-        93.75,
-        81.25,
-        81.25,
-        87.5,
-        68.75,
-        81.25,
-        87.5,
-        87.5,
-        87.5,
-        75,
-        93.75,
-        93.75,
-        93.75,
-    ]
+
     fig, ax = plt.subplots()
     fig.patch.set_visible(False)
     ax.axis("off")
@@ -92,7 +47,6 @@ if __name__ == "__main__":
                 for delta in columns:
                     mse = []
                     r_squared = []
-                    results = []
                     for fold in range(1, fold_number + 1):
                         full_path = os.path.join(
                             path,
@@ -103,33 +57,25 @@ if __name__ == "__main__":
                             "soft_thres_{}".format(float(soft_thres)),
                         )
                         if os.path.exists(full_path):
-                            (
-                                train_index,
-                                test_index,  # <- train and test index are loaded to match mdae training
-                                ref_subject,
-                                orig_path,
-                                base_path,
-                                sub_list,
-                            ) = build_path_and_vars(
-                                "interTVA", "tfMRI", str(15) + "-" + str(5), fold,
+
+                            mse.append(np.load(os.path.join(full_path, "mse.npy")))
+                            r_squared.append(
+                                np.load(os.path.join(full_path, "r_squared.npy"))
                             )
-                            sub_index = np.arange(0, len(sub_list))
-                            results[sub_index[test_index]] = np.load(
-                                os.path.join(full_path, "results.npy")
-                            )
-                            # mse.append(np.load(os.path.join(full_path, "mse.npy")))
-                            # r_squared.append(
-                            #     np.load(os.path.join(full_path, "r_squared.npy"))
-                            # )
                         else:
                             print("missing : ", full_path)
-                    # print("MSE : ", mse)
-                    # print("MSE mean", np.mean(mse))
+                    print("MSE : ", mse)
+                    print("MSE mean", np.mean(mse))
 
                     cell_text_row.append(
-                        str(mean_squared_error(Y, results))
-                        + " // "
-                        + str(r2_score(Y, results))
+                        str(
+                            "%.3f (+/- %.5f)" % (np.mean(mse), np.std(mse))
+                            + "// %.3f (+/- %.5f)"
+                            % (
+                                np.mean(r_squared),
+                                np.std(r_squared),
+                            )  # Really not beautiful, and lacks legend...
+                        )
                     )
 
                 cell_text.append(cell_text_row)
@@ -151,4 +97,3 @@ if __name__ == "__main__":
                 pad_inches=0.5,
             )
             i += 1
-
