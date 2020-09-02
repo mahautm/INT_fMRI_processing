@@ -64,6 +64,8 @@ if __name__ == "__main__":
         93.75,
         93.75,
     ]
+    y = np.array(Y)
+    YZ = (y - min(y)) / (max(y) - min(y))
     fig, ax = plt.subplots()
     fig.patch.set_visible(False)
     ax.axis("off")
