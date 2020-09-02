@@ -223,8 +223,7 @@ file_path = "/scratch/mmahaut/data/intertva/regression_output/tfMRI/reproducibil
 
 
 if __name__ == "__main__":
-    if not os.path.exists(os.path.join(file_path, "fold_{}".format(fold))):
-        os.makedirs(os.path.join(file_path, "fold_{}".format(fold)))
+
     # 10-fold validation
     idx = np.arange(39)
     kf = KFold(n_splits=10)
@@ -232,6 +231,8 @@ if __name__ == "__main__":
     results = np.zeros(39)
     for train_index, test_index in kf.split(idx):
         fold += 1
+        if not os.path.exists(os.path.join(file_path, "fold_{}".format(fold))):
+            os.makedirs(os.path.join(file_path, "fold_{}".format(fold)))
         print(f"Fold #{fold}")
         # Chargement des données
         X, Y = load_data(fold)
