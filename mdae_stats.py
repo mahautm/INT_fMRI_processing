@@ -710,28 +710,6 @@ def get_model_stats(data_orig, data_type, dim, number_folds="10"):
     # setting x and y axis range
     # plotting the mse train
 
-    # Here what we really want is all the combinations between dimensions_1 and 2, and not just dimensions_1
-    plt.plot(dimensions, mse_train, label="mse_train")
-    plt.plot(dimensions, mse_test, label="mse_test")
-    plt.xlabel("Encoding dimension")
-    plt.ylabel("Reconstruction error (MSE)")
-    # showing legend
-    plt.legend()
-    plt.savefig("{}/reconstruction_error_mse.pdf".format(base_path))
-    plt.savefig("{}/reconstruction_error_mse.png".format(base_path))
-    plt.close()
-    # plotting the rmse train
-    # setting x and y axis range
-    plt.plot(dimensions, rmse_train, label="rmse_train")
-    plt.plot(dimensions, rmse_test, label="rmse_test")
-    plt.xlabel("Encoding dimension")
-    plt.ylabel("Reconstruction error (RMSE)")
-    # showing legend
-    plt.legend()
-    plt.savefig("{}/reconstruction_error_rmse.pdf".format(base_path))
-    plt.savefig("{}/reconstruction_error_rmse.png".format(base_path))
-    plt.close()
-
 
 if __name__ == "__main__":
     # The dimension is used accross 3 scripts, there should be a parameter file that is loaded, probably in json format
