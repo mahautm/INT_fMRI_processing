@@ -445,7 +445,6 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
                 ref_subject,
                 orig_path,
                 base_path,
-                index_subjects,
                 sub_list,
             ) = build_path_and_vars(data_orig, data_type, dim, fold)
 
@@ -464,7 +463,6 @@ def get_model_stats(data_orig, data_type, dimensions, number_folds="10"):
                 ref_subject,
                 orig_path,
                 sub_list,
-                index_subjects,
                 train_index,
                 test_index,
             )
