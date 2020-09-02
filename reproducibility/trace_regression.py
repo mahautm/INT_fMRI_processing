@@ -231,6 +231,10 @@ if __name__ == "__main__":
     results = np.zeros(39)
     for train_index, test_index in kf.split(idx):
         fold += 1
+        if (
+            fold == 6
+        ):  # this fold gives back nan for some reason... probably a damaged encoder
+            fold = 7
         if not os.path.exists(os.path.join(file_path, "fold_{}".format(fold))):
             os.makedirs(os.path.join(file_path, "fold_{}".format(fold)))
         print(f"Fold #{fold}")
