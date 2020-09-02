@@ -92,7 +92,7 @@ if __name__ == "__main__":
                 for delta in columns:
                     mse = []
                     r_squared = []
-                    results = []
+                    results = np.zeros(len(sub_list))
                     for fold in range(1, fold_number + 1):
                         full_path = os.path.join(
                             path,
