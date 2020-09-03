@@ -82,7 +82,8 @@ if __name__ == "__main__":
 
     for dim in dimensions:
         for modality in [
-            "tfMRI",
+            # "tfMRI",
+            "tfMRI/reproducibility",
             # "gyrification",
             # "raw_input/tfMRI",
             # "raw_input/gyrification",
