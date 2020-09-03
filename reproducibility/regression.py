@@ -10,6 +10,8 @@ from sklearn.metrics import r2_score
 import tensorflow as tf
 import os
 import sys
+
+sys.path.append("../")
 import errno
 import numpy as np
 import json
