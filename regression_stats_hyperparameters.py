@@ -130,9 +130,9 @@ if __name__ == "__main__":
                     # print("MSE mean", np.mean(mse))
 
                     cell_text_row.append(
-                        "%.3f" % str(mean_squared_error(Y, results))
+                        "%.3f" % mean_squared_error(Y, results)
                         + " // "
-                        + "%.3f" % str(r2_score(Y, results))
+                        + "%.3f" % r2_score(Y, results)
                     )
 
                 cell_text.append(cell_text_row)
