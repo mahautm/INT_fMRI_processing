@@ -13,7 +13,7 @@ import sys
 import errno
 import numpy as np
 import json
-from mdae_step import (
+from ..mdae_step import (
     build_path_and_vars,
     load_raw_data,
     load_intertva_rsfmri,
