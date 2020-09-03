@@ -71,74 +71,6 @@ def load_data(fold):
     YZ = (x - min(x)) / (max(x) - min(x))
     return XZ, YZ
 
-
-def load_concat_data(fold):
-    # Les données dans une liste (pour commencer)
-    X = []
-    for i in range(3, 43):
-        if i == 36:  # Avoid missing data
-            continue
-        mat_tf = np.load(
-            "/scratch/mmahaut/data/intertva/past_data/representation_learning/relu_linear_three_layers/tfmri/10/fold_{}/X_{}.npy".format(
-                fold, i
-            )
-        )
-        mat_rsf = np.load(
-            "/scratch/mmahaut/data/intertva/past_data/representation_learning/relu_linear_three_layers/rsfmri/10/fold_{}/X_{}.npy".format(
-                fold, i
-            )
-        )
-        X.append(np.concatenate((mat_tf, mat_rsf), axis=1))
-
-    XZ = np.array(X)
-
-    Y = [
-        81.25,
-        81.25,
-        93.75,
-        93.75,
-        93.75,
-        62.5,
-        81.25,
-        100,
-        100,
-        87.5,
-        87.5,
-        68.75,
-        68.75,
-        87.5,
-        93.75,
-        100,
-        62.5,
-        87.5,
-        93.75,
-        87.5,
-        81.25,
-        81.25,
-        81.25,
-        93.75,
-        50,
-        62.5,
-        93.75,
-        81.25,
-        81.25,
-        87.5,
-        68.75,
-        81.25,
-        87.5,
-        87.5,
-        87.5,
-        75,
-        93.75,
-        93.75,
-        93.75,
-    ]
-    YZ = np.array(Y)
-    x = np.array(Y)
-    YZ = (x - min(x)) / (max(x) - min(x))
-    return XZ, YZ
-
-
 def load_graph():
     graph = None
     with open("/scratch/mmahaut/scripts/INT_fMRI_processing/adj_matrix.pck", "rb") as f:
@@ -295,15 +227,11 @@ if __name__ == "__main__":
 
     # 10-fold validation
     idx = np.arange(39)
-    kf = KFold(n_splits=6)
+    kf = KFold(n_splits=10)
     fold = 0
     results = np.zeros(39)
     for train_index, test_index in kf.split(idx):
         fold += 1
-        if (
-            fold == 6
-        ):  # this fold gives back nan for some reason... probably a damaged encoder
-            break
         if not os.path.exists(os.path.join(file_path, "fold_{}".format(fold))):
             os.makedirs(os.path.join(file_path, "fold_{}".format(fold)))
         print(f"Fold #{fold}")
