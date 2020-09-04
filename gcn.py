@@ -60,9 +60,11 @@ if __name__ == "__main__":
     X_test = X_val[sub_index[test_index], :, :]
     y_test = y_val[sub_index[test_index]]
     X_train, X_val, X_test = X_train[..., None], X_val[..., None], X_test[..., None]
-
+    print(X_val.shape)
     N = X_train.shape[-2]  # Number of nodes in the graphs
+    print(N)
     F = X_train.shape[-1]  # Node features dimensionality
+    print(F)
     n_out = y_val.shape[-1]  # Dimension of the target
 
     fltr = GraphConv.preprocess(A)
