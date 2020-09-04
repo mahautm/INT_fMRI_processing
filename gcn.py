@@ -66,9 +66,9 @@ if __name__ == "__main__":
     )
     print(X_val.shape)
     print(X_train.shape)
-    N = X_train.shape[-2]  # Number of nodes in the graphs
+    N = X_train.shape[-3]  # Number of nodes in the graphs
     print(N)
-    F = X_train.shape[-1]  # Node features dimensionality
+    F = X_train.shape[-2]  # Node features dimensionality
     print(F)
     n_out = y_val.shape[-1]  # Dimension of the target
 
