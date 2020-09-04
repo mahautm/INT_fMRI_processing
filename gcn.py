@@ -101,7 +101,7 @@ if __name__ == "__main__":
     # Train model
     validation_data = (X_val, y_val)
     model.fit(
-        X_train.T,
+        X_train.reshape(20484, -1, -1),
         y_train,
         batch_size=batch_size,
         validation_data=validation_data,
