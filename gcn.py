@@ -30,7 +30,7 @@ if __name__ == "__main__":
     params["data_source"] = sys.argv[1]  # ABIDE or interTVA
     params["modality"] = sys.argv[2]  # gyrification or tfMRI
     # each fold is trained on a different node, that way calculations can be done faster
-    params["fold"] = int(sys.argv[5])
+    params["fold"] = int(sys.argv[3])
     # According to IJCNN paper, 15 is the best number of dimensions for tfMRI
     params["dim_1"] = 15
     # According to IJCNN paper, 5 is the best number of dimensions for rsfMRI
