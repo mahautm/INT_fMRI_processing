@@ -60,9 +60,9 @@ if __name__ == "__main__":
     X_test = X_val[sub_index[test_index], :, :]
     y_test = y_val[sub_index[test_index]]
     X_train, X_val, X_test = (
-        X_train.reshape(20484, 294, 39),
-        X_val[..., None].reshape(20484, 294, 39),
-        X_test.reshape(20484, 294, 39),
+        X_train.reshape(20484, 294, -1),
+        X_val[..., None].reshape(20484, 294, -1),
+        X_test.reshape(20484, 294, -1),
     )
     print(X_val.shape)
     print(X_train.shape)
