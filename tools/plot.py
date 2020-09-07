@@ -52,6 +52,7 @@ y_true = [
     93.75,
 ]
 y_true = np.array(y_true)
+y_true = (y_true - min(y_true)) / (max(y_true) - min(y_true))
 y_prediction = np.zeros(39)
 sub_index = np.arange(0, 39)
 
@@ -118,6 +119,7 @@ plt.legend(
         % (mean_squared_error(y_true, y_reg), r2_score(y_true, y_reg))
     ],
 )
+plt.gca().legend(loc="best")
 
 plt.savefig(os.path.join(file_path, "y_ypred.png"))
 
