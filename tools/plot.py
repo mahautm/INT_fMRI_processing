@@ -4,6 +4,8 @@ import sys
 import os
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.model_selection import KFold
+
 
 sys.path.append("../")
 from mdae_step import build_path_and_vars
@@ -52,18 +54,13 @@ y_true = [
 y_prediction = np.zeros(39)
 sub_index = np.arange(0, 39)
 
-for fold in range(1, 11):
-    (
-        train_index,
-        test_index,  # <- train and test index are loaded to match mdae training
-        ref_subject,
-        orig_path,
-        base_path,
-        sub_list,
-    ) = build_path_and_vars(
-        "interTVA", "tfMRI", "reproducibility/tfmri10-rsfmri10", fold,
-    )
-
+kf = KFold(n_splits=10)
+print(kf.get_n_splits(sub_index))
+print("number of splits:", kf)
+orig_path = "/scratch/mmahaut/data/intertva"
+fold = 0
+for train_index, test_index in kf.split(sub_index):
+    fold += 1
     file_path = os.path.join(
         orig_path,
         "regression_output/tfMRI/reproducibility/tfmri10-rsfmri10/fold_{}".format(fold),
