@@ -250,7 +250,7 @@ if __name__ == "__main__":
         XE = X[idx[train_index], :, :].reshape(len(train_index), -1)
         YE = Y[idx[train_index]]
         # Ensemble de test
-        XT = X[idx[test_index], :, :].reshape(len(train_index), -1)
+        XT = X[idx[test_index], :, :].reshape(len(test_index), -1)
         YT = Y[idx[test_index]]
         beta = estimate_beta(XE, YE, params)
         file = "fold_{}/beta.npy".format(fold)
