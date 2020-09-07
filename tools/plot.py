@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 import os
+from sklearn import linear_model
+from sklearn.metrics import mean_squared_error, r2_score
 
 sys.path.append("../")
 from mdae_step import build_path_and_vars
@@ -110,7 +112,7 @@ file_path = os.path.join(
 )
 
 plt.scatter(y_true, y_prediction, color="black")
-droite = plt.plot(diabetes_X_test, diabetes_y_pred, color="blue")
+droite = plt.plot(y_true, y_reg, color="blue")
 plt.legend(
     [droite],
     [
