@@ -48,7 +48,7 @@ y_true = [
     93.75,
 ]
 y_prediction = np.zeros(39)
-sub_index = np.arange(0, 39))
+sub_index = np.arange(0, 39)
 
 for fold in range(1, 11):
     (
@@ -100,22 +100,24 @@ regr = linear_model.LinearRegression()
 regr.fit(y_true, y_prediction)
 y_reg = regr.predict(y_true)
 # The coefficients
-print('Coefficients: \n', regr.coef_)
+print("Coefficients: \n", regr.coef_)
 # The mean squared error
-print('Mean squared error: %.2f'
-      % mean_squared_error(y_true, y_reg))
+print("Mean squared error: %.2f" % mean_squared_error(y_true, y_reg))
 # The coefficient of determination: 1 is perfect prediction
-print('Coefficient of determination: %.2f'
-      % r2_score(y_true, y_reg))
+print("Coefficient of determination: %.2f" % r2_score(y_true, y_reg))
 file_path = os.path.join(
-        orig_path,
-        "regression_output/tfMRI/reproducibility/tfmri10-rsfmri10/",
-    )
+    orig_path, "regression_output/tfMRI/reproducibility/tfmri10-rsfmri10/",
+)
 
 plt.scatter(y_true, y_prediction, color="black")
-droite = plt.plot(diabetes_X_test, diabetes_y_pred, color='blue')
-plt.legend([droite],['Coefficients: {}\nMean squared error: %.2f \nR²: %.2f'.format(regr.coef_) % (mean_squared_error(y_true, y_reg),r2_score(y_true, y_reg))])
+droite = plt.plot(diabetes_X_test, diabetes_y_pred, color="blue")
+plt.legend(
+    [droite],
+    [
+        "Coefficients: {}\nMean squared error: %.2f \nR²: %.2f".format(regr.coef_)
+        % (mean_squared_error(y_true, y_reg), r2_score(y_true, y_reg))
+    ],
+)
 
-plt.savefig(os.path.join(file_path,"y_ypred.png"))
-
+plt.savefig(os.path.join(file_path, "y_ypred.png"))
 
