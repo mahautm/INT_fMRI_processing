@@ -110,24 +110,24 @@ for train_index, test_index in kf.split(sub_index):
 
 regr_tot = linear_model.LinearRegression()
 regr_tot.fit(Y.reshape(-1, 1), y_prediction)
-y_reg = regr_tot.predict(y_true.reshape(-1, 1))
+y_reg = regr_tot.predict(Y.reshape(-1, 1))
 # The coefficients
 print("Coefficients: \n", regr.coef_)
 # The mean squared error
-print("Mean squared error: %.2f" % mean_squared_error(y_true, y_reg))
+print("Mean squared error: %.2f" % mean_squared_error(Y, y_reg))
 # The coefficient of determination: 1 is perfect prediction
-print("Coefficient of determination: %.2f" % r2_score(y_true, y_reg))
+print("Coefficient of determination: %.2f" % r2_score(Y, y_reg))
 file_path = os.path.join(
     orig_path, "regression_output/tfMRI/reproducibility/tfmri10-rsfmri10/",
 )
 
-plt.scatter(y_true, y_prediction, color="black")
-droite = plt.plot(y_true, y_reg, color="blue")
+plt.scatter(Y, y_prediction, color="black")
+droite = plt.plot(Y, y_reg, color="blue")
 plt.legend(
     [droite],
     [
         "Coefficients: {}\nMean squared error: %.2f \nR²: %.2f".format(regr.coef_)
-        % (mean_squared_error(y_true, y_reg), r2_score(y_true, y_reg))
+        % (mean_squared_error(Y, y_reg), r2_score(Y, y_reg))
     ],
 )
 plt.gca().legend(loc="best")
