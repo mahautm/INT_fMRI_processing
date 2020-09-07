@@ -77,12 +77,6 @@ orig_path = "/scratch/mmahaut/data/intertva"
 fold = 0
 for train_index, test_index in kf.split(sub_index):
     fold += 1
-    file_path = os.path.join(
-        orig_path,
-        "regression_output/tfMRI/reproducibility/tfmri10-rsfmri10/fold_{}".format(fold),
-    )
-    beta = np.load(os.path.join(file_path, "beta.npy"))
-
     X = []
     for i in range(3, 43):
         if i == 36:  # Avoid missing data
@@ -102,10 +96,10 @@ for train_index, test_index in kf.split(sub_index):
     X = np.array(X)
     print("TRAIN:", sub_index[train_index], "TEST:", sub_index[test_index])
     # Ensemble d'entrainement
-    XE = X[sub_index[train_index], :, :]
+    XE = X[sub_index[train_index], :, :].reshape(len(train_index), -1)
     YE = Y[sub_index[train_index]]
     # Ensemble de test
-    XT = X[sub_index[test_index], :, :]
+    XT = X[sub_index[test_index], :, :].reshape(len(test_index), -1)
     YT = Y[sub_index[test_index]]
 
     regr = linear_model.LinearRegression()
