@@ -51,6 +51,7 @@ y_true = [
     93.75,
     93.75,
 ]
+y_true = np.array(y_true)
 y_prediction = np.zeros(39)
 sub_index = np.arange(0, 39)
 
