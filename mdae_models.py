@@ -1,7 +1,7 @@
 import keras
-from keras.layers import Input, Dense, concatenate, Conv2D, MaxPooling2D, UpSampling2D
+from keras.layers import Input, Dense, concatenate, Dropout
 from keras.models import Model
-
+from spektral.layers import GraphConv
 from keras.optimizers import Adam
 
 
@@ -155,16 +155,30 @@ def build_trimodal_model():
     return multimodal_autoencoder, encoder_rsfmri, encoder_shared_layer, encoder_gyr
 
 
+def load_graph():
+    graph = None
+    with open("/scratch/mmahaut/scripts/INT_fMRI_processing/adj_matrix.pck", "rb") as f:
+        graph = pickle.load(f)
+    return graph
+
+
 def build_convolutional_model(
     input_shape_1, input_shape_2, hidden_layer, output_layer
 ):  # <- no need as vertexes don't hold spatial information, I need to include a laplatian in all that, to give it back its spatial dimension
     # Apply linear autoencoder
+
+    # Calcul du Laplacien du graphe
+    adj_matrix = load_graph()
+
     # Inputs Shape
     input_view_1 = Input(shape=(input_shape_1))
     input_view_2 = Input(shape=(input_shape_2))
+    A_in = Input(
+        shape=adj_matrix.shape[0]
+    )  # the adj_matrix is a square 20484 * 20484 matrix
 
     # First view
-    conv_1 = Conv2D(16, (3, 3), activation=hidden_layer, padding="same")(input_view_1)
+    conv_1 = GraphConv(16, activation=hidden_layer)(input_view_1,)
     conv_1 = MaxPooling2D((2, 2), padding="same")(conv_1)
     conv_1 = Conv2D(8, (3, 3), activation=hidden_layer, padding="same")(conv_1)
     conv_1 = MaxPooling2D((2, 2), padding="same")(conv_1)
