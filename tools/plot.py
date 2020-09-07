@@ -96,8 +96,8 @@ for train_index, test_index in kf.split(sub_index):
     )
 
 regr = linear_model.LinearRegression()
-regr.fit(y_true, y_prediction)
-y_reg = regr.predict(y_true)
+regr.fit(y_true.reshape(-1, 1), y_prediction)
+y_reg = regr.predict(y_true.reshape(-1, 1))
 # The coefficients
 print("Coefficients: \n", regr.coef_)
 # The mean squared error
