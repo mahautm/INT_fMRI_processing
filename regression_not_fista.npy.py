@@ -68,7 +68,6 @@ y_true = np.array(y_true)
 Y = (y_true - min(y_true)) / (max(y_true) - min(y_true))
 y_prediction = np.zeros(39)
 sub_index = np.arange(0, 39)
-print("Fold #{}".format(params["fold"]))
 # Chargement des données
 
 kf = KFold(n_splits=10)
