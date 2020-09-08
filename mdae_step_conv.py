@@ -48,6 +48,7 @@ if __name__ == "__main__":
     ) = build_normalised_data(
         data_orig, data_type, ref_subject, orig_path, sub_list, train_index, test_index,
     )
+    
     (
         multimodal_autoencoder,
         encoder_rsfmri,
