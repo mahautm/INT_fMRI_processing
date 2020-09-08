@@ -17,7 +17,7 @@ from mdae_step import build_path_and_vars
 
 y_prediction = np.zeros(39)
 
-for fold in range(2, 11):
+for fold in range(1, 11):
     # Calcul du Laplacien du graphe
     A = load_graph()
     params = {}
@@ -52,7 +52,7 @@ for fold in range(2, 11):
         ("/scratch/mmahaut/data/intertva/ae/gcnn/fold_{}/model.h5".format(fold)),
         custom_objects={"GraphConv": GraphConv},
     )
-    y_prediction[sub_index[test_index]] = model.predict(X_test)
+    y_prediction[sub_index[test_index]] = model.predict([X_test,A])
 
 regr = linear_model.LinearRegression()
 regr.fit(y_val.reshape(-1, 1), y_prediction)
