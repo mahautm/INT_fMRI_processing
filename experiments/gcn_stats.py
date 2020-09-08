@@ -9,7 +9,6 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 sys.path.append("/scratch/mmahaut/scripts/INT_fMRI_processing/")
 
 from regression import build_raw_xy_data, load_graph
@@ -18,7 +17,7 @@ from mdae_step import build_path_and_vars
 
 y_prediction = np.zeros(39)
 
-for fold in range(1, 11):
+for fold in range(2, 11):
     # Calcul du Laplacien du graphe
     A = load_graph()
     params = {}
