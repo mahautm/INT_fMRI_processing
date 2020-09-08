@@ -11,7 +11,7 @@ from spektral.layers.ops import sp_matrix_to_sp_tensor
 
 import sys
 
-sys.path.append("../")
+sys.path.append("/scratch/mmahaut/scripts/INT_fMRI_processing/")
 
 from regression import build_raw_xy_data, load_graph
 from mdae_step import mdae_step
