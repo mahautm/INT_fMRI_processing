@@ -1,14 +1,20 @@
-import glob
 from spektral.layers import GraphConv
-from tensorflow.keras import Model
-from regression import build_raw_xy_data, load_graph
-from mdae_step import build_path_and_vars
-import numpy as np
-from tensorflow.keras.models import load_model
-import os
-import matplotlib.pyplot as plt
 from sklearn import linear_model
 from sklearn.metrics import mean_squared_error, r2_score
+from tensorflow.keras import Model
+from tensorflow.keras.models import load_model
+import sys
+import glob
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+sys.path.append("/scratch/mmahaut/scripts/INT_fMRI_processing/")
+
+from regression import build_raw_xy_data, load_graph
+from mdae_step import build_path_and_vars
+
 
 y_prediction = np.zeros(39)
 
