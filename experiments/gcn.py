@@ -70,7 +70,7 @@ if __name__ == "__main__":
     print(N)
     F = X_train.shape[-1]  # Node features dimensionality
     print(F)
-    n_out = y_val.shape[-1]  # Dimension of the target
+    n_out = 1  # Dimension of the target
     print(y_val.shape)
     fltr = GraphConv.preprocess(A)
 
