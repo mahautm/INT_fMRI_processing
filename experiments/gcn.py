@@ -34,7 +34,7 @@ if __name__ == "__main__":
     params["dim_1"] = 15
     # According to IJCNN paper, 5 is the best number of dimensions for rsfMRI
     params["dim_2"] = 5
-    for fold in range(1, 11):
+    for fold in range(9, 11):
         params["fold"] = fold
         (
             train_index,

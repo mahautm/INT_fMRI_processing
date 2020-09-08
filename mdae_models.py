@@ -178,11 +178,11 @@ def build_convolutional_model(
     )  # the adj_matrix is a square 20484 * 20484 matrix
 
     # First view
-    conv_1 = GraphConv(16, activation=hidden_layer)(input_view_1,)
-    conv_1 = MaxPooling2D((2, 2), padding="same")(conv_1)
-    conv_1 = Conv2D(8, (3, 3), activation=hidden_layer, padding="same")(conv_1)
-    conv_1 = MaxPooling2D((2, 2), padding="same")(conv_1)
-    conv_1 = Conv2D(8, (3, 3), activation=hidden_layer, padding="same")(conv_1)
+    conv_1 = GraphConv(16, activation=hidden_layer)(input_view_1,A_in)
+    conv_1 = Dropout(0.5)(conv_1)
+    conv_1 = GraphConv(8, activation=hidden_layer)(conv_1,A_in)
+    conv_1 = Dropout(0.5)(conv_1)
+    conv_1 = GraphConv(4, activation=hidden_layer)(conv_1,A_in)
     encoded_1 = MaxPooling2D((2, 2), padding="same")(conv_1)
     print("encoded_1 shape : ", encoded_1.shape)
 
