@@ -59,7 +59,7 @@ print("Mean squared error: %.2f" % mean_squared_error(y_val, y_reg))
 # The coefficient of determination: 1 is perfect prediction
 print("R²: %.2f" % r2_score(y_val, y_reg))
 file_path = os.path.join(
-    params["orig_path"], "regression_output/tfMRI/reproducibility/tfmri10-rsfmri10/",
+    params["orig_path"], "/scratch/mmahaut/data/intertva/ae/gcnn/",
 )
 
 plt.scatter(y_val, y_prediction, color="black")
