@@ -14,7 +14,7 @@ import sys
 sys.path.append("/scratch/mmahaut/scripts/INT_fMRI_processing/")
 
 from regression import build_raw_xy_data, load_graph
-from mdae_step import mdae_step
+from mdae_step import build_path_and_vars
 import os
 import numpy as np
 
