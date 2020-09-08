@@ -9,8 +9,11 @@ from tensorflow.keras.regularizers import l2
 from spektral.layers import GraphConv
 from spektral.layers.ops import sp_matrix_to_sp_tensor
 
-from regression import build_raw_xy_data, build_path_and_vars, load_graph
 import sys
+
+sys.path.append("../")
+
+from regression import build_raw_xy_data, build_path_and_vars, load_graph
 import os
 import numpy as np
 
