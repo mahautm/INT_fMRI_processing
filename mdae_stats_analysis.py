@@ -41,7 +41,9 @@ def build_stat_table(dimensions, orig_path, stat_files, title=""):
         rows.append("{} dim encoding".format(dimensions[dim_index]))
         row_cell_text = []
         for filename in stat_files:
-            stat = np.load(os.path.join(orig_path, dimensions[dim_index], filename))[0]
+            stat = np.mean(
+                np.load(os.path.join(orig_path, dimensions[dim_index], filename))
+            )
             row_cell_text.append(stat)
             columns.append(
                 filename[: len(filename) - 4]
@@ -117,16 +119,16 @@ if __name__ == "__main__":
         # "ABIDE gyrification MSE",
     ]
     stat_files = [
-        "rmse_test_mean.npy",
-        "rmse_test_mean_rsfmri.npy",
-        "rmse_train_mean.npy",
-        "rmse_train_mean_rsfmri.npy",
-        "std_mse_mean_rsfmri.npy",
-        "std_mse_test_mean.npy",
-        "std_mse_train_mean.npy",
-        "std_rmse_mean_rsfmri.npy",
-        "std_rmse_test_mean.npy",
-        "std_rmse_train_mean.npy",
+        "cvscores_mse_gyr_test.npy",
+        "cvscores_mse_gyr_train.npy",
+        "cvscores_mse_rsfmri_test.npy",
+        "cvscores_mse_rsfmri_train.npy",
+        "cvscores_mse_test.npy",
+        "cvscores_mse_train.npy",
+        "cvscores_rmse_gyr_test.npy",
+        "cvscores_rmse_gyr_train.npy",
+        "cvscores_rmse_rsfmri_test.npy",
+        "cvscores_rmse_rsfmri_train.npy",
     ]
     for i in range(len(paths_to_analyse)):
         # regroup_stats(paths_to_analyse[i], dimensions, nb_folds)
