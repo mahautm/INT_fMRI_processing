@@ -41,7 +41,7 @@ def build_stat_table(dimensions, orig_path, stat_files, title=""):
         rows.append("{} dim encoding".format(dimensions[dim_index]))
         row_cell_text = []
         for filename in stat_files:
-            stat = np.load(os.path.join(orig_path, filename))[0]
+            stat = np.load(os.path.join(orig_path, dimensions[dim_index], filename))[0]
             row_cell_text.append(stat)
             columns.append(
                 filename[: len(filename) - 4]
