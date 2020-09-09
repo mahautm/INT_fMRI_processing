@@ -63,7 +63,6 @@ if __name__ == "__main__":
     # Ensemble de test
     X_test = X_val[sub_index[test_index], :, :]
     y_test = y_val[sub_index[test_index]]
-    X_train, X_val, X_test
     print(X_val.shape)
     print(X_train.shape)
     N = X_train.shape[-2]  # Number of nodes in the graphs

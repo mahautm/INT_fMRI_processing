@@ -129,7 +129,7 @@ if __name__ == "__main__":
         "std_rmse_train_mean.npy",
     ]
     for i in range(len(paths_to_analyse)):
-        regroup_stats(paths_to_analyse[i], dimensions, nb_folds)
+        # regroup_stats(paths_to_analyse[i], dimensions, nb_folds)
         table = build_stat_table(dimensions, paths_to_analyse[i], stat_files, titles[i])
 
 # This script has to be run AFTER mdae_stats.py, it will summarise the evaluation data in a table and save it as a png
