@@ -52,7 +52,11 @@ for fold in range(1, 11):
         ("/scratch/mmahaut/data/intertva/ae/gcnn/fold_{}/model.h5".format(fold)),
         custom_objects={"GraphConv": GraphConv},
     )
-    y_prediction[sub_index[test_index]] = model.predict([X_test,A])
+    y_prediction[sub_index[test_index]] = model.predict([X_test, A])
+    np.save(
+        "/scratch/mmahaut/data/intertva/ae/gcnn/fold_{}/predictions.npy".format(fold),
+        y_prediction[sub_index[test_index]],
+    )
 
 regr = linear_model.LinearRegression()
 regr.fit(y_val.reshape(-1, 1), y_prediction)
