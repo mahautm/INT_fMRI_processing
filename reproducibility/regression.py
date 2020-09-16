@@ -52,17 +52,24 @@ def build_xy_data(params, dimension, fold, sub_list):
     for i in range(3, 43):
         if i == 36:  # Avoid missing data
             continue
-        mat_tf = np.load(
-            "/scratch/mmahaut/data/intertva/past_data/representation_learning/relu_linear_three_layers/tfmri/10/fold_{}/X_{}.npy".format(
-                fold, i
+        # mat_tf = np.load(
+        #     "/scratch/mmahaut/data/intertva/past_data/representation_learning/relu_linear_three_layers/tfmri/10/fold_{}/X_{}.npy".format(
+        #         fold, i
+        #     )
+        # )
+        # mat_rsf = np.load(
+        #     "/scratch/mmahaut/data/intertva/past_data/representation_learning/relu_linear_three_layers/rsfmri/10/fold_{}/X_{}.npy".format(
+        #         fold, i
+        #     )
+        # )
+        # X.append(np.concatenate((mat_tf, mat_rsf), axis=1))
+        X.append(
+            np.load(
+                "/scratch/mmahaut/data/intertva/past_data/relu_linear/concat/10/fold_{}/X_{}".format(
+                    fold, i
+                )
             )
         )
-        mat_rsf = np.load(
-            "/scratch/mmahaut/data/intertva/past_data/representation_learning/relu_linear_three_layers/rsfmri/10/fold_{}/X_{}.npy".format(
-                fold, i
-            )
-        )
-        X.append(np.concatenate((mat_tf, mat_rsf), axis=1))
 
     XZ = np.array(X)
     Y = []

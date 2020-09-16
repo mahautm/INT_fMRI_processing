@@ -108,11 +108,8 @@ def run_slurm_job_regression(
 if __name__ == "__main__":
 
     params_grid = {}
-    params_grid["delta"] = [0, 100, 1000]  # list values to grid_search on
-    params_grid["soft_thresh"] = [
-        0,
-        1.9e-4,
-    ]
+    params_grid["delta"] = [0, 10, 1e-3, 1e-5]  # list values to grid_search on
+    params_grid["soft_thresh"] = [0, 1.9e-4, 1e-5]
     params_grid["modality"] = ["tfMRI"]  # ["gyrification", "tfMRI"]
     params_grid["data_source"] = ["interTVA"]  # ["ABIDE", "interTVA"]
     params_grid["auto_encoded"] = [True]  # [True, False]

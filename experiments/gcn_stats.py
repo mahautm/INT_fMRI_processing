@@ -15,9 +15,7 @@ from regression import build_raw_xy_data, load_graph
 from mdae_step import build_path_and_vars
 
 
-y_prediction = np.zeros(39)
-
-for fold in range(1, 11):
+def fold_stat(fold):
     # Calcul du Laplacien du graphe
     A = load_graph()
     params = {}
@@ -58,6 +56,16 @@ for fold in range(1, 11):
         y_prediction[sub_index[test_index]],
     )
 
+
+y_prediction = np.zeros(39)
+
+for fold in range(1, 11):
+    fold_stat(fold)
+
+y_val = np.load(
+    "/scratch/mmahaut/data/intertva/ae/gcnn/fold_{}/predictions.npy".format(fold)
+)
+y_prediction[sub_index[test_index]] = np.load()
 regr = linear_model.LinearRegression()
 regr.fit(y_val.reshape(-1, 1), y_prediction)
 y_reg = regr.predict(y_val.reshape(-1, 1))
@@ -67,9 +75,7 @@ print("Coefficients: \n", regr.coef_)
 print("Mean squared error: %.2f" % mean_squared_error(y_val, y_reg))
 # The coefficient of determination: 1 is perfect prediction
 print("R²: %.2f" % r2_score(y_val, y_reg))
-file_path = os.path.join(
-    params["orig_path"], "/scratch/mmahaut/data/intertva/ae/gcnn/",
-)
+file_path = "/scratch/mmahaut/data/intertva/ae/gcnn/"
 
 plt.scatter(y_val, y_prediction, color="black")
 droite = plt.plot(
