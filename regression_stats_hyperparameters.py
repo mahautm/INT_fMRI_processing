@@ -76,9 +76,9 @@ if __name__ == "__main__":
 
     i = 0
     # Here collumns are for delta params
-    columns = [0, 100, 1000]
+    columns = [0, 10, 1e-3, 1e-5]
     # Here rows are for soft thres params
-    rows = [0, 1.9e-4]
+    rows = [0, 1.9e-4, 1e-5]
 
     for dim in dimensions:
         for modality in [
