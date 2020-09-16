@@ -1,6 +1,6 @@
 # INT_fMRI_processing
 # Part 1 : feature extraction
-
+![flow_chart for feature extraction](https://github.com/mahautm/INT_fMRI_processing/blob/master/documentation/extract_one_ABIDE.png)
 feature_extraction_ABIDE prepares data from a given set of subjects in the ABIDE data set, and prepares them for feature extraction through an auto-encoder by producing an activation matrix, and one representative of anatomical girification.
 
 ## Functions
