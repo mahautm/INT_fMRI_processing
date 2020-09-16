@@ -4,9 +4,10 @@
 feature_extraction_ABIDE prepares data from a given set of subjects in the ABIDE data set, and prepares them for feature extraction through an auto-encoder by producing an activation matrix, and one representative of anatomical girification.
 
 ## Functions
-As represented in the flow chart, the steps are as follows :
-download_abide-urls : downloads all required data for chosen subjects
-register : sets
+As represented in the flow chart, the modules run as follows :
+*download_abide-urls* : downloads all required data for chosen subjects
+*compute_rsfmri* : computes rsfmri connectivity matrices between regions of interest and brain vertices
+*compute_gyrification* : computes a matrix made of 100 eigenvectors, representing the frequency of spatial brain folds, also named gyrifications
 
 ## requires :
 
