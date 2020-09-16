@@ -30,9 +30,9 @@ the template files to be used (default is fsaverage5) must be in the freesurfer 
 
 Prepare the subs_list JSON file in url_preparation to contain the list of subjects you wish to prepare matrices for.
 
-### Then, you have to options :
+### Then, you have two options :
 
-1. run the script from the mesocentre, with SLURM : in this case, call mesocentre_ABIDE, with python3, each subject will be a separate job
+1. run the script from the mesocentre, with SLURM : in this case, call mesocentre_ABIDE, with python3, each subject will be a separate job. The subjects to run on can be parametered in a JSON file, located in the url_preparation file (subs_list_asd.json for abide data).
 
 2. run from a single machine : use feature_extraction_ABIDE's extract_all_ABIDE function to extract features on each subject, one after the other.
 
