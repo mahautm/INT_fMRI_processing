@@ -59,7 +59,7 @@ All scripts suffixed with "mdae" contribute to that aim.
     same as mdae.py, but training folds are done by vertex, and not by subject
     
 ## B. trace-regression
-All scripts prefixed with "regression" aim to predict the text score (interTVA) from a subject or classify (ABIDE) subjects.
+All scripts prefixed with "regression" aim to predict the test score (interTVA) from a subject or classify (ABIDE) subjects.
 
   1. regression.py
     generates and save the beta matrix for regression.
