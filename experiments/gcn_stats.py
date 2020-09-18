@@ -51,7 +51,7 @@ def fold_stat(fold):
         ("/scratch/mmahaut/data/intertva/ae/gcnn/fold_{}/model.h5".format(fold)),
         custom_objects={"GraphConv": GraphConv},
     )
-    y_prediction = model.predict([X_test, A])
+    y_prediction = model.predict(X_test)
     np.save(
         "/scratch/mmahaut/data/intertva/ae/gcnn/fold_{}/predictions.npy".format(fold),
         y_prediction,
