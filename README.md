@@ -1,12 +1,17 @@
 # INT_fMRI_processing
 # Part 1 : feature extraction
-
+![flow_chart for feature extraction](https://github.com/mahautm/INT_fMRI_processing/blob/master/documentation/extract_one_ABIDE.png)
 feature_extraction_ABIDE prepares data from a given set of subjects in the ABIDE data set, and prepares them for feature extraction through an auto-encoder by producing an activation matrix, and one representative of anatomical girification.
 
 ## Functions
-As represented in the flow chart, the steps are as follows :
-download_abide-urls : downloads all required data for chosen subjects
-register : sets
+As represented in the flow chart, the modules run as follows :
+
+*download_abide-urls* : downloads all required data for chosen subjects
+
+*compute_rsfmri* : computes rsfmri connectivity matrices between regions of interest and brain vertices
+
+*compute_gyrification* : computes a matrix made of 100 eigenvectors, representing the frequency of spatial brain folds, also named gyrifications
+
 
 ## requires :
 
@@ -25,9 +30,9 @@ the template files to be used (default is fsaverage5) must be in the freesurfer 
 
 Prepare the subs_list JSON file in url_preparation to contain the list of subjects you wish to prepare matrices for.
 
-### Then, you have to options :
+### Then, you have two options :
 
-1. run the script from the mesocentre, with SLURM : in this case, call mesocentre_ABIDE, with python3, each subject will be a separate job
+1. run the script from the mesocentre, with SLURM : in this case, call mesocentre_ABIDE, with python3, each subject will be a separate job. The subjects to run on can be parametered in a JSON file, located in the url_preparation file (subs_list_asd.json for abide data).
 
 2. run from a single machine : use feature_extraction_ABIDE's extract_all_ABIDE function to extract features on each subject, one after the other.
 
@@ -54,7 +59,7 @@ All scripts suffixed with "mdae" contribute to that aim.
     same as mdae.py, but training folds are done by vertex, and not by subject
     
 ## B. trace-regression
-All scripts prefixed with "regression" aim to predict the text score (interTVA) from a subject or classify (ABIDE) subjects.
+All scripts prefixed with "regression" aim to predict the test score (interTVA) from a subject or classify (ABIDE) subjects.
 
   1. regression.py
     generates and save the beta matrix for regression.
