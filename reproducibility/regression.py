@@ -11,7 +11,7 @@ import tensorflow as tf
 import os
 import sys
 
-sys.path.append("../")
+sys.path.append("/scratch/mmahaut/scripts/INT_fMRI_processing")
 import errno
 import numpy as np
 import json
