@@ -65,7 +65,7 @@ def build_xy_data(params, dimension, fold, sub_list):
         # X.append(np.concatenate((mat_tf, mat_rsf), axis=1))
         X.append(
             np.load(
-                "/scratch/mmahaut/data/intertva/past_data/latent_representation/relu_linear_concat_z/fold_{}/X_{}.npy".format(
+                "/scratch/mmahaut/data/intertva/past_data/latent_representation/relu_sigmoid_concat_z/fold_{}/X_{}.npy".format(
                     fold, i
                 )
             )
