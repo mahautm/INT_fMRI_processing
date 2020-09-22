@@ -466,7 +466,6 @@ def get_model_stats(data_orig, data_type, dim, number_folds="10"):
             train_index,
             test_index,
         )
-        # This is hard coding a temporary solution : not good
 
         multimodal_autoencoder = tf.keras.models.load_model(
             "{}/{}/fold_{}/multimodal_autoencoder.h5".format(base_path, dim, fold)
@@ -522,6 +521,11 @@ def get_model_stats(data_orig, data_type, dim, number_folds="10"):
             [normalized_test_gyr_data, normalized_test_rsfmri_data]
         )
 
+        print(
+            "prediction v.s. expected :\n",
+            [X_test_new_gyr, X_test_new_rsfmri],
+            [normalized_test_gyr_data, normalized_test_rsfmri_data],
+        )
         # Test
         # gyr
         print("Max value of predicted testing gyr data ", np.max(X_test_new_gyr))

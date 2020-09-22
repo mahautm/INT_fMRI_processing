@@ -1,8 +1,9 @@
 import keras
 from keras.layers import Input, Dense, concatenate, Dropout
 from keras.models import Model
-from spektral.layers import GraphConv
 from keras.optimizers import Adam
+
+# from spektral.layers import GraphConv
 
 
 def build_model(dim_1, dim_2, input_shape_1, input_shape_2, hidden_layer, output_layer):
@@ -162,81 +163,81 @@ def load_graph():
     return graph
 
 
-def build_convolutional_model(
-    input_shape_1, input_shape_2, hidden_layer, output_layer
-):  # <- no need as vertexes don't hold spatial information, I need to include a laplatian in all that, to give it back its spatial dimension
-    # Apply linear autoencoder
+# def build_convolutional_model(
+#     input_shape_1, input_shape_2, hidden_layer, output_layer
+# ):  # <- no need as vertexes don't hold spatial information, I need to include a laplatian in all that, to give it back its spatial dimension
+#     # Apply linear autoencoder
 
-    # Calcul du Laplacien du graphe
-    adj_matrix = load_graph()
+#     # Calcul du Laplacien du graphe
+#     adj_matrix = load_graph()
 
-    # Inputs Shape
-    input_view_1 = Input(shape=(input_shape_1))
-    input_view_2 = Input(shape=(input_shape_2))
-    A_in = Input(
-        shape=adj_matrix.shape[0]
-    )  # the adj_matrix is a square 20484 * 20484 matrix
+#     # Inputs Shape
+#     input_view_1 = Input(shape=(input_shape_1))
+#     input_view_2 = Input(shape=(input_shape_2))
+#     A_in = Input(
+#         shape=adj_matrix.shape[0]
+#     )  # the adj_matrix is a square 20484 * 20484 matrix
 
-    # First view
-    conv_1 = GraphConv(16, activation=hidden_layer)(input_view_1,A_in)
-    conv_1 = Dropout(0.5)(conv_1)
-    conv_1 = GraphConv(8, activation=hidden_layer)(conv_1,A_in)
-    conv_1 = Dropout(0.5)(conv_1)
-    conv_1 = GraphConv(4, activation=hidden_layer)(conv_1,A_in)
-    encoded_1 = MaxPooling2D((2, 2), padding="same")(conv_1)
-    print("encoded_1 shape : ", encoded_1.shape)
+#     # First view
+#     conv_1 = GraphConv(16, activation=hidden_layer)(input_view_1,A_in)
+#     conv_1 = Dropout(0.5)(conv_1)
+#     conv_1 = GraphConv(8, activation=hidden_layer)(conv_1,A_in)
+#     conv_1 = Dropout(0.5)(conv_1)
+#     conv_1 = GraphConv(4, activation=hidden_layer)(conv_1,A_in)
+#     encoded_1 = MaxPooling2D((2, 2), padding="same")(conv_1)
+#     print("encoded_1 shape : ", encoded_1.shape)
 
-    # Second view
-    conv_2 = Conv2D(16, (3, 3), activation=hidden_layer, padding="same")(input_view_2)
-    conv_2 = MaxPooling2D((2, 2), padding="same")(conv_2)
-    conv_2 = Conv2D(8, (3, 3), activation=hidden_layer, padding="same")(conv_2)
-    conv_2 = MaxPooling2D((2, 2), padding="same")(conv_2)
-    conv_2 = Conv2D(8, (3, 3), activation=hidden_layer, padding="same")(conv_2)
-    encoded_2 = MaxPooling2D((2, 2), padding="same")(conv_2)
-    print("encoded_2 shape : ", encoded_1.shape)
+#     # Second view
+#     conv_2 = Conv2D(16, (3, 3), activation=hidden_layer, padding="same")(input_view_2)
+#     conv_2 = MaxPooling2D((2, 2), padding="same")(conv_2)
+#     conv_2 = Conv2D(8, (3, 3), activation=hidden_layer, padding="same")(conv_2)
+#     conv_2 = MaxPooling2D((2, 2), padding="same")(conv_2)
+#     conv_2 = Conv2D(8, (3, 3), activation=hidden_layer, padding="same")(conv_2)
+#     encoded_2 = MaxPooling2D((2, 2), padding="same")(conv_2)
+#     print("encoded_2 shape : ", encoded_1.shape)
 
-    # Shared representation with concatenation
-    shared_layer = concatenate([encoded_1, encoded_2])  # Layer 3: Bottelneck layer
-    print("Shared Layer", shared_layer.shape)
+#     # Shared representation with concatenation
+#     shared_layer = concatenate([encoded_1, encoded_2])  # Layer 3: Bottelneck layer
+#     print("Shared Layer", shared_layer.shape)
 
-    # Decoder Model
-    # First view
-    conv_1 = Conv2D(8, (3, 3), activation=hidden_layer, padding="same")(shared_layer)
-    conv_1 = UpSampling2D((2, 2))(conv_1)
-    conv_1 = Conv2D(8, (3, 3), activation=hidden_layer, padding="same")(conv_1)
-    conv_1 = UpSampling2D((2, 2))(conv_1)
-    conv_1 = Conv2D(16, (3, 3), activation=hidden_layer, padding="same")(conv_1)
-    conv_1 = UpSampling2D((2, 2))(conv_1)
-    decoded_1 = Conv2D(1, (3, 3), activation=output_layer, padding="same")(conv_1)
+#     # Decoder Model
+#     # First view
+#     conv_1 = Conv2D(8, (3, 3), activation=hidden_layer, padding="same")(shared_layer)
+#     conv_1 = UpSampling2D((2, 2))(conv_1)
+#     conv_1 = Conv2D(8, (3, 3), activation=hidden_layer, padding="same")(conv_1)
+#     conv_1 = UpSampling2D((2, 2))(conv_1)
+#     conv_1 = Conv2D(16, (3, 3), activation=hidden_layer, padding="same")(conv_1)
+#     conv_1 = UpSampling2D((2, 2))(conv_1)
+#     decoded_1 = Conv2D(1, (3, 3), activation=output_layer, padding="same")(conv_1)
 
-    # Second view
-    conv_2 = Conv2D(8, (3, 3), activation=hidden_layer, padding="same")(shared_layer)
-    conv_2 = UpSampling2D((2, 2))(conv_2)
-    conv_2 = Conv2D(8, (3, 3), activation=hidden_layer, padding="same")(conv_2)
-    conv_2 = UpSampling2D((2, 2))(conv_2)
-    conv_2 = Conv2D(16, (3, 3), activation=hidden_layer, padding="same")(conv_2)
-    conv_2 = UpSampling2D((2, 2))(conv_2)
-    decoded_2 = Conv2D(1, (3, 3), activation=output_layer, padding="same")(conv_2)
+#     # Second view
+#     conv_2 = Conv2D(8, (3, 3), activation=hidden_layer, padding="same")(shared_layer)
+#     conv_2 = UpSampling2D((2, 2))(conv_2)
+#     conv_2 = Conv2D(8, (3, 3), activation=hidden_layer, padding="same")(conv_2)
+#     conv_2 = UpSampling2D((2, 2))(conv_2)
+#     conv_2 = Conv2D(16, (3, 3), activation=hidden_layer, padding="same")(conv_2)
+#     conv_2 = UpSampling2D((2, 2))(conv_2)
+#     decoded_2 = Conv2D(1, (3, 3), activation=output_layer, padding="same")(conv_2)
 
-    # This model maps an input to its reconstruction
-    multimodal_autoencoder = Model(
-        inputs=[input_view_1, input_view_2], outputs=[decoded_1, decoded_2],
-    )
-    adam = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, amsgrad=False)
-    multimodal_autoencoder.compile(optimizer=adam, loss="mse")
-    print(multimodal_autoencoder.summary())
+#     # This model maps an input to its reconstruction
+#     multimodal_autoencoder = Model(
+#         inputs=[input_view_1, input_view_2], outputs=[decoded_1, decoded_2],
+#     )
+#     adam = Adam(lr=0.001, beta_1=0.9, beta_2=0.999, amsgrad=False)
+#     multimodal_autoencoder.compile(optimizer=adam, loss="mse")
+#     print(multimodal_autoencoder.summary())
 
-    # This model maps an inputs to its encoded representation
-    # First view
-    encoder_1 = Model(input_view_1, encoded_1)
-    encoder_1.summary()
-    # Second view
-    encoder_2 = Model(input_view_2, encoded_2)
-    encoder_2.summary()
-    # This model maps a two inputs to its bottelneck layer (shared layer)
-    encoder_shared_layer = Model(
-        inputs=[input_view_1, input_view_2], outputs=shared_layer
-    )
-    encoder_shared_layer.summary()
+#     # This model maps an inputs to its encoded representation
+#     # First view
+#     encoder_1 = Model(input_view_1, encoded_1)
+#     encoder_1.summary()
+#     # Second view
+#     encoder_2 = Model(input_view_2, encoded_2)
+#     encoder_2.summary()
+#     # This model maps a two inputs to its bottelneck layer (shared layer)
+#     encoder_shared_layer = Model(
+#         inputs=[input_view_1, input_view_2], outputs=shared_layer
+#     )
+#     encoder_shared_layer.summary()
 
-    return multimodal_autoencoder, encoder_1, encoder_2, encoder_shared_layer
+#     return multimodal_autoencoder, encoder_1, encoder_2, encoder_shared_layer

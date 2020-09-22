@@ -295,7 +295,6 @@ def build_raw_xy_data(params, fold, sub_list):
             93.75,
             93.75,
         ]
-    YZ = np.array(Y)
     x = np.array(Y)
     YZ = (x - min(x)) / (max(x) - min(x))
     return XZ, YZ
