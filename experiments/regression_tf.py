@@ -139,7 +139,6 @@ for train_index, test_index in kf.split(sub_index):
         YE,
         epochs=1000,
         verbose=0,
-        validation_split=0.2,
         callbacks=[early_stop, tfdocs.modeling.EpochDots()],
     )
     plotter = tfdocs.plots.HistoryPlotter(smoothing_std=2)
