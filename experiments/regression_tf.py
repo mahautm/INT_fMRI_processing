@@ -146,7 +146,7 @@ for train_index, test_index in kf.split(sub_index):
     # Estimate the results
     print(XT.shape)
     y_prediction.append(model.predict(np.array(XE)))
-    prediction_index.append[test_index]
+    prediction_index.append(test_index)
     print(fold, " done")
     print(y_prediction, YT)
 
