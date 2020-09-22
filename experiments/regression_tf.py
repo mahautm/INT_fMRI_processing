@@ -144,9 +144,9 @@ for train_index, test_index in kf.split(sub_index):
     plotter = tfdocs.plots.HistoryPlotter(smoothing_std=2)
     # Estimate the results
     print(XT.shape)
-    y_prediction[sub_index[test_index]] = model.predict(np.array(XT))
+    y_prediction[sub_index[test_index]] = model.predict(np.array(XE))
     print(fold, " done")
-    print(y_prediction,)
+    print(y_prediction)
 
 
 # regr_tot = linear_model.LinearRegression()
