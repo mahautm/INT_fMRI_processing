@@ -128,7 +128,7 @@ for train_index, test_index in kf.split(sub_index):
     YT = Y[sub_index[test_index]]
 
     # Model
-    model = build_model(XE.shape[1])
+    model = build_model(XE[0].shape)
     history = model.fit(
         XE, YE, epochs=300, verbose=0, callbacks=[tfdocs.modeling.EpochDots()],
     )
