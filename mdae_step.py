@@ -20,7 +20,7 @@ from keras.models import load_model
 
 # import keras.backend as K
 
-from mdae_models import build_convolutional_model, build_trimodal_model, build_model
+from mdae_models import build_trimodal_model, build_model  # , build_convolutional_model
 
 
 def load_intertva_rsfmri(subject, path, username="mahaut.m"):
@@ -238,7 +238,7 @@ def build_normalised_data(
 ):
     """
     !! : pb here, the prefix "gyr" is used, when it is not necesserally that modality which is used
-    !! should be corrected to data_1, data_2, as in other marts of the script, with comments to help differentiate
+    !! should be corrected to data_1, data_2, as in other parts of the script, with comments to help differentiate
     Loads and normalises input data.
 
     Parameters
