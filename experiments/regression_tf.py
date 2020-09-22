@@ -172,5 +172,11 @@ plt.scatter(Y, y_prediction, color="black")
 #     ],
 # )
 # plt.gca().legend(loc="best")
-
+droite = plt.plot(
+    Y,
+    y_prediction,
+    color="blue",
+    label="Coefficients: \nMean squared error: %.2f \nR²: %.2f"
+    % (mean_squared_error(Y, y_prediction), r2_score(Y, y_prediction)),
+)
 plt.savefig(os.path.join(file_path, "y_ypred_tf.png"))
