@@ -92,7 +92,7 @@ y_true = [
 ]
 y_true = np.array(y_true)
 Y = (y_true - min(y_true)) / (max(y_true) - min(y_true))
-y_prediction = []
+y_prediction = np.array([])
 prediction_index = np.array([])
 sub_index = np.arange(0, 39)
 # Chargement des données
@@ -145,7 +145,7 @@ for train_index, test_index in kf.split(sub_index):
     plotter = tfdocs.plots.HistoryPlotter(smoothing_std=2)
     # Estimate the results
     print(XT.shape)
-    y_prediction.append(model.predict(np.array(XT)))
+    y_prediction = np.append(model.predict(np.array(XT)), y_prediction)
     prediction_index = np.append(test_index, prediction_index)
     print(fold, " done")
 print(Y.shape, y_prediction.shape, Y, y_prediction)
