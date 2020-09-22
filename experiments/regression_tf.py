@@ -148,9 +148,9 @@ for train_index, test_index in kf.split(sub_index):
     y_prediction.append(model.predict(np.array(XE)))
     prediction_index.append(test_index)
     print(fold, " done")
-    print(y_prediction, YT)
+    print(y_prediction[len(y_prediction) - 4 :], YT)
 
-
+print(Y.shape, y_prediction.shape, Y, y_prediction)
 # regr_tot = linear_model.LinearRegression()
 # regr_tot.fit(Y.reshape(-1, 1), y_prediction)
 # y_reg = regr_tot.predict(Y.reshape(-1, 1))
