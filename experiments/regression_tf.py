@@ -172,4 +172,4 @@ plt.scatter(Y, y_prediction, color="black")
 # )
 # plt.gca().legend(loc="best")
 
-plt.savefig(os.path.join(file_path, "y_ypred_nofista.png"))
+plt.savefig(os.path.join(file_path, "y_ypred_tf.png"))
