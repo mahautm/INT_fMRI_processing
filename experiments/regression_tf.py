@@ -146,9 +146,7 @@ for train_index, test_index in kf.split(sub_index):
         [XT[i] for i in range(len(test_index))],
         [XT[i].shape for i in range(len(test_index))],
     )
-    y_prediction[sub_index[test_index]] = [
-        model.predict(XT[i].T) for i in range(len(test_index))
-    ]
+    y_prediction[sub_index[test_index]] = model.predict(XT.T)
     print(fold, " done")
     print(y_prediction,)
 
