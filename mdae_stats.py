@@ -524,6 +524,7 @@ def get_model_stats(data_orig, data_type, dim, number_folds="10"):
         print(
             "prediction v.s. expected :\n",
             [X_test_new_gyr, X_test_new_rsfmri],
+            "\n----------\n",
             [normalized_test_gyr_data, normalized_test_rsfmri_data],
         )
         # Test
