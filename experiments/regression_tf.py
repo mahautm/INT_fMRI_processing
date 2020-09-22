@@ -24,7 +24,8 @@ import tensorflow_docs.modeling
 def build_model(input_size):
     model = keras.Sequential(
         [
-            layers.Dense(64, activation="relu", input_shape=input_size),
+            layers.Input(shape=(input_size)),
+            layers.Dense(64, activation="relu"),
             layers.Dense(64, activation="relu"),
             layers.Dense(1),
         ]
