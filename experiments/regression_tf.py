@@ -131,12 +131,21 @@ for train_index, test_index in kf.split(sub_index):
     print("Train", XE.shape, "Test : ", XT.shape)
     model = build_model(XE[0].shape)
     print(model.summary())
+    early_stop = keras.callbacks.EarlyStopping(monitor="val_loss", patience=10)
     history = model.fit(
-        XE, YE, epochs=1000, verbose=0, callbacks=[tfdocs.modeling.EpochDots()],
+        XE,
+        YE,
+        epochs=1000,
+        verbose=0,
+        validation_split=0.2,
+        callbacks=[early_stop, tfdocs.modeling.EpochDots()],
     )
     plotter = tfdocs.plots.HistoryPlotter(smoothing_std=2)
-
     # Estimate the results
+    print(
+        [model.predict(XT[i]) for i in range(len(test_index))],
+        [model.predict(XT[i]).shape for i in range(len(test_index))],
+    )
     y_prediction[sub_index[test_index]] = [
         model.predict(XT[i]) for i in range(len(test_index))
     ]
