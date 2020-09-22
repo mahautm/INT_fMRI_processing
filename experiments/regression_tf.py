@@ -137,7 +137,7 @@ for train_index, test_index in kf.split(sub_index):
     plotter = tfdocs.plots.HistoryPlotter(smoothing_std=2)
 
     # Estimate the results
-    y_prediction[sub_index[test_index]] = model.predict(XT)
+    y_prediction[sub_index[test_index]] = [model.predict(xt) for xt in XT]
     print(fold, " done")
     print(y_prediction,)
 
