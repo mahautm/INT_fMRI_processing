@@ -133,7 +133,7 @@ for train_index, test_index in kf.split(sub_index):
     print("Train", XE.shape, "Test : ", XT.shape)
     model = build_model(XE[0].shape)
     print(model.summary())
-    early_stop = keras.callbacks.EarlyStopping(monitor="val_loss", patience=100)
+    early_stop = keras.callbacks.EarlyStopping(monitor="mse", patience=100)
     history = model.fit(
         XE,
         YE,
