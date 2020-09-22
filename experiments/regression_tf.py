@@ -12,7 +12,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import KFold
 
 
-sys.path.append("../")
+sys.path.append("/scratch/mmahaut/scripts/INT_fMRI_processing")
 from mdae_step import build_path_and_vars
 from regression import build_xy_data
 
