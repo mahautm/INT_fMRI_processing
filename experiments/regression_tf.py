@@ -25,9 +25,9 @@ def build_model(input_size):
     model = keras.Sequential(
         [
             layers.Input(shape=(input_size)),
-            layers.Dense(140, activation="relu"),
-            layers.Dense(120, activation="relu"),
-            layers.Dense(20, activation="linear"),
+            layers.Dense(1400, activation="relu"),
+            layers.Dense(300, activation="relu"),
+            layers.Dense(100, activation="linear"),
             layers.Dense(1),
         ]
     )
