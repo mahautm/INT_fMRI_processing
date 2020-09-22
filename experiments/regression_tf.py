@@ -154,10 +154,10 @@ print(Y.shape, y_prediction.shape, Y, y_prediction)
 # y_reg = regr_tot.predict(Y.reshape(-1, 1))
 # # The coefficients
 # print("Coefficients: \n", regr.coef_)
-# # The mean squared error
-# print("Mean squared error: %.2f" % mean_squared_error(Y, y_reg))
-# # The coefficient of determination: 1 is perfect prediction
-# print("Coefficient of determination: %.2f" % r2_score(Y, y_reg))
+# The mean squared error
+print("Mean squared error: %.2f" % mean_squared_error(Y, y_reg))
+# The coefficient of determination: 1 is perfect prediction
+print("Coefficient of determination: %.2f" % r2_score(Y, y_reg))
 file_path = os.path.join(
     orig_path, "regression_output/tfMRI/reproducibility/tfmri10-rsfmri10/",
 )
