@@ -93,7 +93,7 @@ y_true = [
 y_true = np.array(y_true)
 Y = (y_true - min(y_true)) / (max(y_true) - min(y_true))
 y_prediction = []
-prediction_index = []
+prediction_index = np.array([])
 sub_index = np.arange(0, 39)
 # Chargement des données
 
@@ -133,7 +133,7 @@ for train_index, test_index in kf.split(sub_index):
     print("Train", XE.shape, "Test : ", XT.shape)
     model = build_model(XE[0].shape)
     print(model.summary())
-    early_stop = keras.callbacks.EarlyStopping(monitor="val_loss", patience=10)
+    early_stop = keras.callbacks.EarlyStopping(monitor="val_loss", patience=100)
     history = model.fit(
         XE,
         YE,
@@ -145,10 +145,9 @@ for train_index, test_index in kf.split(sub_index):
     plotter = tfdocs.plots.HistoryPlotter(smoothing_std=2)
     # Estimate the results
     print(XT.shape)
-    y_prediction.append(model.predict(np.array(XE)))
-    prediction_index.append(test_index)
+    y_prediction.append(model.predict(np.array(XT)))
+    prediction_index = np.append(test_index, prediction_index)
     print(fold, " done")
-y_prediction = np.array(y_prediction)
 print(Y.shape, y_prediction.shape, Y, y_prediction)
 # regr_tot = linear_model.LinearRegression()
 # regr_tot.fit(Y.reshape(-1, 1), y_prediction)
