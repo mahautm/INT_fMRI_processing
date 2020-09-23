@@ -30,8 +30,9 @@ def build_model(input_size):
             layers.Dropout(0.2),
             layers.Dense(120, activation="relu"),
             layers.Dropout(0.2),
-            layers.Dense(20, activation="linear"),
-            layers.Dense(1),
+            layers.Dense(20, activation="relu"),
+            layers.Dropout(0.2),
+            layers.Dense(1, activation="sigmoid"),
         ]
     )
 
@@ -142,6 +143,7 @@ for train_index, test_index in kf.split(sub_index):
         XE,
         YE,
         epochs=1000,
+        batch_size=500,
         verbose=0,
         callbacks=[early_stop, tfdocs.modeling.EpochDots()],
     )
