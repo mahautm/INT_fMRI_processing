@@ -30,9 +30,9 @@ def build_model(input_size):
             layers.Dropout(0.2),
             layers.Dense(120, activation="relu"),
             layers.Dropout(0.2),
-            layers.Dense(20, activation="relu"),
+            layers.Dense(20, activation="sigmoid"),
             layers.Dropout(0.2),
-            layers.Dense(1, activation="sigmoid"),
+            layers.Dense(1),
         ]
     )
 
