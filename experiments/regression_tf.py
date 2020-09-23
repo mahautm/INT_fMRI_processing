@@ -25,9 +25,12 @@ def build_model(input_size):
     model = keras.Sequential(
         [
             layers.Input(shape=(input_size)),
-            layers.Dense(1400, activation="relu"),
-            layers.Dense(300, activation="relu"),
-            layers.Dense(100, activation="linear"),
+            layers.Dropout(0.2),
+            layers.Dense(140, activation="relu"),
+            layers.Dropout(0.2),
+            layers.Dense(120, activation="relu"),
+            layers.Dropout(0.2),
+            layers.Dense(20, activation="linear"),
             layers.Dense(1),
         ]
     )
@@ -172,11 +175,7 @@ plt.scatter(Y, y_prediction, color="black")
 #     ],
 # )
 # plt.gca().legend(loc="best")
-droite = plt.plot(
-    Y,
-    y_prediction,
-    color="blue",
-    label="Coefficients: \nMean squared error: %.2f \nR²: %.2f"
-    % (mean_squared_error(Y, y_prediction), r2_score(Y, y_prediction)),
-)
+plt.xlabel("Y réel")
+plt.ylabel("Y prédit")
+plt.title("TF REGRESSION\ninterTVA tfMRI+rsfMRI")
 plt.savefig(os.path.join(file_path, "y_ypred_tf.png"))
